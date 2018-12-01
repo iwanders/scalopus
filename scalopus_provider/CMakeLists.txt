@@ -21,11 +21,12 @@ include(GNUInstallDirs)
 
 if (LTTngUST_FOUND)
   # Create the library that provides the scope tracepoints 
-  add_library(scalopus_scope_tracepoints
-    src/scope_tracepoints.cpp
+  add_library(scalopus_scope_tracepoint
+    src/scope_tracepoint.cpp
+    src/scope_trace_raii.cpp
   )
 
-  target_include_directories(scalopus_scope_tracepoints
+  target_include_directories(scalopus_scope_tracepoint
       PUBLIC 
           $<INSTALL_INTERFACE:include>
           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -34,7 +35,7 @@ if (LTTngUST_FOUND)
           ${LTTngUST_INCLUDE_DIRS}
   )
 
-  target_link_libraries(scalopus_scope_tracepoints
+  target_link_libraries(scalopus_scope_tracepoint
     INTERFACE
       ${LTTngUST_LIBRARIES}
   )
@@ -43,13 +44,13 @@ if (LTTngUST_FOUND)
   add_executable(example_scope_tracepoints
     example/example_scope_tracepoints.cpp
   )
-  target_link_libraries(example_scope_tracepoints scalopus_scope_tracepoints)
+  target_link_libraries(example_scope_tracepoints scalopus_scope_tracepoint)
 
 
 endif()
 
 # 'make install' to the correct locations (provided by GNUInstallDirs).
-install(TARGETS scalopus_scope_tracepoints EXPORT scalopus_provider
+install(TARGETS scalopus_scope_tracepoint EXPORT scalopus_provider
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
@@ -60,6 +61,6 @@ install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT scalopus_providerConfig DESTINATION share/scalopus_provider/cmake)
 
 # This makes the project importable from the build directory
-export(TARGETS scalopus_scope_tracepoints FILE scalopus_providerConfig.cmake)
+export(TARGETS scalopus_scope_tracepoint FILE scalopus_providerConfig.cmake)
 
 
