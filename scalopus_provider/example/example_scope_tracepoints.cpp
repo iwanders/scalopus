@@ -30,11 +30,28 @@
 
 #include <scalopus/scope_tracing.h>
 
+void test_two_raiis_in_same_scope()
+{
+  // Verify that two RAII tracepoints in the same scope works.
+  TRACE_PRETTY_FUNCTION();
+  TRACE_PRETTY_FUNCTION();
+}
+
+void test_two_named_in_same_scope()
+{
+  TRACE_TRACKED_RAII("Tracepoint 1");
+  TRACE_TRACKED_RAII("Tracepoint 2");
+}
+
 int main(int /* argc */, char** /* argv */)
 {
   scalopus::scope_entry(0);
   scalopus::scope_exit(0);
 
   scalopus::TraceRAII(2);
+
+  TRACE_PRETTY_FUNCTION();
+  test_two_raiis_in_same_scope();
+  test_two_named_in_same_scope();
   return 0;
 }

@@ -23,33 +23,31 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#ifndef SCALOPUS_SCOPE_TRACE_RAII_H
-#define SCALOPUS_SCOPE_TRACE_RAII_H
-
-#include <scalopus/scope_tracepoint.h>
+#include <scalopus/scope_trace_tracker.h>
 
 namespace scalopus
 {
-/**
- * @brief RAII Tracepoint that stores the ID in an entry tracepoint and an exit tracepoint once destroyed.
- */
-class TraceRAII
+TraceTracker::TraceTracker()
 {
-  unsigned int id_;  //! Storage of the ID of this tracepoint.
-public:
-  /**
-   * @brief Constructor for the RAII tracepoint.
-   * @param id A unique id to refence this tracepoint by.
-   */
-  TraceRAII(const unsigned int id);
+}
 
-  /**
-   * @brief Destructor, emits the exit tracepoint.
-   */
-  ~TraceRAII();
-};
+void TraceTracker::trackEntryExitName(unsigned int id, std::string name)
+{
+  // For writing we require a unique lock on the mutex.
+  std::unique_lock<decltype(entry_exit_mutex_)> lock(entry_exit_mutex_);
+  entry_exit_mapping_[id] = name;
+}
+
+std::map<unsigned int, std::string> TraceTracker::getEntryExitMapping()
+{
+  std::shared_lock<decltype(entry_exit_mutex_)> lock(entry_exit_mutex_);
+  return entry_exit_mapping_;
+}
+
+TraceTracker& TraceTracker::getInstance()
+{
+  static TraceTracker instance;
+  return instance;
+}
 
 }  // namespace scalopus
-
-#endif  // SCALOPUS_SCOPE_TRACE_RAII_H

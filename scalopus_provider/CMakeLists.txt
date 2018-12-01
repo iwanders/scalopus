@@ -13,41 +13,48 @@ endif()
 
 add_compile_options("-Werror;-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-Wpedantic;${CLANG_ONLY_COMPILE_FLAGS}")
 
+include(FindThreads)
+
 include (FindPkgConfig)
 if (PKG_CONFIG_FOUND)
   pkg_check_modules(LTTngUST lttng-ust)
 endif()
 include(GNUInstallDirs)
 
-if (LTTngUST_FOUND)
-  # Create the library that provides the scope tracepoints 
-  add_library(scalopus_scope_tracepoint
-    src/scope_tracepoint.cpp
-    src/scope_trace_raii.cpp
-  )
-
-  target_include_directories(scalopus_scope_tracepoint
-      PUBLIC 
-          $<INSTALL_INTERFACE:include>
-          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-      PRIVATE
-          ${CMAKE_CURRENT_SOURCE_DIR}/src
-          ${LTTngUST_INCLUDE_DIRS}
-  )
-
-  target_link_libraries(scalopus_scope_tracepoint
-    INTERFACE
-      ${LTTngUST_LIBRARIES}
-  )
-
-
-  add_executable(example_scope_tracepoints
-    example/example_scope_tracepoints.cpp
-  )
-  target_link_libraries(example_scope_tracepoints scalopus_scope_tracepoint)
-
-
+if (!LTTngUST_FOUND)
+  error("LTTNG could not be found")
 endif()
+
+# Create the library that provides the scope tracepoints 
+add_library(scalopus_scope_tracepoint
+  src/scope_tracepoint.cpp
+  src/scope_trace_raii.cpp
+  src/scope_trace_tracker.cpp
+)
+
+target_include_directories(scalopus_scope_tracepoint
+    PUBLIC 
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${LTTngUST_INCLUDE_DIRS}
+        
+)
+
+target_link_libraries(scalopus_scope_tracepoint
+  PRIVATE
+    Threads::Threads
+  INTERFACE
+    ${LTTngUST_LIBRARIES}
+)
+
+
+add_executable(example_scope_tracepoints
+  example/example_scope_tracepoints.cpp
+)
+target_link_libraries(example_scope_tracepoints scalopus_scope_tracepoint)
+
 
 # 'make install' to the correct locations (provided by GNUInstallDirs).
 install(TARGETS scalopus_scope_tracepoint EXPORT scalopus_provider
