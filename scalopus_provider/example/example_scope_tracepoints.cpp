@@ -27,8 +27,12 @@
 
 #include <sstream>
 #include <string>
+#include <chrono>
+#include <iostream>
+#include <thread>
 
 #include <scalopus/scope_tracing.h>
+#include <scalopus/exposer.h>
 
 void test_two_raiis_in_same_scope()
 {
@@ -36,15 +40,43 @@ void test_two_raiis_in_same_scope()
   TRACE_PRETTY_FUNCTION();
   TRACE_PRETTY_FUNCTION();
 }
-
 void test_two_named_in_same_scope()
 {
   TRACE_TRACKED_RAII("Tracepoint 1");
   TRACE_TRACKED_RAII("Tracepoint 2");
 }
 
+
+void c()
+{
+  TRACE_PRETTY_FUNCTION();
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  std::cout << "  c" << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+}
+
+void b()
+{
+  TRACE_PRETTY_FUNCTION();
+  std::cout << " b" << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  c();
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+}
+
+void a()
+{
+  TRACE_PRETTY_FUNCTION();
+  std::cout << "a" << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  b();
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+}
+
+
 int main(int /* argc */, char** /* argv */)
 {
+  scalopus::Exposer exposer;
   scalopus::scope_entry(0);
   scalopus::scope_exit(0);
 
@@ -53,5 +85,11 @@ int main(int /* argc */, char** /* argv */)
   TRACE_PRETTY_FUNCTION();
   test_two_raiis_in_same_scope();
   test_two_named_in_same_scope();
+
+  while (true)
+  {
+    a();
+  }
+
   return 0;
 }

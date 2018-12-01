@@ -30,6 +30,7 @@ add_library(scalopus_scope_tracepoint
   src/scope_tracepoint.cpp
   src/scope_trace_raii.cpp
   src/scope_trace_tracker.cpp
+  src/exposer.cpp
 )
 
 target_include_directories(scalopus_scope_tracepoint
