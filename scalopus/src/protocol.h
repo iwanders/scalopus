@@ -23,17 +23,16 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus/interface/provider.h>
+#ifndef SCALOPUS_PROTOCOL_H
+#define SCALOPUS_PROTOCOL_H
 
 namespace scalopus
 {
-
-Provider::Provider()
+namespace protocol
 {
-}
-
-Provider::~Provider()
-{
+  
 }
 
 }
+
+#endif

@@ -38,15 +38,11 @@ std::string EndpointScopeTracing::getName() const
   return "scope_tracing";
 }
 
-std::string EndpointScopeTracing::handle(const std::string& request)
+bool EndpointScopeTracing::handle(const std::vector<char> request, std::vector<char>& response)
 {
-  return request;
+  response = request;
+  return true;
 }
 
-EndpointScopeTracing& EndpointScopeTracing::getInstance()
-{
-  static EndpointScopeTracing instance;
-  return instance;
-}
 
 }  // namespace scalopus

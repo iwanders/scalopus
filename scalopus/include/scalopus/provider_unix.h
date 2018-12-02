@@ -23,17 +23,17 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+#ifndef SCALOPUS_PROVIDER_UNIX_H
+#define SCALOPUS_PROVIDER_UNIX_H
+
 #include <scalopus/interface/provider.h>
+#include <memory>
 
 namespace scalopus
 {
-
-Provider::Provider()
-{
+  std::unique_ptr<Provider> providerUnix();
 }
 
-Provider::~Provider()
-{
-}
 
-}
+#endif  // SCALOPUS_PROVIDER_UNIX_H

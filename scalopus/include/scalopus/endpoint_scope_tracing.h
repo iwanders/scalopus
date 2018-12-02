@@ -27,7 +27,6 @@
 #ifndef SCALOPUS_ENDPOINT_SCOPE_TRACING_H
 #define SCALOPUS_ENDPOINT_SCOPE_TRACING_H
 
-#include <scalopus/provider.h>
 #include <scalopus/interface/endpoint.h>
 
 namespace scalopus
@@ -36,11 +35,9 @@ namespace scalopus
 class EndpointScopeTracing : public Endpoint
 {
 public:
-  std::string getName() const;
-  std::string handle(const std::string& request);
-  static EndpointScopeTracing& getInstance();
-private:
   EndpointScopeTracing();
+  std::string getName() const;
+  bool handle(const std::vector<char> request, std::vector<char>& response);
 };
 
 }

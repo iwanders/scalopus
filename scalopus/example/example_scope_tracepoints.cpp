@@ -33,6 +33,7 @@
 
 #include <scalopus/scope_tracing.h>
 #include <scalopus/endpoint_scope_tracing.h>
+#include <scalopus/provider_unix.h>
 
 
 void test_two_raiis_in_same_scope()
@@ -77,8 +78,10 @@ void a()
 
 int main(int /* argc */, char** /* argv */)
 {
-  scalopus::Provider provider;
-  provider.addEndpoint(scalopus::EndpointScopeTracing::getInstance());
+  const auto provider = scalopus::providerUnix();
+  scalopus::EndpointScopeTracing tracing_endpoint;
+  provider->addEndpoint(tracing_endpoint);
+
   scalopus::scope_entry(0);
   scalopus::scope_exit(0);
 

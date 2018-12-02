@@ -23,17 +23,55 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+#ifndef SCALOPUS_PROVIDER_H
+#define SCALOPUS_PROVIDER_H
+
+#include <thread>
+#include <map>
+#include <scalopus/interface/endpoint.h>
 #include <scalopus/interface/provider.h>
+#include <set>
+#include <vector>
+#include <utility>
 
 namespace scalopus
 {
-
-Provider::Provider()
+/**
+ * @brief The exposer class that is used to get the data about the trace mappings out of the proces.
+ */
+class ProviderUnix: public Provider
 {
-}
+public:
+  struct Msg
+  {
+    std::string endpoint;
+    std::vector<char> data;
+  };
 
-Provider::~Provider()
-{
-}
+  ProviderUnix();
+  ~ProviderUnix();
 
-}
+  void addEndpoint(Endpoint& endpoint);
+private:
+  std::thread thread_;
+  void work();
+  int server_fd_ { 0 };
+  bool running_ { true };
+
+  std::map<std::string, Endpoint*> endpoints_;
+  std::set<int> connections_;
+
+  bool readData(int connection, size_t max_length, std::vector<char>& received);
+
+  bool handleIncoming(int connection, Msg& request);
+
+  bool processMsg(const Msg& request, Msg& response);
+};
+
+
+std::unique_ptr<Provider> providerUnixSocket();
+
+
+}  // namespace scalopus
+#endif  // SCALOPUS_PROVIDER_H
