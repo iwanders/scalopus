@@ -75,7 +75,7 @@ bool TransportClientUnix::connect(std::size_t pid, const std::string& suffix)
   ss << "" << pid << suffix;
   std::strncpy(socket_config.sun_path + 1, ss.str().c_str(), sizeof(socket_config.sun_path) - 2);
 
-  std::size_t path_length = offsetof(struct sockaddr_un, sun_path) + strlen(socket_config.sun_path + 1) + 1;
+  std::size_t path_length = sizeof(socket_config.sun_family) + strlen(socket_config.sun_path + 1) + 1;
   if (::connect(fd_, reinterpret_cast<sockaddr*>(&socket_config), static_cast<unsigned int>(path_length)) == -1)
   {
     std::cerr << "[scalopus] Could not connect socket." << std::endl;
