@@ -23,28 +23,31 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#ifndef SCALOPUS_EXPOSER_H
-#define SCALOPUS_EXPOSER_H
-
-#include <thread>
+#include <scalopus/internal/scope_trace_tracker.h>
 
 namespace scalopus
 {
-/**
- * @brief The exposer class that is used to get the data about the trace mappings out of the proces.
- */
-class Exposer
+ScopeTraceTracker::ScopeTraceTracker()
 {
-public:
-  Exposer();
-private:
-  std::thread thread_;
-  void work();
-  int fd_ { 0 };
-  bool running_ { true };
-};
+}
 
+void ScopeTraceTracker::trackEntryExitName(unsigned int id, std::string name)
+{
+  // For writing we require a unique lock on the mutex.
+  std::unique_lock<decltype(entry_exit_mutex_)> lock(entry_exit_mutex_);
+  entry_exit_mapping_[id] = name;
+}
+
+std::map<unsigned int, std::string> ScopeTraceTracker::getEntryExitMapping()
+{
+  std::shared_lock<decltype(entry_exit_mutex_)> lock(entry_exit_mutex_);
+  return entry_exit_mapping_;
+}
+
+ScopeTraceTracker& ScopeTraceTracker::getInstance()
+{
+  static ScopeTraceTracker instance;
+  return instance;
+}
 
 }  // namespace scalopus
-#endif  // SCALOPUS_EXPOSER_H

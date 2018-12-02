@@ -38,17 +38,17 @@ namespace scalopus
  * @brief A singleton class that keeps track of the mapping between the ID's stored in the trace and the user-provided
           name for them.
  */
-class TraceTracker
+class ScopeTraceTracker
 {
 public:
-  TraceTracker(TraceTracker const&) = delete;    //! Delete the copy constructor.
-  void operator=(TraceTracker const&) = delete;  //! Delete the assigment operator.
+  ScopeTraceTracker(ScopeTraceTracker const&) = delete;    //! Delete the copy constructor.
+  void operator=(ScopeTraceTracker const&) = delete;  //! Delete the assigment operator.
 
   /**
    * @brief Static method through which the singleton instance can be retrieved.
-   * @return Returns the singleton instance of the TraceTracker object.
+   * @return Returns the singleton instance of the ScopeTraceTracker object.
    */
-  static TraceTracker& getInstance();
+  static ScopeTraceTracker& getInstance();
 
   /**
    * @brief Function to insert an id->name mapping. Is thread safe.
@@ -67,7 +67,7 @@ private:
   std::map<unsigned int, std::string> entry_exit_mapping_;  //! The map in which the id's and names are stored.
   std::shared_timed_mutex entry_exit_mutex_;                //! Mutex for the mapping container.
 
-  TraceTracker();  //! Make constructor private such that we can ensure it is a singleton.
+  ScopeTraceTracker();  //! Make constructor private such that we can ensure it is a singleton.
 };
 }  // namespace scalopus
 

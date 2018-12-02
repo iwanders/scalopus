@@ -24,32 +24,30 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_SCOPE_TRACE_RAII_H
-#define SCALOPUS_SCOPE_TRACE_RAII_H
+#ifndef SCALOPUS_CONSUMER_H
+#define SCALOPUS_CONSUMER_H
 
-#include <scalopus/scope_tracepoint.h>
+#include <thread>
+#include <vector>
+#include <string>
 
 namespace scalopus
 {
-/**
- * @brief RAII Tracepoint that stores the ID in an entry tracepoint and an exit tracepoint once destroyed.
- */
-class TraceRAII
+class Consumer
 {
-  unsigned int id_;  //! Storage of the ID of this tracepoint.
 public:
-  /**
-   * @brief Constructor for the RAII tracepoint.
-   * @param id A unique id to refence this tracepoint by.
-   */
-  TraceRAII(const unsigned int id);
+  Consumer();
+  ~Consumer();
+  bool connect(std::size_t pid, const std::string& suffix = "_scalopus");
+  void disconnect();
 
-  /**
-   * @brief Destructor, emits the exit tracepoint.
-   */
-  ~TraceRAII();
+  bool send(const std::string& data);
+
+  static std::vector<std::size_t> getProviders(const std::string& suffix = "_scalopus");
+private:
+  int fd_ { 0 };
 };
 
-}  // namespace scalopus
 
-#endif  // SCALOPUS_SCOPE_TRACE_RAII_H
+}  // namespace scalopus
+#endif  // SCALOPUS_CONSUMER_H

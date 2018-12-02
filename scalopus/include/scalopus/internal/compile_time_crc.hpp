@@ -72,7 +72,7 @@ constexpr uint32_t compute(const char* data, uint32_t len, uint32_t crc = 0)
   crc = crc ^ 0xFFFFFFFFU;
   for (uint32_t i = 0; i < len; i++)
   {
-    crc = table[*data ^ (crc & 0xFF)] ^ (crc >> 8);
+    crc = table[static_cast<unsigned char>(*data) ^ (crc & 0xFF)] ^ (crc >> 8);
     data++;
   }
   crc = crc ^ 0xFFFFFFFFU;

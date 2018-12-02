@@ -23,7 +23,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus/exposer.h>
+#include "consumer.h"
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <sys/types.h>
@@ -31,11 +31,29 @@
 #include <sstream>
 #include <cstring>
 #include <iostream>
+#include <fstream>
 
 namespace scalopus
 {
 
-Exposer::Exposer()
+Consumer::Consumer()
+{
+}
+
+Consumer::~Consumer()
+{
+  disconnect();
+}
+
+void Consumer::disconnect()
+{
+  if (fd_)
+  {
+    ::close(fd_);
+  }
+}
+
+bool Consumer::connect(std::size_t pid, const std::string& suffix)
 {
   fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
 
@@ -43,6 +61,7 @@ Exposer::Exposer()
   {
     std::cerr << "[scalopus] Could not create socket." << std::endl;
     // Should we continue if this happens?
+    return false;
   }
 
   // Create the socket struct.
@@ -51,53 +70,60 @@ Exposer::Exposer()
   socket_config.sun_family = AF_UNIX;
 
   std::stringstream ss;
-  ss << "scalopus_" << ::getpid();
+  ss << "" << pid << suffix;
   std::strncpy(socket_config.sun_path + 1, ss.str().c_str(), sizeof(socket_config.sun_path) - 2);
 
   std::size_t path_length = offsetof(struct sockaddr_un, sun_path) + strlen(socket_config.sun_path + 1) + 1;
-  if (bind(fd_, reinterpret_cast<sockaddr*>(&socket_config), path_length) == -1)
+  if (::connect(fd_, reinterpret_cast<sockaddr*>(&socket_config), static_cast<unsigned int>(path_length)) == -1)
   {
-    std::cerr << "[scalopus] Could not bind socket." << std::endl;
+    std::cerr << "[scalopus] Could not connect socket." << std::endl;
+    return false;
   }
 
-  if (listen(fd_, 5) == -1)
-  {
-    std::cerr << "[scalopus] Could not start listening for connections." << std::endl;
-  }
-
-  // If we get here, we are golden, we got a working unix domain socket and can start our worker thread.
+  return true;
 }
 
-void Exposer::work()
+bool Consumer::send(const std::string& data)
 {
-  while (running_)
+  if (fd_ == 0)
   {
-    int client { 0 };
-    client = accept(fd_, NULL, NULL);
-    if (client == -1)
-    {
-      perror("accept error");
-      continue;
-    }
-    int received { 0 };
-    std::array<char, 4096> buf;
-    received = read(client, buf.data(), buf.size());
+    return false;
+  }
+  return write(fd_, data.c_str(), data.size()) == static_cast<ssize_t>(data.size());
+}
 
-    while (received > 0)
+std::vector<std::size_t> Consumer::getProviders(const std::string& suffix)
+{
+  std::ifstream infile("/proc/net/unix");
+  std::vector<std::size_t> res;
+  //  Num       RefCount Protocol Flags    Type St Inode Path
+  //  0000000000000000: 00000002 00000000 00010000 0001 01 235190 @16121_scalopus 
+  std::string line;
+  while (std::getline(infile, line))
+  {
+    if (line.size() < suffix.size())
     {
-      printf("read %u bytes: %.*s\n", received, received, buf.data());
+      continue;  // definitely is not a line we are interested in.
     }
-
-    if (received == -1)
+    // std::basic_string::ends_with is c++20 :|
+    if (line.substr(line.size() - suffix.size()) == suffix)
     {
-      std::cerr << "[scalopus] Read error occured." << std::endl;
-    }
-    else if (received == 0)
-    {
-      printf("EOF\n");
-      close(client);
+      // We got a hit, extract the process id.
+      const auto space_before_path = line.rfind(" ");
+      const auto path = line.substr(space_before_path + 2);  // + 2 for space and @ symbol.
+      const auto space_before_inode = line.rfind(" ", space_before_path - 1);
+      const auto inode_str = line.substr(space_before_inode, space_before_path - space_before_inode);
+      if (std::atoi(inode_str.c_str()) == 0)
+      {
+        // clients to the socket get this 0 inode address...
+        continue;
+      }
+      char* tmp;
+      res.emplace_back(std::strtoul(path.substr(0, path.size() - suffix.size()).c_str(), &tmp, 10));
     }
   }
+
+  return res;
 }
 
 }

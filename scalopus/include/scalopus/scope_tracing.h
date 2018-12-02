@@ -24,10 +24,10 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <scalopus/internal_macros.h>
-#include <scalopus/scope_trace_raii.h>
-#include <scalopus/scope_trace_tracker.h>
-#include <scalopus/compile_time_crc.hpp>
+#include <scalopus/internal/scope_internal_macros.h>
+#include <scalopus/internal/scope_trace_raii.h>
+#include <scalopus/internal/scope_trace_tracker.h>
+#include <scalopus/internal/compile_time_crc.hpp>
 
 /**
  * Public Macros

@@ -32,7 +32,8 @@
 #include <thread>
 
 #include <scalopus/scope_tracing.h>
-#include <scalopus/exposer.h>
+#include <scalopus/endpoint_scope_tracing.h>
+
 
 void test_two_raiis_in_same_scope()
 {
@@ -76,7 +77,8 @@ void a()
 
 int main(int /* argc */, char** /* argv */)
 {
-  scalopus::Exposer exposer;
+  scalopus::Provider provider;
+  provider.addEndpoint(scalopus::EndpointScopeTracing::getInstance());
   scalopus::scope_entry(0);
   scalopus::scope_exit(0);
 

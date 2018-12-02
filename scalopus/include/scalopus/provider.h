@@ -23,31 +23,34 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus/scope_trace_tracker.h>
+
+#ifndef SCALOPUS_PROVIDER_H
+#define SCALOPUS_PROVIDER_H
+
+#include <thread>
+#include <map>
+#include <scalopus/interface/endpoint.h>
 
 namespace scalopus
 {
-TraceTracker::TraceTracker()
+/**
+ * @brief The exposer class that is used to get the data about the trace mappings out of the proces.
+ */
+class Provider
 {
-}
+public:
+  Provider();
 
-void TraceTracker::trackEntryExitName(unsigned int id, std::string name)
-{
-  // For writing we require a unique lock on the mutex.
-  std::unique_lock<decltype(entry_exit_mutex_)> lock(entry_exit_mutex_);
-  entry_exit_mapping_[id] = name;
-}
+  void addEndpoint(Endpoint& endpoint);
+private:
+  std::thread thread_;
+  void work();
+  int fd_ { 0 };
+  bool running_ { true };
 
-std::map<unsigned int, std::string> TraceTracker::getEntryExitMapping()
-{
-  std::shared_lock<decltype(entry_exit_mutex_)> lock(entry_exit_mutex_);
-  return entry_exit_mapping_;
-}
+  std::map<std::string, Endpoint*> endpoints_;
+};
 
-TraceTracker& TraceTracker::getInstance()
-{
-  static TraceTracker instance;
-  return instance;
-}
 
 }  // namespace scalopus
+#endif  // SCALOPUS_PROVIDER_H

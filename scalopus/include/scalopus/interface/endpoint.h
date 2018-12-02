@@ -23,22 +23,22 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef SCALOPUS_INTERFACE_ENDPOINT_H
+#define SCALOPUS_INTERFACE_ENDPOINT_H
 
-#define TRACEPOINT_DEFINE
-#define TRACEPOINT_CREATE_PROBES
-#include "scope_tracepoint.h"
-#include <scalopus/scope_tracepoint.h>
+#include <string>
 
 namespace scalopus
 {
-void scope_entry(const unsigned int id)
-{
-  tracepoint(scalopus_scope_id, entry, id);
-}
 
-void scope_exit(const unsigned int id)
+class Endpoint
 {
-  tracepoint(scalopus_scope_id, exit, id);
-}
+public:
+  Endpoint();
+  virtual std::string getName() const = 0;
+  virtual std::string handle(const std::string& request) = 0;
+  virtual ~Endpoint();
+};
 
-}  // namespace scalopus
+}
+#endif  // SCALOPUS_INTERFACE_ENDPOINT_H
