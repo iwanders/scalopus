@@ -41,7 +41,7 @@ public:
   bool connect(std::size_t pid, const std::string& suffix = "_scalopus");
   void disconnect();
 
-  bool send(const std::string& data);
+  bool send(const std::string& endpoint, std::vector<char> data);
 
   static std::vector<std::size_t> getProviders(const std::string& suffix = "_scalopus");
 private:

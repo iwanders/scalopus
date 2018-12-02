@@ -84,13 +84,39 @@ bool Consumer::connect(std::size_t pid, const std::string& suffix)
   return true;
 }
 
-bool Consumer::send(const std::string& data)
+bool Consumer::send(const std::string& endpoint, std::vector<char> data)
 {
   if (fd_ == 0)
   {
     return false;
   }
-  return write(fd_, data.c_str(), data.size()) == static_cast<ssize_t>(data.size());
+  uint16_t length_endpoint_name = static_cast<uint16_t>(endpoint.size());
+  uint32_t length_data = static_cast<uint32_t>(data.size());
+
+  // Send endpoint length
+  if (write(fd_, &length_endpoint_name, sizeof(length_endpoint_name)) != static_cast<ssize_t>(sizeof(length_endpoint_name)))
+  {
+    return false;
+  }
+
+  // Send endpoint name.
+  if (write(fd_, endpoint.data(), length_endpoint_name) != static_cast<ssize_t>(length_endpoint_name))
+  {
+    return false;
+  }
+
+  // Send data length
+  if (write(fd_, &length_data, sizeof(length_data)) != static_cast<ssize_t>(sizeof(length_data)))
+  {
+    return false;
+  }
+
+  // Send data
+  if (write(fd_, data.data(), data.size()) != static_cast<ssize_t>(data.size()))
+  {
+    return false;
+  }
+  return true;
 }
 
 std::vector<std::size_t> Consumer::getProviders(const std::string& suffix)

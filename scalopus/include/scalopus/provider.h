@@ -32,6 +32,7 @@
 #include <scalopus/interface/endpoint.h>
 #include <set>
 #include <vector>
+#include <utility>
 
 namespace scalopus
 {
@@ -41,6 +42,12 @@ namespace scalopus
 class Provider
 {
 public:
+  struct Msg
+  {
+    std::string endpoint;
+    std::vector<char> data;
+  } ;
+
   Provider();
   ~Provider();
 
@@ -54,9 +61,11 @@ private:
   std::map<std::string, Endpoint*> endpoints_;
   std::set<int> connections_;
 
-  std::vector<char> readData(int connection);
+  bool readData(int connection, size_t max_length, std::vector<char>& received);
 
-  void processData(int connection, const std::vector<char>& incoming);
+  bool handleIncoming(int connection, Msg& request);
+
+  bool processMsg(const Msg& request, Msg& response);
 };
 
 

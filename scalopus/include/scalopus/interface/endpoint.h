@@ -36,7 +36,7 @@ class Endpoint
 public:
   Endpoint();
   virtual std::string getName() const = 0;
-  virtual std::string handle(const std::string& request) = 0;
+  virtual bool handle(const std::vector<char> request, std::vector<char> response) = 0;
   virtual ~Endpoint();
 };
 

@@ -97,46 +97,104 @@ Provider::~Provider()
   }
 }
 
-std::vector<char> Provider::readData(int connection)
+bool Provider::readData(int connection, size_t length, std::vector<char>& incoming)
 {
   const size_t chunk_size = 4096;
-  std::vector<char> buf(chunk_size, 0);
+  std::array<char, chunk_size> buf;
+  incoming.resize(0);
+  incoming.reserve(chunk_size);
   size_t received { 0 };
   while(true)
   {
-    ssize_t chunk_received = read(connection, &buf[received], chunk_size);
+    ssize_t chunk_received = read(connection, buf.data(), std::min(length - received, chunk_size));
 
     if (chunk_received > 0)
     {
       printf("[scalopus] read %zd bytes: %.*s\n", chunk_received, static_cast<int>(chunk_received), buf.data());
     }
+
+    // Add the data to incoming.
+    incoming.resize(received + static_cast<size_t>(chunk_received));
+    std::memcpy(&incoming[received], buf.data(), static_cast<size_t>(chunk_received));
     received += static_cast<size_t>(chunk_received);
+
+    if (received == length)
+    {
+      break;
+    }
 
     if (chunk_received == chunk_size)
     {
       // read the next chunk.
-      buf.resize(buf.size() + chunk_size);
       continue;
     }
 
     if (chunk_received == -1)
     {
       std::cerr << "[scalopus] Read error occured." << std::endl;
-      ::close(connection);
-      connections_.erase(connection);
-      return {};
+      return false;
     }
     else if (chunk_received == 0)
     {
       std::cerr << "[scalopus] EOF" << std::endl;
-      ::close(connection);
-      connections_.erase(connection);
-      return {};
+      return false;
     }
     std::cerr << "Total bytes from transmission.: " << received << std::endl;
     break;
   }
-  return buf;
+  return true;
+}
+
+
+bool Provider::handleIncoming(int connection, Msg& request)
+{
+  // Simple length-prefixed protocol:
+  // uint16_t length_endpoint_name;
+  // char[length_endpoint_name] endpoint_name;
+  // uint32_t length_of_payload;
+  // char[length_of_payload] payload;
+  std::uint16_t length_endpoint_name { 0 };
+  std::vector<char> tmp;
+  if (readData(connection, sizeof(length_endpoint_name), tmp))
+  {
+    length_endpoint_name = *reinterpret_cast<decltype(length_endpoint_name)*>(tmp.data());
+  }
+  else
+  {
+    return false;
+  }
+  std::cout << "length_endpoint_name: " << length_endpoint_name << std::endl;
+
+  std::string endpoint_name;
+  if (readData(connection, length_endpoint_name, tmp))
+  {
+    request.endpoint.resize(length_endpoint_name);
+    std::memcpy(&request.endpoint[0], tmp.data(), length_endpoint_name);
+  }
+  else
+  {
+    return false;
+  }
+  std::cout << "endpoint: " << request.endpoint << std::endl;
+
+  std::uint32_t length_data { 0 };
+  if (readData(connection, sizeof(length_data), tmp))
+  {
+    length_data = *reinterpret_cast<decltype(length_data)*>(tmp.data());
+  }
+  else
+  {
+    return false;
+  }
+  std::cout << "length length_data: " << length_data << std::endl;
+
+  // Finally, read the data.
+  if (readData(connection, length_data, request.data))
+  {
+    return true;
+  }
+
+  return false;
 }
 
 void Provider::work()
@@ -157,9 +215,9 @@ void Provider::work()
     }
     
     const int nfds = *std::max_element(connections_.begin(), connections_.end()) + 1;
-    int response = select(nfds, &read_fds, &write_fds, &except_fds, nullptr);
+    int select_result = select(nfds, &read_fds, &write_fds, &except_fds, nullptr);
 
-    if (response == -1)
+    if (select_result == -1)
     {
       std::cerr << "[scalopus]: Failure occured on select." << std::endl;
     }
@@ -195,10 +253,22 @@ void Provider::work()
       if (FD_ISSET(connection, &read_fds))
       {
         std::cout << "[scalopus] read_fds on connection" << connection << std::endl;
-        const auto data = readData(connection);
-        if (!data.empty())
+        Msg request;
+        bool result = handleIncoming(connection, request);
+        if (result)
         {
-          processData(connection, data);
+          Msg response;
+          if (processMsg(request, response))
+          {
+            // send response
+          }
+        }
+        else
+        {
+          std::cout << "Incoming returned false." << std::endl;
+          ::close(connection);
+          ::shutdown(connection, 2);
+          connections_.erase(connection);
         }
       }
 
@@ -206,15 +276,23 @@ void Provider::work()
       {
         std::cout << "[scalopus] except_fds on connection" << connection << std::endl;
         ::close(connection);
+        ::shutdown(connection, 2);
         connections_.erase(connection);
       }
     }
   }
 }
 
-void Provider::processData(int connection, const std::vector<char>& incoming)
+bool Provider::processMsg(const Msg& request, Msg& response)
 {
-  printf("[scalopus] Connection %d, read %zd bytes: %.*s\n", connection, incoming.size(), static_cast<int>(incoming.size()), incoming.data());
+  //  printf("[scalopus] Connection %d, read %zd bytes: %.*s\n", connection, incoming.size(), static_cast<int>(incoming.size()), incoming.data());
+  response.endpoint = request.endpoint;
+  const auto it = endpoints_.find(request.endpoint);
+  if (it != endpoints_.end())
+  {
+    return it->handle(request.data, response.data);
+  }
+  return false;
 }
 
 void Provider::addEndpoint(Endpoint& endpoint)
