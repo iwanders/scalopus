@@ -23,33 +23,17 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#ifndef SCALOPUS_SCOPE_TRACE_RAII_H
-#define SCALOPUS_SCOPE_TRACE_RAII_H
-
-#include <scalopus/internal/scope_tracepoint.h>
+#include <scalopus_transport/interface/endpoint.h>
 
 namespace scalopus
 {
-/**
- * @brief RAII Tracepoint that stores the ID in an entry tracepoint and an exit tracepoint once destroyed.
- */
-class TraceRAII
+
+Endpoint::Endpoint()
 {
-  unsigned int id_;  //! Storage of the ID of this tracepoint.
-public:
-  /**
-   * @brief Constructor for the RAII tracepoint.
-   * @param id A unique id to refence this tracepoint by.
-   */
-  TraceRAII(const unsigned int id);
+}
 
-  /**
-   * @brief Destructor, emits the exit tracepoint.
-   */
-  ~TraceRAII();
-};
+Endpoint::~Endpoint()
+{
+}
 
-}  // namespace scalopus
-
-#endif  // SCALOPUS_SCOPE_TRACE_RAII_H
+}

@@ -23,7 +23,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus/endpoint_scope_tracing.h>
+#include <scalopus_lttng/endpoint_scope_tracing.h>
 
 namespace scalopus
 {

@@ -23,22 +23,13 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#define TRACEPOINT_DEFINE
-#define TRACEPOINT_CREATE_PROBES
-#include "scope_tracepoint.h"
-#include <scalopus/internal/scope_tracepoint.h>
+#include <scalopus_transport/interface/transport_server.h>
 
 namespace scalopus
 {
-void scope_entry(const unsigned int id)
+
+TransportServer::~TransportServer()
 {
-  tracepoint(scalopus_scope_id, entry, id);
 }
 
-void scope_exit(const unsigned int id)
-{
-  tracepoint(scalopus_scope_id, exit, id);
 }
-
-}  // namespace scalopus

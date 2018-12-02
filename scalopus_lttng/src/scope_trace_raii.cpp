@@ -23,17 +23,19 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus/interface/endpoint.h>
+#include <scalopus_lttng/internal/scope_trace_raii.h>
+#include <scalopus_lttng/internal/scope_tracepoint.h>
 
 namespace scalopus
 {
-
-Endpoint::Endpoint()
+TraceRAII::TraceRAII(const unsigned int id) : id_(id)
 {
+  scope_entry(id_);
 }
 
-Endpoint::~Endpoint()
+TraceRAII::~TraceRAII()
 {
+  scope_exit(id_);
 }
 
-}
+}  // namespace scalopus

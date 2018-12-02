@@ -23,19 +23,22 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus/internal/scope_trace_raii.h>
-#include <scalopus/internal/scope_tracepoint.h>
+
+#define TRACEPOINT_DEFINE
+#define TRACEPOINT_CREATE_PROBES
+#include "scope_tracepoint.h"
+#include <scalopus_lttng/internal/scope_tracepoint.h>
 
 namespace scalopus
 {
-TraceRAII::TraceRAII(const unsigned int id) : id_(id)
+void scope_entry(const unsigned int id)
 {
-  scope_entry(id_);
+  tracepoint(scalopus_scope_id, entry, id);
 }
 
-TraceRAII::~TraceRAII()
+void scope_exit(const unsigned int id)
 {
-  scope_exit(id_);
+  tracepoint(scalopus_scope_id, exit, id);
 }
 
 }  // namespace scalopus

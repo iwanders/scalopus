@@ -24,21 +24,32 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_INTERFACE_PROVIDER_H
-#define SCALOPUS_INTERFACE_PROVIDER_H
+#ifndef SCALOPUS_SCOPE_TRACE_RAII_H
+#define SCALOPUS_SCOPE_TRACE_RAII_H
 
-#include <scalopus/interface/endpoint.h>
-#include <memory>
+#include <scalopus_lttng/internal/scope_tracepoint.h>
 
 namespace scalopus
 {
-
-class TransportClient
+/**
+ * @brief RAII Tracepoint that stores the ID in an entry tracepoint and an exit tracepoint once destroyed.
+ */
+class TraceRAII
 {
+  unsigned int id_;  //! Storage of the ID of this tracepoint.
 public:
-  virtual ~TransportClient();
+  /**
+   * @brief Constructor for the RAII tracepoint.
+   * @param id A unique id to refence this tracepoint by.
+   */
+  TraceRAII(const unsigned int id);
+
+  /**
+   * @brief Destructor, emits the exit tracepoint.
+   */
+  ~TraceRAII();
 };
 
-
 }  // namespace scalopus
-#endif  // SCALOPUS_INTERFACE_PROVIDER_H
+
+#endif  // SCALOPUS_SCOPE_TRACE_RAII_H

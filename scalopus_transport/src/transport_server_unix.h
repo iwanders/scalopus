@@ -24,23 +24,50 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_ENDPOINT_SCOPE_TRACING_H
-#define SCALOPUS_ENDPOINT_SCOPE_TRACING_H
+#ifndef SCALOPUS_PROVIDER_H
+#define SCALOPUS_PROVIDER_H
 
-#include <scalopus/interface/endpoint.h>
+#include <thread>
+#include <map>
+#include <scalopus_transport/interface/endpoint.h>
+#include <scalopus_transport/interface/transport_server.h>
+#include <set>
+#include <vector>
+#include <utility>
+#include "protocol.h"
 
 namespace scalopus
 {
-
-class EndpointScopeTracing : public Endpoint
+/**
+ * @brief The exposer class that is used to get the data about the trace mappings out of the proces.
+ */
+class TransportServerUnix: public TransportServer
 {
 public:
-  EndpointScopeTracing();
-  std::string getName() const;
-  bool handle(const std::vector<char> request, std::vector<char>& response);
+
+  TransportServerUnix();
+  ~TransportServerUnix();
+
+  void addEndpoint(std::unique_ptr<Endpoint>&& endpoint);
+private:
+  std::thread thread_;
+  void work();
+  int server_fd_ { 0 };
+  bool running_ { true };
+
+  std::map<std::string, std::unique_ptr<Endpoint>> endpoints_;
+  std::set<int> connections_;
+
+  bool readData(int connection, size_t max_length, std::vector<char>& received);
+
+  bool handleIncoming(int connection, protocol::Msg& request);
+
+  bool processMsg(const protocol::Msg& request, protocol::Msg& response);
 };
 
-}
+
+std::unique_ptr<TransportServer> transportServerUnix();
 
 
-#endif  // SCALOPUS_ENDPOINT_SCOPE_TRACING_H
+}  // namespace scalopus
+#endif  // SCALOPUS_PROVIDER_H

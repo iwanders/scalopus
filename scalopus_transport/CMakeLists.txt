@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5.0)
 
-project(Scalopus VERSION 0.0.1)
+project(ScalopusTransport VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,57 +16,30 @@ add_compile_options("-Werror;-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-Wpedanti
 include(GNUInstallDirs)
 include(FindThreads)
 
-include (FindPkgConfig)
-if (PKG_CONFIG_FOUND)
-  pkg_check_modules(LTTngUST lttng-ust)
-endif()
-
-if (!LTTngUST_FOUND)
-  error("LTTNG could not be found")
-endif()
-
 # Create the library that provides the scope tracepoints 
-add_library(scalopus_scope_tracepoint SHARED
-  src/scope_tracepoint.cpp
-  src/scope_trace_raii.cpp
-  src/scope_trace_tracker.cpp
-#~   src/consumer.cpp
+add_library(scalopus_transport SHARED
   src/transport_server.cpp
   src/transport_server_unix.cpp
   src/endpoint.cpp
   src/protocol.cpp
-  src/endpoint_scope_tracing.cpp
 )
 
-target_include_directories(scalopus_scope_tracepoint
+target_include_directories(scalopus_transport
   PUBLIC 
       $<INSTALL_INTERFACE:include>
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/src
-      ${LTTngUST_INCLUDE_DIRS}
 )
 
-target_link_libraries(scalopus_scope_tracepoint
+target_link_libraries(scalopus_transport
   PRIVATE
     Threads::Threads
-    ${LTTngUST_LIBRARIES}
 )
 
-
-add_executable(example_scope_tracepoints
-  example/example_scope_tracepoints.cpp
-)
-target_link_libraries(example_scope_tracepoints scalopus_scope_tracepoint)
-
-
-add_executable(endpoint_tool
-  src/endpoint_tool.cpp
-)
-target_link_libraries(endpoint_tool scalopus_scope_tracepoint)
 
 # 'make install' to the correct locations (provided by GNUInstallDirs).
-install(TARGETS scalopus_scope_tracepoint EXPORT Scalopus
+install(TARGETS scalopus_transport EXPORT ScalopusTransport
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
@@ -74,9 +47,9 @@ install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 # This makes the project importable from the install directory
 # Put config file in per-project dir (name MUST match), can also
 # just go into 'cmake'.
-install(EXPORT ScalopusConfig DESTINATION share/scalopus/cmake)
+install(EXPORT ScalopusTransport DESTINATION share/scalopus_transport/cmake)
 
 # This makes the project importable from the build directory
-export(TARGETS scalopus_scope_tracepoint FILE ScalopusConfig.cmake)
+export(TARGETS scalopus_transport FILE ScalopusTransportConfig.cmake)
 
 

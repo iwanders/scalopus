@@ -23,13 +23,24 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus/interface/transport_server.h>
+
+#ifndef SCALOPUS_ENDPOINT_SCOPE_TRACING_H
+#define SCALOPUS_ENDPOINT_SCOPE_TRACING_H
+
+#include <scalopus_transport/interface/endpoint.h>
 
 namespace scalopus
 {
 
-TransportServer::~TransportServer()
+class EndpointScopeTracing : public Endpoint
 {
-}
+public:
+  EndpointScopeTracing();
+  std::string getName() const;
+  bool handle(const std::vector<char> request, std::vector<char>& response);
+};
 
 }
+
+
+#endif  // SCALOPUS_ENDPOINT_SCOPE_TRACING_H

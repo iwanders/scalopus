@@ -27,7 +27,7 @@
 #ifndef SCALOPUS_INTERFACE_TRANSPORT_SERVER_H
 #define SCALOPUS_INTERFACE_TRANSPORT_SERVER_H
 
-#include <scalopus/interface/endpoint.h>
+#include <scalopus_transport/interface/endpoint.h>
 #include <memory>
 
 namespace scalopus
