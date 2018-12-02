@@ -38,7 +38,7 @@ std::string EndpointScopeTracing::getName() const
   return "scope_tracing";
 }
 
-bool EndpointScopeTracing::handle(const std::vector<char> request, std::vector<char>& response)
+bool EndpointScopeTracing::handle(TransportServer& /* server */, const std::vector<char> request, std::vector<char>& response)
 {
   response = request;
   return true;

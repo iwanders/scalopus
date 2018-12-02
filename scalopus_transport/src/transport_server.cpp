@@ -32,4 +32,19 @@ TransportServer::~TransportServer()
 {
 }
 
+void TransportServer::addEndpoint(std::unique_ptr<Endpoint>&& endpoint)
+{
+  endpoints_[endpoint->getName()] = std::move(endpoint);
+}
+
+std::vector<std::string> TransportServer::endpoints() const
+{
+  std::vector<std::string> keys;
+  for (const auto& name_endpoint : endpoints_)
+  {
+    keys.emplace_back(name_endpoint.first);
+  }
+  return keys;
+}
+
 }

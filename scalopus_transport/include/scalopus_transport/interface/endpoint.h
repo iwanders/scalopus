@@ -28,16 +28,19 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace scalopus
 {
+
+class TransportServer;
 
 class Endpoint
 {
 public:
   Endpoint();
   virtual std::string getName() const = 0;
-  virtual bool handle(const std::vector<char> request, std::vector<char>& response) = 0;
+  virtual bool handle(TransportServer& server, const std::vector<char> request, std::vector<char>& response) = 0;
   virtual ~Endpoint();
 };
 

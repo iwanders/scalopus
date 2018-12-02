@@ -34,6 +34,7 @@
 #include <scalopus_lttng/scope_tracing.h>
 #include <scalopus_lttng/endpoint_scope_tracing.h>
 #include <scalopus_transport/transport_unix.h>
+#include <scalopus_transport/endpoint_introspect.h>
 
 
 void test_two_raiis_in_same_scope()
@@ -80,6 +81,7 @@ int main(int /* argc */, char** /* argv */)
 {
   const auto provider = scalopus::transportServerUnix();
   provider->addEndpoint(std::make_unique<scalopus::EndpointScopeTracing>());
+  provider->addEndpoint(std::make_unique<scalopus::EndpointIntrospect>());
 
   scalopus::scope_entry(0);
   scalopus::scope_exit(0);

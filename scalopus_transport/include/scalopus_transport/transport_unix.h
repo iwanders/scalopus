@@ -24,16 +24,21 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_PROVIDER_UNIX_H
-#define SCALOPUS_PROVIDER_UNIX_H
+#ifndef SCALOPUS_TRANSPORT_UNIX_H
+#define SCALOPUS_TRANSPORT_UNIX_H
 
 #include <scalopus_transport/interface/transport_server.h>
+#include <scalopus_transport/interface/transport_client.h>
 #include <memory>
 
 namespace scalopus
 {
   std::unique_ptr<TransportServer> transportServerUnix();
+
+  std::shared_ptr<TransportClient> transportClientUnix(const size_t pid);
+
+  std::vector<size_t> getTransportServersUnix();
 }
 
 
-#endif  // SCALOPUS_PROVIDER_UNIX_H
+#endif  // SCALOPUS_TRANSPORT_UNIX_H

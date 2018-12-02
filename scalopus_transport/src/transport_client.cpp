@@ -23,31 +23,19 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#ifndef SCALOPUS_CONSUMER_H
-#define SCALOPUS_CONSUMER_H
-
-#include <thread>
-#include <vector>
-#include <string>
+#include <scalopus_transport/interface/transport_client.h>
 
 namespace scalopus
 {
-class Consumer
+
+TransportClient::~TransportClient()
 {
-public:
-  Consumer();
-  ~Consumer();
-  bool connect(std::size_t pid, const std::string& suffix = "_scalopus");
-  void disconnect();
+}
 
-  bool send(const std::string& endpoint, std::vector<char> data);
-
-  static std::vector<std::size_t> getProviders(const std::string& suffix = "_scalopus");
-private:
-  int fd_ { 0 };
-};
+void TransportClient::addClient(const std::shared_ptr<Client>& client)
+{
+  clients_[client->getName()] = std::move(client);
+}
 
 
-}  // namespace scalopus
-#endif  // SCALOPUS_CONSUMER_H
+}

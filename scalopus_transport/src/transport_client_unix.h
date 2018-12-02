@@ -24,44 +24,40 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_PROVIDER_H
-#define SCALOPUS_PROVIDER_H
+#ifndef SCALOPUS_CONSUMER_H
+#define SCALOPUS_CONSUMER_H
+
+#include <scalopus_transport/interface/transport_client.h>
+#include <scalopus_transport/interface/client.h>
 
 #include <thread>
-#include <map>
-#include <scalopus_transport/interface/endpoint.h>
-#include <scalopus_transport/interface/transport_server.h>
-#include <set>
 #include <vector>
-#include <utility>
-#include "protocol.h"
+#include <string>
+#include <memory>
+#include <map>
 
 namespace scalopus
 {
-/**
- * @brief The exposer class that is used to get the data about the trace mappings out of the proces.
- */
-class TransportServerUnix: public TransportServer
+class TransportClientUnix : public TransportClient
 {
 public:
+  TransportClientUnix();
+  ~TransportClientUnix();
+  bool connect(std::size_t pid, const std::string& suffix = "_scalopus");
+  void disconnect();
 
-  TransportServerUnix();
-  ~TransportServerUnix();
+  bool send(const std::string& remote_endpoint_name, const std::vector<char>& data, std::vector<char>& response);
 
+  bool isConnected() const;
+
+  static std::vector<std::size_t> getProviders(const std::string& suffix = "_scalopus");
 private:
-  std::thread thread_;
-  void work();
-  int server_fd_ { 0 };
-  bool running_ { true };
-
-  std::set<int> connections_;
-
-  bool processMsg(const protocol::Msg& request, protocol::Msg& response);
+  int fd_ { 0 };
 };
 
 
-std::unique_ptr<TransportServer> transportServerUnix();
-
+std::shared_ptr<TransportClient> transportClientUnix();
+std::vector<size_t> getTransportServersUnix();
 
 }  // namespace scalopus
-#endif  // SCALOPUS_PROVIDER_H
+#endif  // SCALOPUS_CONSUMER_H

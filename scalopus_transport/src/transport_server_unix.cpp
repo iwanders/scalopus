@@ -190,14 +190,9 @@ bool TransportServerUnix::processMsg(const protocol::Msg& request, protocol::Msg
   if (it != endpoints_.end())
   {
     // Let the endpoint handle the data and if necessary respond.
-    return it->second->handle(request.data, response.data);
+    return it->second->handle(*this, request.data, response.data);
   }
   return false;
-}
-
-void TransportServerUnix::addEndpoint(std::unique_ptr<Endpoint>&& endpoint)
-{
-  endpoints_[endpoint->getName()] = std::move(endpoint);
 }
 
 

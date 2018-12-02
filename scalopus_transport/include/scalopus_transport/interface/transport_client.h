@@ -24,11 +24,12 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_INTERFACE_PROVIDER_H
-#define SCALOPUS_INTERFACE_PROVIDER_H
+#ifndef SCALOPUS_INTERFACE_TRANSPORT_CLIENT_H
+#define SCALOPUS_INTERFACE_TRANSPORT_CLIENT_H
 
-#include <scalopus_transport/interface/endpoint.h>
+#include <scalopus_transport/interface/client.h>
 #include <memory>
+#include <map>
 
 namespace scalopus
 {
@@ -36,9 +37,18 @@ namespace scalopus
 class TransportClient
 {
 public:
+  using WeakPtr = std::weak_ptr<TransportClient>;
+  using Ptr = std::shared_ptr<TransportClient>;
+
+  virtual bool send(const std::string& remote_endpoint_name, const std::vector<char>& outgoing, std::vector<char>& response) = 0;
+
   virtual ~TransportClient();
+  virtual bool isConnected() const = 0;
+  virtual void addClient(const std::shared_ptr<Client>& client);
+protected:
+  std::map<std::string, std::shared_ptr<Client>> clients_;
 };
 
 
 }  // namespace scalopus
-#endif  // SCALOPUS_INTERFACE_PROVIDER_H
+#endif  // SCALOPUS_INTERFACE_TRANSPORT_CLIENT_H

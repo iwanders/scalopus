@@ -23,45 +23,46 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#ifndef SCALOPUS_PROVIDER_H
-#define SCALOPUS_PROVIDER_H
-
-#include <thread>
-#include <map>
-#include <scalopus_transport/interface/endpoint.h>
-#include <scalopus_transport/interface/transport_server.h>
-#include <set>
-#include <vector>
-#include <utility>
-#include "protocol.h"
+#include <scalopus_transport/client_introspect.h>
+#include <scalopus_transport/interface/transport_client.h>
+#include <algorithm>
+#include <iostream>
 
 namespace scalopus
 {
-/**
- * @brief The exposer class that is used to get the data about the trace mappings out of the proces.
- */
-class TransportServerUnix: public TransportServer
+
+std::string ClientIntrospect::getName() const
 {
-public:
+  return "introspect";
+}
 
-  TransportServerUnix();
-  ~TransportServerUnix();
+std::vector<std::string> ClientIntrospect::supported()
+{
+  // send message...
+  auto transport = transport_.lock();
+  if (transport == nullptr)
+  {
+    std::cout << "No transport :( " << std::endl;
+    return {};  // @todo(iwanders) probably better to throw...
+  }
 
-private:
-  std::thread thread_;
-  void work();
-  int server_fd_ { 0 };
-  bool running_ { true };
+  std::vector<char> resp;
+  std::vector<std::string> endpoints{""};
+  if (transport->send(getName(), {'a'}, resp))
+  {
+    resp.pop_back();
+    for (const auto z : resp)
+    {
+      if (z == '\n')
+      {
+        endpoints.push_back("");
+        continue;
+      }
+      endpoints.back() += z;
+    }
+  }
+  
+  return endpoints;
+}
 
-  std::set<int> connections_;
-
-  bool processMsg(const protocol::Msg& request, protocol::Msg& response);
-};
-
-
-std::unique_ptr<TransportServer> transportServerUnix();
-
-
-}  // namespace scalopus
-#endif  // SCALOPUS_PROVIDER_H
+}

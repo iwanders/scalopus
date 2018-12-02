@@ -23,7 +23,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "consumer.h"
+#include "transport_client_unix.h"
 #include "protocol.h"
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -37,16 +37,16 @@
 namespace scalopus
 {
 
-Consumer::Consumer()
+TransportClientUnix::TransportClientUnix()
 {
 }
 
-Consumer::~Consumer()
+TransportClientUnix::~TransportClientUnix()
 {
   disconnect();
 }
 
-void Consumer::disconnect()
+void TransportClientUnix::disconnect()
 {
   if (fd_)
   {
@@ -55,7 +55,7 @@ void Consumer::disconnect()
   }
 }
 
-bool Consumer::connect(std::size_t pid, const std::string& suffix)
+bool TransportClientUnix::connect(std::size_t pid, const std::string& suffix)
 {
   fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
 
@@ -85,15 +85,33 @@ bool Consumer::connect(std::size_t pid, const std::string& suffix)
   return true;
 }
 
-bool Consumer::send(const std::string& endpoint, std::vector<char> data)
+bool TransportClientUnix::send(const std::string& remote_endpoint_name, const std::vector<char>& data, std::vector<char>& response)
 {
-  protocol::Msg msg;
-  msg.endpoint = endpoint;
-  msg.data = data;
-  return protocol::send(fd_, msg);
+  protocol::Msg outgoing;
+  outgoing.endpoint = remote_endpoint_name;
+  outgoing.data = data;
+  if (!protocol::send(fd_, outgoing))
+  {
+    std::cout << "Send fail" << std::endl;
+    return false;
+  }
+  protocol::Msg incoming;
+  if (!protocol::receive(fd_, incoming))
+  {
+    std::cerr << "receive fail" << std::endl;
+    return false;
+  }
+
+  response = incoming.data;
+  return true;
 }
 
-std::vector<std::size_t> Consumer::getProviders(const std::string& suffix)
+bool TransportClientUnix::isConnected() const
+{
+  return fd_ != 0;
+}
+
+std::vector<std::size_t> TransportClientUnix::getProviders(const std::string& suffix)
 {
   std::ifstream infile("/proc/net/unix");
   std::vector<std::size_t> res;
@@ -127,4 +145,17 @@ std::vector<std::size_t> Consumer::getProviders(const std::string& suffix)
   return res;
 }
 
+std::shared_ptr<TransportClient> transportClientUnix(const size_t pid)
+{
+  auto z = std::make_shared<TransportClientUnix>();
+  z->connect(pid);
+  return z;
 }
+std::vector<size_t> getTransportServersUnix()
+{
+  return TransportClientUnix::getProviders();
+}
+
+}
+
+

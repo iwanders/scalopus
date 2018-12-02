@@ -29,6 +29,8 @@
 
 #include <scalopus_transport/interface/endpoint.h>
 #include <memory>
+#include <map>
+#include <vector>
 
 namespace scalopus
 {
@@ -37,7 +39,10 @@ class TransportServer
 {
 public:
   virtual ~TransportServer();
-  virtual void addEndpoint(std::unique_ptr<Endpoint>&& endpoint) = 0;
+  virtual void addEndpoint(std::unique_ptr<Endpoint>&& endpoint);
+  std::vector<std::string> endpoints() const;
+protected:
+  std::map<std::string, std::unique_ptr<Endpoint>> endpoints_;
 };
 
 

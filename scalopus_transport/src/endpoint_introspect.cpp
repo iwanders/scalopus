@@ -23,45 +23,32 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#ifndef SCALOPUS_PROVIDER_H
-#define SCALOPUS_PROVIDER_H
-
-#include <thread>
-#include <map>
-#include <scalopus_transport/interface/endpoint.h>
+#include <scalopus_transport/endpoint_introspect.h>
 #include <scalopus_transport/interface/transport_server.h>
-#include <set>
-#include <vector>
-#include <utility>
-#include "protocol.h"
 
 namespace scalopus
 {
-/**
- * @brief The exposer class that is used to get the data about the trace mappings out of the proces.
- */
-class TransportServerUnix: public TransportServer
+
+EndpointIntrospect::EndpointIntrospect()
 {
-public:
 
-  TransportServerUnix();
-  ~TransportServerUnix();
+}
 
-private:
-  std::thread thread_;
-  void work();
-  int server_fd_ { 0 };
-  bool running_ { true };
+std::string EndpointIntrospect::getName() const
+{
+  return "introspect";
+}
 
-  std::set<int> connections_;
-
-  bool processMsg(const protocol::Msg& request, protocol::Msg& response);
-};
-
-
-std::unique_ptr<TransportServer> transportServerUnix();
+bool EndpointIntrospect::handle(TransportServer& server, const std::vector<char> /* request */, std::vector<char>& response)
+{
+  const auto endpoints = server.endpoints();
+  for (const auto& name : endpoints)
+  {
+    response.insert(response.end(), name.begin(), name.end());
+    response.push_back('\n');
+  }
+  return true;
+}
 
 
 }  // namespace scalopus
-#endif  // SCALOPUS_PROVIDER_H

@@ -37,7 +37,7 @@ class EndpointScopeTracing : public Endpoint
 public:
   EndpointScopeTracing();
   std::string getName() const;
-  bool handle(const std::vector<char> request, std::vector<char>& response);
+  bool handle(TransportServer& server, const std::vector<char> request, std::vector<char>& response);
 };
 
 }

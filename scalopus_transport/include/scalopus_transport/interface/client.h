@@ -23,45 +23,31 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef SCALOPUS_INTERFACE_CLIENT_H
+#define SCALOPUS_INTERFACE_CLIENT_H
 
-#ifndef SCALOPUS_PROVIDER_H
-#define SCALOPUS_PROVIDER_H
-
-#include <thread>
-#include <map>
-#include <scalopus_transport/interface/endpoint.h>
-#include <scalopus_transport/interface/transport_server.h>
-#include <set>
+#include <string>
 #include <vector>
-#include <utility>
-#include "protocol.h"
+#include <memory>
 
 namespace scalopus
 {
-/**
- * @brief The exposer class that is used to get the data about the trace mappings out of the proces.
- */
-class TransportServerUnix: public TransportServer
+class TransportClient;
+
+class Client
 {
 public:
+  using Ptr = std::shared_ptr<Client>;
 
-  TransportServerUnix();
-  ~TransportServerUnix();
+  Client();
+  virtual std::string getName() const = 0;
+  virtual bool handle(const std::vector<char> incoming);
+  virtual ~Client();
 
-private:
-  std::thread thread_;
-  void work();
-  int server_fd_ { 0 };
-  bool running_ { true };
-
-  std::set<int> connections_;
-
-  bool processMsg(const protocol::Msg& request, protocol::Msg& response);
+  void setTransport(const std::shared_ptr<TransportClient>& transport);
+protected:
+  std::weak_ptr<TransportClient> transport_;
 };
 
-
-std::unique_ptr<TransportServer> transportServerUnix();
-
-
-}  // namespace scalopus
-#endif  // SCALOPUS_PROVIDER_H
+}
+#endif  // SCALOPUS_INTERFACE_CLIENT_H
