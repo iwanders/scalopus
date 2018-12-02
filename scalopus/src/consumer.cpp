@@ -50,6 +50,7 @@ void Consumer::disconnect()
   if (fd_)
   {
     ::close(fd_);
+    ::shutdown(fd_, 2);
   }
 }
 

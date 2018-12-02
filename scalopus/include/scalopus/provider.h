@@ -30,6 +30,8 @@
 #include <thread>
 #include <map>
 #include <scalopus/interface/endpoint.h>
+#include <set>
+#include <vector>
 
 namespace scalopus
 {
@@ -40,15 +42,21 @@ class Provider
 {
 public:
   Provider();
+  ~Provider();
 
   void addEndpoint(Endpoint& endpoint);
 private:
   std::thread thread_;
   void work();
-  int fd_ { 0 };
+  int server_fd_ { 0 };
   bool running_ { true };
 
   std::map<std::string, Endpoint*> endpoints_;
+  std::set<int> connections_;
+
+  std::vector<char> readData(int connection);
+
+  void processData(int connection, const std::vector<char>& incoming);
 };
 
 
