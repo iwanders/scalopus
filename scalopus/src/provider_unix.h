@@ -34,6 +34,7 @@
 #include <set>
 #include <vector>
 #include <utility>
+#include "protocol.h"
 
 namespace scalopus
 {
@@ -43,11 +44,6 @@ namespace scalopus
 class ProviderUnix: public Provider
 {
 public:
-  struct Msg
-  {
-    std::string endpoint;
-    std::vector<char> data;
-  };
 
   ProviderUnix();
   ~ProviderUnix();
@@ -64,9 +60,9 @@ private:
 
   bool readData(int connection, size_t max_length, std::vector<char>& received);
 
-  bool handleIncoming(int connection, Msg& request);
+  bool handleIncoming(int connection, protocol::Msg& request);
 
-  bool processMsg(const Msg& request, Msg& response);
+  bool processMsg(const protocol::Msg& request, protocol::Msg& response);
 };
 
 

@@ -24,6 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "provider_unix.h"
+#include "protocol.h"
 #include <sys/socket.h>
 #include <sys/select.h>
 #include <sys/un.h>
@@ -97,106 +98,6 @@ ProviderUnix::~ProviderUnix()
   }
 }
 
-bool ProviderUnix::readData(int connection, size_t length, std::vector<char>& incoming)
-{
-  const size_t chunk_size = 4096;
-  std::array<char, chunk_size> buf;
-  incoming.resize(0);
-  incoming.reserve(chunk_size);
-  size_t received { 0 };
-  while(true)
-  {
-    ssize_t chunk_received = read(connection, buf.data(), std::min(length - received, chunk_size));
-
-    if (chunk_received > 0)
-    {
-      printf("[scalopus] read %zd bytes: %.*s\n", chunk_received, static_cast<int>(chunk_received), buf.data());
-    }
-
-    // Add the data to incoming.
-    incoming.resize(received + static_cast<size_t>(chunk_received));
-    std::memcpy(&incoming[received], buf.data(), static_cast<size_t>(chunk_received));
-    received += static_cast<size_t>(chunk_received);
-
-    if (received == length)
-    {
-      break;
-    }
-
-    if (chunk_received == chunk_size)
-    {
-      // read the next chunk.
-      continue;
-    }
-
-    if (chunk_received == -1)
-    {
-      std::cerr << "[scalopus] Read error occured." << std::endl;
-      return false;
-    }
-    else if (chunk_received == 0)
-    {
-      std::cerr << "[scalopus] EOF" << std::endl;
-      return false;
-    }
-    std::cerr << "Total bytes from transmission.: " << received << std::endl;
-    break;
-  }
-  return true;
-}
-
-
-bool ProviderUnix::handleIncoming(int connection, Msg& request)
-{
-  // Simple length-prefixed protocol:
-  // uint16_t length_endpoint_name;
-  // char[length_endpoint_name] endpoint_name;
-  // uint32_t length_of_payload;
-  // char[length_of_payload] payload;
-  std::uint16_t length_endpoint_name { 0 };
-  std::vector<char> tmp;
-  if (readData(connection, sizeof(length_endpoint_name), tmp))
-  {
-    length_endpoint_name = *reinterpret_cast<decltype(length_endpoint_name)*>(tmp.data());
-  }
-  else
-  {
-    return false;
-  }
-  std::cout << "length_endpoint_name: " << length_endpoint_name << std::endl;
-
-  std::string endpoint_name;
-  if (readData(connection, length_endpoint_name, tmp))
-  {
-    request.endpoint.resize(length_endpoint_name);
-    std::memcpy(&request.endpoint[0], tmp.data(), length_endpoint_name);
-  }
-  else
-  {
-    return false;
-  }
-  std::cout << "endpoint: " << request.endpoint << std::endl;
-
-  std::uint32_t length_data { 0 };
-  if (readData(connection, sizeof(length_data), tmp))
-  {
-    length_data = *reinterpret_cast<decltype(length_data)*>(tmp.data());
-  }
-  else
-  {
-    return false;
-  }
-  std::cout << "length length_data: " << length_data << std::endl;
-
-  // Finally, read the data.
-  if (readData(connection, length_data, request.data))
-  {
-    return true;
-  }
-
-  return false;
-}
-
 void ProviderUnix::work()
 {
   fd_set read_fds;
@@ -253,14 +154,15 @@ void ProviderUnix::work()
       if (FD_ISSET(connection, &read_fds))
       {
         std::cout << "[scalopus] read_fds on connection" << connection << std::endl;
-        Msg request;
-        bool result = handleIncoming(connection, request);
+        protocol::Msg request;
+        bool result = protocol::receive(connection, request);
         if (result)
         {
-          Msg response;
+          protocol::Msg response;
           if (processMsg(request, response))
           {
             // send response
+            protocol::send(connection, response);
           }
         }
         else
@@ -283,7 +185,7 @@ void ProviderUnix::work()
   }
 }
 
-bool ProviderUnix::processMsg(const Msg& request, Msg& response)
+bool ProviderUnix::processMsg(const protocol::Msg& request, protocol::Msg& response)
 {
   //  printf("[scalopus] Connection %d, read %zd bytes: %.*s\n", connection, incoming.size(), static_cast<int>(incoming.size()), incoming.data());
   response.endpoint = request.endpoint;

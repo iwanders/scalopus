@@ -25,12 +25,35 @@
 */
 #ifndef SCALOPUS_PROTOCOL_H
 #define SCALOPUS_PROTOCOL_H
+#include <vector>
+#include <string>
 
 namespace scalopus
 {
 namespace protocol
 {
-  
+  struct Msg
+  {
+    std::string endpoint;    //!< Endpoint name for this message.
+    std::vector<char> data;  //!< Data in this message.
+  };
+
+  /**
+   * @brief Read fixed length data from a socket and place it in incoming.
+   */
+  bool readData(int fd, size_t length, std::vector<char>& incoming);
+
+  /**
+   * @brief Receive a message from a socket.
+   * @return True if success, false if error occured and the socket can be closed.
+   */
+  bool receive(int fd, Msg& incoming);
+
+  /**
+   * @brief Send a message from a socket.
+   * @return True if success, false if error occured and the socket can be closed.
+   */
+  bool send(int fd, const Msg& send);
 }
 
 }

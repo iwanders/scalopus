@@ -34,6 +34,7 @@ add_library(scalopus_scope_tracepoint SHARED
   src/provider.cpp
   src/provider_unix.cpp
   src/endpoint.cpp
+  src/protocol.cpp
   src/endpoint_scope_tracing.cpp
 )
 

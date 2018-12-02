@@ -24,6 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "consumer.h"
+#include "protocol.h"
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <sys/types.h>
@@ -86,37 +87,10 @@ bool Consumer::connect(std::size_t pid, const std::string& suffix)
 
 bool Consumer::send(const std::string& endpoint, std::vector<char> data)
 {
-  if (fd_ == 0)
-  {
-    return false;
-  }
-  uint16_t length_endpoint_name = static_cast<uint16_t>(endpoint.size());
-  uint32_t length_data = static_cast<uint32_t>(data.size());
-
-  // Send endpoint length
-  if (write(fd_, &length_endpoint_name, sizeof(length_endpoint_name)) != static_cast<ssize_t>(sizeof(length_endpoint_name)))
-  {
-    return false;
-  }
-
-  // Send endpoint name.
-  if (write(fd_, endpoint.data(), length_endpoint_name) != static_cast<ssize_t>(length_endpoint_name))
-  {
-    return false;
-  }
-
-  // Send data length
-  if (write(fd_, &length_data, sizeof(length_data)) != static_cast<ssize_t>(sizeof(length_data)))
-  {
-    return false;
-  }
-
-  // Send data
-  if (write(fd_, data.data(), data.size()) != static_cast<ssize_t>(data.size()))
-  {
-    return false;
-  }
-  return true;
+  protocol::Msg msg;
+  msg.endpoint = endpoint;
+  msg.data = data;
+  return protocol::send(fd_, msg);
 }
 
 std::vector<std::size_t> Consumer::getProviders(const std::string& suffix)
