@@ -33,12 +33,12 @@ namespace scalopus
 {
 void scope_entry(const unsigned int id)
 {
-  tracepoint(scalopus_entry_exit_id, entry, id);
+  tracepoint(scalopus_scope_id, entry, id);
 }
 
 void scope_exit(const unsigned int id)
 {
-  tracepoint(scalopus_entry_exit_id, exit, id);
+  tracepoint(scalopus_scope_id, exit, id);
 }
 
 }  // namespace scalopus

@@ -25,25 +25,25 @@
 */
 
 #undef TRACEPOINT_PROVIDER
-#define TRACEPOINT_PROVIDER scalopus_entry_exit_id
+#define TRACEPOINT_PROVIDER scalopus_scope_id
 
-#if !defined(_TRACEPOINT_scalopus_entry_exit_id_H) || defined(TRACEPOINT_HEADER_MULTI_READ)
-#define _TRACEPOINT_scalopus_entry_exit_id_H
+#if !defined(_TRACEPOINT_scalopus_scope_id_H) || defined(TRACEPOINT_HEADER_MULTI_READ)
+#define _TRACEPOINT_scalopus_scope_id_H
 
 #include <lttng/tracepoint.h>
 
-TRACEPOINT_EVENT_CLASS(scalopus_entry_exit_id, entry_exit_id_class, TP_ARGS(unsigned int, id_),
+TRACEPOINT_EVENT_CLASS(scalopus_scope_id, scope_id_class, TP_ARGS(unsigned int, id_),
                        TP_FIELDS(ctf_integer(unsigned int, id, id_)))
 
-TRACEPOINT_EVENT_INSTANCE(scalopus_entry_exit_id, entry_exit_id_class, entry, TP_ARGS(unsigned int, id_))
+TRACEPOINT_EVENT_INSTANCE(scalopus_scope_id, scope_id_class, entry, TP_ARGS(unsigned int, id_))
 
-TRACEPOINT_LOGLEVEL(scalopus_entry_exit_id, entry, TRACE_DEBUG_FUNCTION)
+TRACEPOINT_LOGLEVEL(scalopus_scope_id, entry, TRACE_DEBUG_FUNCTION)
 
-TRACEPOINT_EVENT_INSTANCE(scalopus_entry_exit_id, entry_exit_id_class, exit, TP_ARGS(unsigned int, id_))
+TRACEPOINT_EVENT_INSTANCE(scalopus_scope_id, scope_id_class, exit, TP_ARGS(unsigned int, id_))
 
-TRACEPOINT_LOGLEVEL(scalopus_entry_exit_id, exit, TRACE_DEBUG_FUNCTION)
+TRACEPOINT_LOGLEVEL(scalopus_scope_id, exit, TRACE_DEBUG_FUNCTION)
 
-#endif /* _TRACEPOINT_scalopus_entry_exit_id_H */
+#endif /* _TRACEPOINT_scalopus_scope_id_H */
 
 #undef TRACEPOINT_INCLUDE
 #define TRACEPOINT_INCLUDE "scope_tracepoint.h"
