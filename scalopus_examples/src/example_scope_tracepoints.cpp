@@ -31,9 +31,9 @@
 #include <iostream>
 #include <thread>
 
-#include <scalopus/scope_tracing.h>
-#include <scalopus/endpoint_scope_tracing.h>
-#include <scalopus/transport_unix.h>
+#include <scalopus_lttng/scope_tracing.h>
+#include <scalopus_lttng/endpoint_scope_tracing.h>
+#include <scalopus_transport/transport_unix.h>
 
 
 void test_two_raiis_in_same_scope()

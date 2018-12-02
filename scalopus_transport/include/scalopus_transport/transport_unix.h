@@ -27,7 +27,7 @@
 #ifndef SCALOPUS_PROVIDER_UNIX_H
 #define SCALOPUS_PROVIDER_UNIX_H
 
-#include <scalopus/interface/transport_server.h>
+#include <scalopus_transport/interface/transport_server.h>
 #include <memory>
 
 namespace scalopus

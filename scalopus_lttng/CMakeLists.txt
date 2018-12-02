@@ -14,7 +14,6 @@ endif()
 add_compile_options("-Werror;-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-Wpedantic;${CLANG_ONLY_COMPILE_FLAGS}")
 
 include(GNUInstallDirs)
-include(FindThreads)
 find_package(ScalopusTransport REQUIRED COMPONENTS
   scalopus_transport)
 
@@ -44,10 +43,10 @@ target_include_directories(scalopus_lttng
 )
 
 target_link_libraries(scalopus_lttng
-  PRIVATE
-    Threads::Threads
-    ${LTTngUST_LIBRARIES}
+  PUBLIC
     scalopus_transport
+  PRIVATE
+    ${LTTngUST_LIBRARIES}
 )
 
 # 'make install' to the correct locations (provided by GNUInstallDirs).

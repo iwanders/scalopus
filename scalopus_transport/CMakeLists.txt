@@ -25,7 +25,7 @@ add_library(scalopus_transport SHARED
 )
 
 target_include_directories(scalopus_transport
-  PUBLIC 
+  PUBLIC
       $<INSTALL_INTERFACE:include>
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE
