@@ -24,23 +24,16 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_INTERFACE_PROVIDER_H
-#define SCALOPUS_INTERFACE_PROVIDER_H
+#ifndef SCALOPUS_PROVIDER_UNIX_H
+#define SCALOPUS_PROVIDER_UNIX_H
 
-#include <scalopus/interface/endpoint.h>
+#include <scalopus/interface/transport_server.h>
 #include <memory>
 
 namespace scalopus
 {
-
-class Provider
-{
-public:
-  Provider();
-  virtual ~Provider();
-  virtual void addEndpoint(std::unique_ptr<Endpoint>&& endpoint) = 0;
-};
+  std::unique_ptr<TransportServer> transportServerUnix();
+}
 
 
-}  // namespace scalopus
-#endif  // SCALOPUS_INTERFACE_PROVIDER_H
+#endif  // SCALOPUS_PROVIDER_UNIX_H

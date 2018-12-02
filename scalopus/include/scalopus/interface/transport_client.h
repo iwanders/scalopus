@@ -23,17 +23,22 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus/interface/provider.h>
+
+#ifndef SCALOPUS_INTERFACE_PROVIDER_H
+#define SCALOPUS_INTERFACE_PROVIDER_H
+
+#include <scalopus/interface/endpoint.h>
+#include <memory>
 
 namespace scalopus
 {
 
-Provider::Provider()
+class TransportClient
 {
-}
+public:
+  virtual ~TransportClient();
+};
 
-Provider::~Provider()
-{
-}
 
-}
+}  // namespace scalopus
+#endif  // SCALOPUS_INTERFACE_PROVIDER_H

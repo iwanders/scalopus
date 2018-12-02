@@ -23,7 +23,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "provider_unix.h"
+#include "transport_server_unix.h"
 #include "protocol.h"
 #include <sys/socket.h>
 #include <sys/select.h>
@@ -39,7 +39,7 @@
 namespace scalopus
 {
 
-ProviderUnix::ProviderUnix()
+TransportServerUnix::TransportServerUnix()
 {
   // Create the server socket to work with.
   server_fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -89,7 +89,7 @@ ProviderUnix::ProviderUnix()
   }
 }
 
-ProviderUnix::~ProviderUnix()
+TransportServerUnix::~TransportServerUnix()
 {
   for (const auto& connection : connections_)
   {
@@ -98,7 +98,7 @@ ProviderUnix::~ProviderUnix()
   }
 }
 
-void ProviderUnix::work()
+void TransportServerUnix::work()
 {
   fd_set read_fds;
   fd_set write_fds;
@@ -182,7 +182,7 @@ void ProviderUnix::work()
   }
 }
 
-bool ProviderUnix::processMsg(const protocol::Msg& request, protocol::Msg& response)
+bool TransportServerUnix::processMsg(const protocol::Msg& request, protocol::Msg& response)
 {
   response.endpoint = request.endpoint;
   // Check if we have this endpoint.
@@ -195,15 +195,15 @@ bool ProviderUnix::processMsg(const protocol::Msg& request, protocol::Msg& respo
   return false;
 }
 
-void ProviderUnix::addEndpoint(std::unique_ptr<Endpoint>&& endpoint)
+void TransportServerUnix::addEndpoint(std::unique_ptr<Endpoint>&& endpoint)
 {
   endpoints_[endpoint->getName()] = std::move(endpoint);
 }
 
 
-std::unique_ptr<Provider> providerUnix()
+std::unique_ptr<TransportServer> transportServerUnix()
 {
-  return std::make_unique<ProviderUnix>();
+  return std::make_unique<TransportServerUnix>();
 }
 
 }

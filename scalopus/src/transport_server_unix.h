@@ -30,7 +30,7 @@
 #include <thread>
 #include <map>
 #include <scalopus/interface/endpoint.h>
-#include <scalopus/interface/provider.h>
+#include <scalopus/interface/transport_server.h>
 #include <set>
 #include <vector>
 #include <utility>
@@ -41,12 +41,12 @@ namespace scalopus
 /**
  * @brief The exposer class that is used to get the data about the trace mappings out of the proces.
  */
-class ProviderUnix: public Provider
+class TransportServerUnix: public TransportServer
 {
 public:
 
-  ProviderUnix();
-  ~ProviderUnix();
+  TransportServerUnix();
+  ~TransportServerUnix();
 
   void addEndpoint(std::unique_ptr<Endpoint>&& endpoint);
 private:
@@ -66,7 +66,7 @@ private:
 };
 
 
-std::unique_ptr<Provider> providerUnixSocket();
+std::unique_ptr<TransportServer> transportServerUnix();
 
 
 }  // namespace scalopus
