@@ -165,7 +165,6 @@ void TransportServerUnix::work()
         }
         else
         {
-          std::cout << "Receive failed." << std::endl;
           ::close(connection);
           ::shutdown(connection, 2);
           connections_.erase(connection);

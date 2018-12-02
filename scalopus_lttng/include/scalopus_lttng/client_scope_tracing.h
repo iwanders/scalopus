@@ -24,22 +24,24 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_ENDPOINT_SCOPE_TRACING_H
-#define SCALOPUS_ENDPOINT_SCOPE_TRACING_H
+#ifndef SCALOPUS_LTTNG_CLIENT_SCOPE_TRACING_H
+#define SCALOPUS_LTTNG_CLIENT_SCOPE_TRACING_H
 
-#include <scalopus_transport/interface/endpoint.h>
+#include <scalopus_transport/interface/client.h>
+#include <map>
+#include <string>
 
 namespace scalopus
 {
 
-class EndpointScopeTracing : public Endpoint
+class ClientScopeTracing : public Client
 {
 public:
   std::string getName() const;
-  bool handle(TransportServer& server, const std::vector<char> request, std::vector<char>& response);
+  std::map<unsigned int, std::string> mapping();
 };
 
 }
 
 
-#endif  // SCALOPUS_ENDPOINT_SCOPE_TRACING_H
+#endif  // SCALOPUS_LTTNG_CLIENT_SCOPE_TRACING_H

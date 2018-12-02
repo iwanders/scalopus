@@ -23,23 +23,53 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#ifndef SCALOPUS_ENDPOINT_SCOPE_TRACING_H
-#define SCALOPUS_ENDPOINT_SCOPE_TRACING_H
-
-#include <scalopus_transport/interface/endpoint.h>
+#include <scalopus_lttng/client_scope_tracing.h>
+#include <scalopus_transport/interface/transport_client.h>
+#include <algorithm>
+#include <iostream>
+#include <map>
+#include <cstring>
 
 namespace scalopus
 {
 
-class EndpointScopeTracing : public Endpoint
+std::string ClientScopeTracing::getName() const
 {
-public:
-  std::string getName() const;
-  bool handle(TransportServer& server, const std::vector<char> request, std::vector<char>& response);
-};
-
+  return "scope_tracing";
 }
 
+std::map<unsigned int, std::string> ClientScopeTracing::mapping()
+{
+  // send message...
+  auto transport = transport_.lock();
+  if (transport == nullptr)
+  {
+    std::cout << "No transport :( " << std::endl;
+    return {};  // @todo(iwanders) probably better to throw...
+  }
 
-#endif  // SCALOPUS_ENDPOINT_SCOPE_TRACING_H
+  std::vector<char> resp;
+  std::map<unsigned int, std::string> res;
+  size_t resp_index = 0;
+  if (transport->send(getName(), {'m'}, resp))
+  {
+    while (resp_index < resp.size())
+    {
+      // now we need to deserialize this...
+      unsigned int id = *reinterpret_cast<unsigned int*>(&resp[resp_index]);
+      resp_index += sizeof(id);
+      std::string::size_type string_length = *reinterpret_cast<std::string::size_type*>(&resp[resp_index]);
+      resp_index += sizeof(string_length);
+
+      std::string name;
+      name.resize(string_length);
+      std::memcpy(&name[0], &resp[resp_index], string_length);
+      resp_index += string_length;
+      res[id] = name;
+    }
+  }
+
+  return res;
+}
+
+}

@@ -24,14 +24,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <scalopus_lttng/endpoint_scope_tracing.h>
+#include <scalopus_lttng/internal/scope_trace_tracker.h>
+#include <cstring>
 
 namespace scalopus
 {
-
-EndpointScopeTracing::EndpointScopeTracing()
-{
-
-}
 
 std::string EndpointScopeTracing::getName() const
 {
@@ -40,8 +37,37 @@ std::string EndpointScopeTracing::getName() const
 
 bool EndpointScopeTracing::handle(TransportServer& /* server */, const std::vector<char> request, std::vector<char>& response)
 {
-  response = request;
-  return true;
+  auto mapping = scalopus::ScopeTraceTracker::getInstance().getEntryExitMapping();
+  // cool, we have the mappings... now we need to serialize this...
+  
+  if (request.front() == 'm')
+  {
+    size_t resp_index = 0;
+    response.resize(0);
+    for (const auto& id_name : mapping)
+    {
+      const auto& id = id_name.first;
+      const auto& name = id_name.second;
+
+      // Pack the id number
+      response.resize(response.size() + sizeof(id));
+      *reinterpret_cast<unsigned int*>(&response[resp_index]) = id;
+      resp_index += sizeof(id);
+
+      // Pack the string length.
+      auto string_length = name.size();
+      response.resize(response.size() + sizeof(string_length));
+      *reinterpret_cast<decltype(string_length)*>(&response[resp_index]) = string_length;
+      resp_index += sizeof(string_length);
+
+      // Finally, we write the string.
+      response.resize(response.size() + string_length);
+      std::memcpy(&response[resp_index], name.c_str(), string_length);
+      resp_index += string_length;
+    }
+    return true;
+  }
+  return false;
 }
 
 

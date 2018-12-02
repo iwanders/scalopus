@@ -54,12 +54,9 @@ bool readData(int fd, size_t length, std::vector<char>& incoming)
     std::memcpy(&incoming[received], buf.data(), static_cast<size_t>(chunk_received));
     received += static_cast<size_t>(chunk_received);
 
-    std::cout << "chunk_received: " << chunk_received << std::endl;
-
     // If we have received all data, continue.
     if (received == length)
     {
-      std::cout << "Got enough data: " << received << std::endl;
       break;
     }
 
@@ -102,10 +99,9 @@ bool receive(int fd, Msg& incoming)
   }
   else
   {
-    std::cout << "Failed on the first thing :/" << std::endl;
+    // We also hit this if the socket can be closed...
     return false;
   }
-  std::cout << "Got endpoint name of " << length_endpoint_name << std::endl;
 
   std::string endpoint_name;
   if (readData(fd, length_endpoint_name, tmp))
@@ -117,7 +113,6 @@ bool receive(int fd, Msg& incoming)
   {
     return false;
   }
-  std::cout << "Got endpoint name " << endpoint_name << std::endl;
 
   std::uint32_t length_data { 0 };
   if (readData(fd, sizeof(length_data), tmp))
@@ -128,7 +123,6 @@ bool receive(int fd, Msg& incoming)
   {
     return false;
   }
-  std::cout << "Got length_data of " << length_data << std::endl;
 
   // Finally, read the data.
   if (readData(fd, length_data, incoming.data))
@@ -151,31 +145,26 @@ bool send(int fd, const Msg& outgoing)
   // Send endpoint length
   if (::write(fd, &length_endpoint_name, sizeof(length_endpoint_name)) != static_cast<ssize_t>(sizeof(length_endpoint_name)))
   {
-    std::cout << "Send length fail" << std::endl;
     return false;
   }
 
   // Send endpoint name.
   if (::write(fd, outgoing.endpoint.data(), length_endpoint_name) != static_cast<ssize_t>(length_endpoint_name))
   {
-    std::cout << "send nom" << std::endl;
     return false;
   }
 
   // Send data length
   if (::write(fd, &length_data, sizeof(length_data)) != static_cast<ssize_t>(sizeof(length_data)))
   {
-    std::cout << "send data length:" << length_data << std::endl;
     return false;
   }
 
   // Send data
   if (::write(fd, outgoing.data.data(), outgoing.data.size()) != static_cast<ssize_t>(outgoing.data.size()))
   {
-    std::cout << "send data fail:" << std::endl;
     return false;
   }
-  std::cout << "Send succesful." << std::endl;
   return true;
 }
 
