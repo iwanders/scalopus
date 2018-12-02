@@ -111,7 +111,7 @@ void ProviderUnix::work()
     for (const auto& connection : connections_)
     {
       FD_SET(connection, &read_fds);
-      FD_SET(connection, &write_fds);
+      //  FD_SET(connection, &write_fds);  // We will just block when writing, that's fine.
       FD_SET(connection, &except_fds);
     }
     
@@ -133,7 +133,6 @@ void ProviderUnix::work()
         std::cerr << "[scalopus] Could not accept client." << std::endl;
         continue;
       }
-      std::cerr << "[scalopus] Accepted client: " << client << std::endl;
       connections_.insert(client);
     }
 
@@ -153,7 +152,6 @@ void ProviderUnix::work()
       
       if (FD_ISSET(connection, &read_fds))
       {
-        std::cout << "[scalopus] read_fds on connection" << connection << std::endl;
         protocol::Msg request;
         bool result = protocol::receive(connection, request);
         if (result)
@@ -161,13 +159,13 @@ void ProviderUnix::work()
           protocol::Msg response;
           if (processMsg(request, response))
           {
-            // send response
+            // send response...
             protocol::send(connection, response);
           }
         }
         else
         {
-          std::cout << "Incoming returned false." << std::endl;
+          std::cout << "Receive failed." << std::endl;
           ::close(connection);
           ::shutdown(connection, 2);
           connections_.erase(connection);
@@ -176,7 +174,6 @@ void ProviderUnix::work()
 
       if (FD_ISSET(connection, &except_fds))
       {
-        std::cout << "[scalopus] except_fds on connection" << connection << std::endl;
         ::close(connection);
         ::shutdown(connection, 2);
         connections_.erase(connection);
@@ -187,19 +184,20 @@ void ProviderUnix::work()
 
 bool ProviderUnix::processMsg(const protocol::Msg& request, protocol::Msg& response)
 {
-  //  printf("[scalopus] Connection %d, read %zd bytes: %.*s\n", connection, incoming.size(), static_cast<int>(incoming.size()), incoming.data());
   response.endpoint = request.endpoint;
+  // Check if we have this endpoint.
   const auto it = endpoints_.find(request.endpoint);
   if (it != endpoints_.end())
   {
+    // Let the endpoint handle the data and if necessary respond.
     return it->second->handle(request.data, response.data);
   }
   return false;
 }
 
-void ProviderUnix::addEndpoint(Endpoint& endpoint)
+void ProviderUnix::addEndpoint(std::unique_ptr<Endpoint>&& endpoint)
 {
-  endpoints_[endpoint.getName()] = &endpoint;
+  endpoints_[endpoint->getName()] = std::move(endpoint);
 }
 
 

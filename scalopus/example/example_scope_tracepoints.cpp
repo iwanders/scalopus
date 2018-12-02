@@ -79,8 +79,7 @@ void a()
 int main(int /* argc */, char** /* argv */)
 {
   const auto provider = scalopus::providerUnix();
-  scalopus::EndpointScopeTracing tracing_endpoint;
-  provider->addEndpoint(tracing_endpoint);
+  provider->addEndpoint(std::make_unique<scalopus::EndpointScopeTracing>());
 
   scalopus::scope_entry(0);
   scalopus::scope_exit(0);

@@ -28,6 +28,7 @@
 #define SCALOPUS_INTERFACE_PROVIDER_H
 
 #include <scalopus/interface/endpoint.h>
+#include <memory>
 
 namespace scalopus
 {
@@ -37,7 +38,7 @@ class Provider
 public:
   Provider();
   virtual ~Provider();
-  virtual void addEndpoint(Endpoint& endpoint) = 0;
+  virtual void addEndpoint(std::unique_ptr<Endpoint>&& endpoint) = 0;
 };
 
 

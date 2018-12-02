@@ -48,14 +48,14 @@ public:
   ProviderUnix();
   ~ProviderUnix();
 
-  void addEndpoint(Endpoint& endpoint);
+  void addEndpoint(std::unique_ptr<Endpoint>&& endpoint);
 private:
   std::thread thread_;
   void work();
   int server_fd_ { 0 };
   bool running_ { true };
 
-  std::map<std::string, Endpoint*> endpoints_;
+  std::map<std::string, std::unique_ptr<Endpoint>> endpoints_;
   std::set<int> connections_;
 
   bool readData(int connection, size_t max_length, std::vector<char>& received);
