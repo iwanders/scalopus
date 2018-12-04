@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.5.0)
 
+find_package(ScalopusTransport REQUIRED)
+
 include (FindPkgConfig)
 if (PKG_CONFIG_FOUND)
   pkg_check_modules(LTTngUST lttng-ust)
@@ -25,13 +27,22 @@ target_include_directories(scalopus_lttng
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-add_library(Scalopus::Lttng ALIAS scalopus_lttng)
+add_library(Scalopus::scalopus_lttng ALIAS scalopus_lttng)
 
 target_link_libraries(scalopus_lttng
   PUBLIC
-    Scalopus::Transport
+    Scalopus::scalopus_transport
   PRIVATE
     ${LTTngUST_LIBRARIES}
 )
 
-
+export(
+  TARGETS scalopus_lttng
+  NAMESPACE Scalopus::
+  FILE ScalopusLttngConfig.cmake
+)
+install(TARGETS scalopus_lttng EXPORT ScalopusLttng
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT ScalopusLttng DESTINATION share/scalopus_lttng/cmake)

@@ -14,6 +14,19 @@ endif()
 
 add_compile_options("-Werror;-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-Wpedantic;${CLANG_ONLY_COMPILE_FLAGS}")
 
+include(GNUInstallDirs)
+
+# https://youtu.be/bsXLMQ6WgIk?t=3170
+set(as_subproject ScalopusTransport ScalopusLttng)
+macro(find_package)
+  if(NOT "${ARGV0}" IN_LIST as_subproject)
+    _find_package(${ARGV})
+  else()
+    message("Detected ${ARGV0} as submodule.")
+  endif()
+endmacro()
+
 add_subdirectory(scalopus_transport)
 add_subdirectory(scalopus_lttng)
 add_subdirectory(scalopus_examples)
+

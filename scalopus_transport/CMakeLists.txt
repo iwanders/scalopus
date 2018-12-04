@@ -14,7 +14,7 @@ add_library(scalopus_transport SHARED
   src/client_introspect.cpp
   src/endpoint_introspect.cpp
 )
-add_library(Scalopus::Transport ALIAS scalopus_transport)
+add_library(Scalopus::scalopus_transport ALIAS scalopus_transport)
 
 target_include_directories(scalopus_transport
   PUBLIC
@@ -32,5 +32,15 @@ target_link_libraries(scalopus_transport
 add_executable(introspect_endpoints
   src/introspect_endpoints.cpp
 )
-target_link_libraries(introspect_endpoints Scalopus::Transport)
+target_link_libraries(introspect_endpoints Scalopus::scalopus_transport)
 
+export(
+  TARGETS scalopus_transport
+  NAMESPACE Scalopus::
+  FILE ScalopusTransportConfig.cmake
+)
+install(TARGETS scalopus_transport EXPORT ScalopusTransport
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT ScalopusTransport DESTINATION share/scalopus_transport/cmake)
