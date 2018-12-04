@@ -25,27 +25,26 @@
 */
 #include "protocol.h"
 
-#include <sys/socket.h>
 #include <sys/select.h>
+#include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <array>
 #include <cstring>
 #include <iostream>
-#include <array>
 
 namespace scalopus
 {
 namespace protocol
 {
-
 bool readData(int fd, size_t length, std::vector<char>& incoming)
 {
   const size_t chunk_size = 4096;
   std::array<char, chunk_size> buf;
   incoming.resize(0);
   incoming.reserve(chunk_size);
-  size_t received { 0 };
-  while(true)
+  size_t received{ 0 };
+  while (true)
   {
     ssize_t chunk_received = ::read(fd, buf.data(), std::min(length - received, chunk_size));
 
@@ -81,7 +80,6 @@ bool readData(int fd, size_t length, std::vector<char>& incoming)
   return true;
 }
 
-
 bool receive(int fd, Msg& incoming)
 {
   // Simple length prefixed protocol:
@@ -91,7 +89,7 @@ bool receive(int fd, Msg& incoming)
   // uint32_t length_of_payload;
   // char[length_of_payload] payload;
 
-  std::uint16_t length_endpoint_name { 0 };
+  std::uint16_t length_endpoint_name{ 0 };
   std::vector<char> tmp;
   if (readData(fd, sizeof(length_endpoint_name), tmp))
   {
@@ -114,7 +112,7 @@ bool receive(int fd, Msg& incoming)
     return false;
   }
 
-  std::uint32_t length_data { 0 };
+  std::uint32_t length_data{ 0 };
   if (readData(fd, sizeof(length_data), tmp))
   {
     length_data = *reinterpret_cast<decltype(length_data)*>(tmp.data());
@@ -143,7 +141,8 @@ bool send(int fd, const Msg& outgoing)
   uint32_t length_data = static_cast<uint32_t>(outgoing.data.size());
 
   // Send endpoint length
-  if (::write(fd, &length_endpoint_name, sizeof(length_endpoint_name)) != static_cast<ssize_t>(sizeof(length_endpoint_name)))
+  if (::write(fd, &length_endpoint_name, sizeof(length_endpoint_name)) !=
+      static_cast<ssize_t>(sizeof(length_endpoint_name)))
   {
     return false;
   }
@@ -167,7 +166,6 @@ bool send(int fd, const Msg& outgoing)
   }
   return true;
 }
-
 
 }  // namespace protocol
 }  // namespace scalopus

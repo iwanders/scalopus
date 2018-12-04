@@ -27,7 +27,6 @@
 
 namespace scalopus
 {
-
 Endpoint::Endpoint()
 {
 }
@@ -36,4 +35,4 @@ Endpoint::~Endpoint()
 {
 }
 
-}
+}  // namespace scalopus

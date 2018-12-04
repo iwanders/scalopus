@@ -1,6 +1,6 @@
-#include <iostream>
-#include <cstring>
 #include <scalopus_transport/transport_unix.h>
+#include <cstring>
+#include <iostream>
 #include "scalopus_lttng/client_scope_tracing.h"
 
 int main(int /* argc */, char** /* argv */)
@@ -24,5 +24,4 @@ int main(int /* argc */, char** /* argv */)
       std::cout << "" << id_name.first << " -> " << id_name.second << std::endl;
     }
   }
-
 }

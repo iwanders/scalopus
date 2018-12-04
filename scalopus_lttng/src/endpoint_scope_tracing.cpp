@@ -29,17 +29,17 @@
 
 namespace scalopus
 {
-
 std::string EndpointScopeTracing::getName() const
 {
   return "scope_tracing";
 }
 
-bool EndpointScopeTracing::handle(TransportServer& /* server */, const std::vector<char> request, std::vector<char>& response)
+bool EndpointScopeTracing::handle(TransportServer& /* server */, const std::vector<char> request,
+                                  std::vector<char>& response)
 {
   auto mapping = scalopus::ScopeTraceTracker::getInstance().getEntryExitMapping();
   // cool, we have the mappings... now we need to serialize this...
-  
+
   if (request.front() == 'm')
   {
     size_t resp_index = 0;
@@ -51,7 +51,7 @@ bool EndpointScopeTracing::handle(TransportServer& /* server */, const std::vect
 
       // Pack the id number
       response.resize(response.size() + sizeof(id));
-      *reinterpret_cast<unsigned int*>(&response[resp_index]) = id;
+      *reinterpret_cast<decltype(mapping)::key_type*>(&response[resp_index]) = id;
       resp_index += sizeof(id);
 
       // Pack the string length.
@@ -69,6 +69,5 @@ bool EndpointScopeTracing::handle(TransportServer& /* server */, const std::vect
   }
   return false;
 }
-
 
 }  // namespace scalopus

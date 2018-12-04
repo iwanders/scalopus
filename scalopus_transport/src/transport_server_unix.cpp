@@ -24,21 +24,19 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "transport_server_unix.h"
-#include "protocol.h"
-#include <sys/socket.h>
 #include <sys/select.h>
-#include <sys/un.h>
+#include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/un.h>
 #include <unistd.h>
-#include <sstream>
+#include <algorithm>
 #include <cstring>
 #include <iostream>
-#include <algorithm>
-
+#include <sstream>
+#include "protocol.h"
 
 namespace scalopus
 {
-
 TransportServerUnix::TransportServerUnix()
 {
   // Create the server socket to work with.
@@ -114,7 +112,7 @@ void TransportServerUnix::work()
       //  FD_SET(connection, &write_fds);  // We will just block when writing, that's fine.
       FD_SET(connection, &except_fds);
     }
-    
+
     const int nfds = *std::max_element(connections_.begin(), connections_.end()) + 1;
     int select_result = select(nfds, &read_fds, &write_fds, &except_fds, nullptr);
 
@@ -126,7 +124,7 @@ void TransportServerUnix::work()
     // Handle server stuff, accept new connection:
     if (FD_ISSET(server_fd_, &read_fds))
     {
-      int client { 0 };
+      int client{ 0 };
       client = accept(server_fd_, nullptr, nullptr);
       if (client == -1)
       {
@@ -149,7 +147,7 @@ void TransportServerUnix::work()
       {
         continue;
       }
-      
+
       if (FD_ISSET(connection, &read_fds))
       {
         protocol::Msg request;
@@ -194,10 +192,9 @@ bool TransportServerUnix::processMsg(const protocol::Msg& request, protocol::Msg
   return false;
 }
 
-
 std::unique_ptr<TransportServer> transportServerUnix()
 {
   return std::make_unique<TransportServerUnix>();
 }
 
-}
+}  // namespace scalopus

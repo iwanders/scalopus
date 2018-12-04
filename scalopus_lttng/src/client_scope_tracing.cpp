@@ -26,13 +26,12 @@
 #include <scalopus_lttng/client_scope_tracing.h>
 #include <scalopus_transport/interface/transport_client.h>
 #include <algorithm>
+#include <cstring>
 #include <iostream>
 #include <map>
-#include <cstring>
 
 namespace scalopus
 {
-
 std::string ClientScopeTracing::getName() const
 {
   return "scope_tracing";
@@ -51,14 +50,15 @@ std::map<unsigned int, std::string> ClientScopeTracing::mapping()
   std::vector<char> resp;
   std::map<unsigned int, std::string> res;
   size_t resp_index = 0;
-  if (transport->send(getName(), {'m'}, resp))
+  if (transport->send(getName(), { 'm' }, resp))
   {
     while (resp_index < resp.size())
     {
       // now we need to deserialize this...
-      unsigned int id = *reinterpret_cast<unsigned int*>(&resp[resp_index]);
+      unsigned int id = *reinterpret_cast<decltype(res)::key_type*>(&resp[resp_index]);
       resp_index += sizeof(id);
-      std::string::size_type string_length = *reinterpret_cast<std::string::size_type*>(&resp[resp_index]);
+      std::string::size_type string_length =
+          *reinterpret_cast<decltype(res)::mapped_type::size_type*>(&resp[resp_index]);
       resp_index += sizeof(string_length);
 
       std::string name;
@@ -72,4 +72,4 @@ std::map<unsigned int, std::string> ClientScopeTracing::mapping()
   return res;
 }
 
-}
+}  // namespace scalopus

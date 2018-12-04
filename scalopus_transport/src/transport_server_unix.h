@@ -27,13 +27,13 @@
 #ifndef SCALOPUS_PROVIDER_H
 #define SCALOPUS_PROVIDER_H
 
-#include <thread>
-#include <map>
 #include <scalopus_transport/interface/endpoint.h>
 #include <scalopus_transport/interface/transport_server.h>
+#include <map>
 #include <set>
-#include <vector>
+#include <thread>
 #include <utility>
+#include <vector>
 #include "protocol.h"
 
 namespace scalopus
@@ -41,27 +41,24 @@ namespace scalopus
 /**
  * @brief The exposer class that is used to get the data about the trace mappings out of the proces.
  */
-class TransportServerUnix: public TransportServer
+class TransportServerUnix : public TransportServer
 {
 public:
-
   TransportServerUnix();
   ~TransportServerUnix();
 
 private:
   std::thread thread_;
   void work();
-  int server_fd_ { 0 };
-  bool running_ { true };
+  int server_fd_{ 0 };
+  bool running_{ true };
 
   std::set<int> connections_;
 
   bool processMsg(const protocol::Msg& request, protocol::Msg& response);
 };
 
-
 std::unique_ptr<TransportServer> transportServerUnix();
-
 
 }  // namespace scalopus
 #endif  // SCALOPUS_PROVIDER_H

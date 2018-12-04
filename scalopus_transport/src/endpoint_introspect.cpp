@@ -28,10 +28,8 @@
 
 namespace scalopus
 {
-
 EndpointIntrospect::EndpointIntrospect()
 {
-
 }
 
 std::string EndpointIntrospect::getName() const
@@ -39,7 +37,8 @@ std::string EndpointIntrospect::getName() const
   return "introspect";
 }
 
-bool EndpointIntrospect::handle(TransportServer& server, const std::vector<char> /* request */, std::vector<char>& response)
+bool EndpointIntrospect::handle(TransportServer& server, const std::vector<char> /* request */,
+                                std::vector<char>& response)
 {
   const auto endpoints = server.endpoints();
   for (const auto& name : endpoints)
@@ -49,6 +48,5 @@ bool EndpointIntrospect::handle(TransportServer& server, const std::vector<char>
   }
   return true;
 }
-
 
 }  // namespace scalopus

@@ -27,7 +27,6 @@
 
 namespace scalopus
 {
-
 TransportServer::~TransportServer()
 {
 }
@@ -47,4 +46,4 @@ std::vector<std::string> TransportServer::endpoints() const
   return keys;
 }
 
-}
+}  // namespace scalopus

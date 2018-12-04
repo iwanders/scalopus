@@ -27,14 +27,14 @@
 #ifndef SCALOPUS_CONSUMER_H
 #define SCALOPUS_CONSUMER_H
 
-#include <scalopus_transport/interface/transport_client.h>
 #include <scalopus_transport/interface/client.h>
+#include <scalopus_transport/interface/transport_client.h>
 
+#include <map>
+#include <memory>
+#include <string>
 #include <thread>
 #include <vector>
-#include <string>
-#include <memory>
-#include <map>
 
 namespace scalopus
 {
@@ -51,10 +51,10 @@ public:
   bool isConnected() const;
 
   static std::vector<std::size_t> getProviders(const std::string& suffix = "_scalopus");
-private:
-  int fd_ { 0 };
-};
 
+private:
+  int fd_{ 0 };
+};
 
 std::shared_ptr<TransportClient> transportClientUnix();
 std::vector<size_t> getTransportServersUnix();

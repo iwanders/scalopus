@@ -30,7 +30,6 @@
 
 namespace scalopus
 {
-
 std::string ClientIntrospect::getName() const
 {
   return "introspect";
@@ -47,8 +46,8 @@ std::vector<std::string> ClientIntrospect::supported()
   }
 
   std::vector<char> resp;
-  std::vector<std::string> endpoints{""};
-  if (transport->send(getName(), {'a'}, resp))
+  std::vector<std::string> endpoints{ "" };
+  if (transport->send(getName(), { 'a' }, resp))
   {
     resp.pop_back();
     for (const auto z : resp)
@@ -61,8 +60,8 @@ std::vector<std::string> ClientIntrospect::supported()
       endpoints.back() += z;
     }
   }
-  
+
   return endpoints;
 }
 
-}
+}  // namespace scalopus

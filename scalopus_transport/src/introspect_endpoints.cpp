@@ -1,7 +1,7 @@
-#include <iostream>
 #include <cstring>
-#include "scalopus_transport/transport_unix.h"
+#include <iostream>
 #include "scalopus_transport/client_introspect.h"
+#include "scalopus_transport/transport_unix.h"
 
 int main(int /* argc */, char** /* argv */)
 {
@@ -25,5 +25,4 @@ int main(int /* argc */, char** /* argv */)
     }
     std::cout << std::endl;
   }
-
 }

@@ -28,7 +28,6 @@
 
 namespace scalopus
 {
-
 Client::Client()
 {
 }
@@ -49,4 +48,4 @@ void Client::setTransport(const std::shared_ptr<TransportClient>& transport)
   std::cout << "set transport_ is called with: " << transport_.lock() << std::endl;
 }
 
-}
+}  // namespace scalopus

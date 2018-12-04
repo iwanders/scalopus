@@ -24,19 +24,18 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "transport_client_unix.h"
-#include "protocol.h"
 #include <sys/socket.h>
-#include <sys/un.h>
 #include <sys/types.h>
+#include <sys/un.h>
 #include <unistd.h>
-#include <sstream>
 #include <cstring>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <sstream>
+#include "protocol.h"
 
 namespace scalopus
 {
-
 TransportClientUnix::TransportClientUnix()
 {
 }
@@ -85,7 +84,8 @@ bool TransportClientUnix::connect(std::size_t pid, const std::string& suffix)
   return true;
 }
 
-bool TransportClientUnix::send(const std::string& remote_endpoint_name, const std::vector<char>& data, std::vector<char>& response)
+bool TransportClientUnix::send(const std::string& remote_endpoint_name, const std::vector<char>& data,
+                               std::vector<char>& response)
 {
   protocol::Msg outgoing;
   outgoing.endpoint = remote_endpoint_name;
@@ -116,7 +116,7 @@ std::vector<std::size_t> TransportClientUnix::getProviders(const std::string& su
   std::ifstream infile("/proc/net/unix");
   std::vector<std::size_t> res;
   //  Num       RefCount Protocol Flags    Type St Inode Path
-  //  0000000000000000: 00000002 00000000 00010000 0001 01 235190 @16121_scalopus 
+  //  0000000000000000: 00000002 00000000 00010000 0001 01 235190 @16121_scalopus
   std::string line;
   while (std::getline(infile, line))
   {
@@ -156,6 +156,4 @@ std::vector<size_t> getTransportServersUnix()
   return TransportClientUnix::getProviders();
 }
 
-}
-
-
+}  // namespace scalopus
