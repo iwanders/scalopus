@@ -45,20 +45,20 @@ std::vector<std::string> ClientIntrospect::supported()
     return {};  // @todo(iwanders) probably better to throw...
   }
 
-  std::vector<char> resp;
   std::vector<std::string> endpoints{ "" };
-  if (transport->send(getName(), { 'a' }, resp))
+  auto future = transport->request(getName(), {'a'});
+  
+  Data resp = future.get();
+
+  resp.pop_back();
+  for (const auto z : resp)
   {
-    resp.pop_back();
-    for (const auto z : resp)
+    if (z == '\n')
     {
-      if (z == '\n')
-      {
-        endpoints.push_back("");
-        continue;
-      }
-      endpoints.back() += z;
+      endpoints.push_back("");
+      continue;
     }
+    endpoints.back() += z;
   }
 
   return endpoints;

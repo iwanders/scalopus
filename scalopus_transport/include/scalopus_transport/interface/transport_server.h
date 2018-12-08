@@ -39,10 +39,10 @@ class TransportServer
 {
 public:
   virtual ~TransportServer();
-  virtual void addEndpoint(std::unique_ptr<Endpoint>&& endpoint);
+  virtual void addEndpoint(const std::shared_ptr<Endpoint>& endpoint);
   std::vector<std::string> endpoints() const;
 protected:
-  std::map<std::string, std::unique_ptr<Endpoint>> endpoints_;
+  std::map<std::string, std::shared_ptr<Endpoint>> endpoints_;
 };
 
 

@@ -41,7 +41,7 @@ public:
 
   Client();
   virtual std::string getName() const = 0;
-  virtual bool handle(const std::vector<char> incoming);
+  virtual void handle(const std::vector<char> incoming);
   virtual ~Client();
 
   void setTransport(const std::shared_ptr<TransportClient>& transport);

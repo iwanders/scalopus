@@ -23,28 +23,16 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus_transport/interface/client.h>
-#include <iostream>
+
+#ifndef SCALOPUS_INTERFACE_TYPES_H
+#define SCALOPUS_INTERFACE_TYPES_H
+
+#include "scalopus_transport/interface/exceptions.h"
+#include <vector>
 
 namespace scalopus
 {
-Client::Client()
-{
-}
-
-Client::~Client()
-{
-}
-
-void Client::handle(const std::vector<char> /* incoming */)
-{
-}
-
-void Client::setTransport(const std::shared_ptr<TransportClient>& transport)
-{
-  std::cout << "set Transport is called with: " << transport << std::endl;
-  transport_ = transport;
-  std::cout << "set transport_ is called with: " << transport_.lock() << std::endl;
-}
-
+using Data = std::vector<char>;
 }  // namespace scalopus
+
+#endif

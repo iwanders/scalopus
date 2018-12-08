@@ -47,6 +47,8 @@ TransportClientUnix::~TransportClientUnix()
 
 void TransportClientUnix::disconnect()
 {
+  running_ = false;
+  incoming_handler_.join();
   if (fd_)
   {
     ::close(fd_);
@@ -81,29 +83,39 @@ bool TransportClientUnix::connect(std::size_t pid, const std::string& suffix)
     return false;
   }
 
+  running_ = true;
+  incoming_handler_ = std::thread([&](){work();});
+
   return true;
 }
 
-bool TransportClientUnix::send(const std::string& remote_endpoint_name, const std::vector<char>& data,
-                               std::vector<char>& response)
+std::shared_future<Data> TransportClientUnix::request(const std::string& remote_endpoint_name, const Data& outgoing, size_t request_id)
 {
-  protocol::Msg outgoing;
-  outgoing.endpoint = remote_endpoint_name;
-  outgoing.data = data;
-  if (!protocol::send(fd_, outgoing))
+  if (request_id == 0)
   {
-    std::cout << "Send fail" << std::endl;
-    return false;
+    request_id = request_counter_++;
   }
-  protocol::Msg incoming;
-  if (!protocol::receive(fd_, incoming))
+  protocol::Msg outgoing_msg;
+  outgoing_msg.endpoint = remote_endpoint_name;
+  outgoing_msg.data = outgoing;
+  outgoing_msg.request_id = request_id;
+
+  auto promise = std::promise<Data>();
+  auto shared_future = std::shared_future<Data>(promise.get_future());
+
   {
-    std::cerr << "receive fail" << std::endl;
-    return false;
+    std::lock_guard<std::mutex> lock(write_lock_);
+    if (!protocol::send(fd_, outgoing_msg))
+    {
+      promise.set_exception(std::make_exception_ptr(communication_error("Failed to send data.")));
+      return shared_future;
+    }
   }
 
-  response = incoming.data;
-  return true;
+  // Send succeeded, store the promise in the map, its result should be pending.
+  std::lock_guard<std::mutex> lock(request_lock_);
+  ongoing_requests_[{remote_endpoint_name, request_id}] = std::move(promise);
+  return shared_future;
 }
 
 bool TransportClientUnix::isConnected() const
@@ -143,6 +155,51 @@ std::vector<std::size_t> TransportClientUnix::getProviders(const std::string& su
   }
 
   return res;
+}
+
+void TransportClientUnix::work()
+{
+  fd_set read_fds;
+  fd_set write_fds;
+  fd_set except_fds;
+  struct timeval tv;
+  tv.tv_usec = 10000;
+  while (running_)
+  {
+    FD_ZERO(&read_fds);
+    FD_ZERO(&write_fds);
+    FD_ZERO(&except_fds);
+    FD_SET(fd_, &read_fds);
+
+    int select_result = select(fd_ + 1, &read_fds, &write_fds, &except_fds, &tv);
+
+    if (select_result == -1)
+    {
+      std::cerr << "[scalopus]: Failure occured on select." << std::endl;
+    }
+
+    // We can read...
+    if (FD_ISSET(fd_, &read_fds))
+    {
+      protocol::Msg incoming;
+      if (!protocol::receive(fd_, incoming))
+      {
+        // we failed reading data, if this happens we lost the connection.
+        running_ = false;
+        fd_ = 0;
+      }
+
+      // lock the requests map.
+      std::lock_guard<std::mutex> lock(request_lock_);
+      // Try to find a promise for the message we just received.
+      auto request_it = ongoing_requests_.find({incoming.endpoint, incoming.request_id});
+      if (request_it != ongoing_requests_.end())
+      {
+        request_it->second.set_value(incoming.data); // set the value into the promise.
+        ongoing_requests_.erase(request_it);  // remove the request promise from the map.
+      }
+    }
+  }
 }
 
 std::shared_ptr<TransportClient> transportClientUnix(const size_t pid)

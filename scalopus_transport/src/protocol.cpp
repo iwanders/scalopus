@@ -39,6 +39,7 @@ namespace protocol
 {
 bool readData(int fd, size_t length, std::vector<char>& incoming)
 {
+  // Technically this doesn't need to read in chunks anymore... since we always know the length.
   const size_t chunk_size = 4096;
   std::array<char, chunk_size> buf;
   incoming.resize(0);
@@ -84,13 +85,25 @@ bool receive(int fd, Msg& incoming)
 {
   // Simple length prefixed protocol:
 
+  // size_t request_id;
   // uint16_t length_endpoint_name;
   // char[length_endpoint_name] endpoint_name;
   // uint32_t length_of_payload;
   // char[length_of_payload] payload;
 
-  std::uint16_t length_endpoint_name{ 0 };
   std::vector<char> tmp;
+
+  // Read the request id.
+  if (readData(fd, sizeof(incoming.request_id), tmp))
+  {
+    incoming.request_id = *reinterpret_cast<decltype(incoming.request_id)*>(tmp.data());
+  }
+  else
+  {
+    return false;
+  }
+
+  std::uint16_t length_endpoint_name{ 0 };
   if (readData(fd, sizeof(length_endpoint_name), tmp))
   {
     length_endpoint_name = *reinterpret_cast<decltype(length_endpoint_name)*>(tmp.data());
@@ -140,6 +153,13 @@ bool send(int fd, const Msg& outgoing)
   uint16_t length_endpoint_name = static_cast<uint16_t>(outgoing.endpoint.size());
   uint32_t length_data = static_cast<uint32_t>(outgoing.data.size());
 
+  // Send request id.
+  if (::write(fd, &outgoing.request_id, sizeof(outgoing.request_id)) !=
+      static_cast<ssize_t>(sizeof(outgoing.request_id)))
+  {
+    return false;
+  }
+  
   // Send endpoint length
   if (::write(fd, &length_endpoint_name, sizeof(length_endpoint_name)) !=
       static_cast<ssize_t>(sizeof(length_endpoint_name)))

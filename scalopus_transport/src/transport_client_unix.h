@@ -46,7 +46,7 @@ public:
   bool connect(std::size_t pid, const std::string& suffix = "_scalopus");
   void disconnect();
 
-  bool send(const std::string& remote_endpoint_name, const std::vector<char>& data, std::vector<char>& response);
+  std::shared_future<Data> request(const std::string& remote_endpoint_name, const Data& outgoing, size_t request_id = 0);
 
   bool isConnected() const;
 
@@ -54,6 +54,15 @@ public:
 
 private:
   int fd_{ 0 };
+  std::thread incoming_handler_;
+  size_t request_counter_ { 0 };
+  std::mutex write_lock_;  //!< Lock to ensure only one thread is writing to the socket.
+
+  std::mutex request_lock_; //!< Lock to guard modification of ongoing_requests_ map.
+  std::map<std::pair<std::string, size_t>, std::promise<Data>> ongoing_requests_;
+
+  bool running_ { false };
+  void work();
 };
 
 std::shared_ptr<TransportClient> transportClientUnix();

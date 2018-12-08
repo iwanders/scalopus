@@ -31,7 +31,7 @@ TransportServer::~TransportServer()
 {
 }
 
-void TransportServer::addEndpoint(std::unique_ptr<Endpoint>&& endpoint)
+void TransportServer::addEndpoint(const std::shared_ptr<Endpoint>& endpoint)
 {
   endpoints_[endpoint->getName()] = std::move(endpoint);
 }

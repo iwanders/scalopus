@@ -23,28 +23,30 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus_transport/interface/client.h>
-#include <iostream>
+
+#ifndef SCALOPUS_INTERFACE_EXCEPTIONS_H
+#define SCALOPUS_INTERFACE_EXCEPTIONS_H
+
+#include <stdexcept>
 
 namespace scalopus
 {
-Client::Client()
+class error : public std::runtime_error
 {
-}
+public:
+  error(const std::string& what_arg) : std::runtime_error(what_arg)
+  {
+  }
+};
 
-Client::~Client()
+class communication_error : public error
 {
-}
-
-void Client::handle(const std::vector<char> /* incoming */)
-{
-}
-
-void Client::setTransport(const std::shared_ptr<TransportClient>& transport)
-{
-  std::cout << "set Transport is called with: " << transport << std::endl;
-  transport_ = transport;
-  std::cout << "set transport_ is called with: " << transport_.lock() << std::endl;
-}
+public:
+  communication_error(const std::string& what_arg) : error(what_arg)
+  {
+  }
+};
 
 }  // namespace scalopus
+
+#endif

@@ -30,10 +30,4 @@ namespace scalopus
 TransportClient::~TransportClient()
 {
 }
-
-void TransportClient::addClient(const std::shared_ptr<Client>& client)
-{
-  clients_[client->getName()] = std::move(client);
-}
-
 }  // namespace scalopus

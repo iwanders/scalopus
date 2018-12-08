@@ -28,8 +28,10 @@
 #define SCALOPUS_INTERFACE_TRANSPORT_CLIENT_H
 
 #include <scalopus_transport/interface/client.h>
+#include <scalopus_transport/interface/types.h>
 #include <memory>
 #include <map>
+#include <future>
 
 namespace scalopus
 {
@@ -40,13 +42,17 @@ public:
   using WeakPtr = std::weak_ptr<TransportClient>;
   using Ptr = std::shared_ptr<TransportClient>;
 
-  virtual bool send(const std::string& remote_endpoint_name, const std::vector<char>& outgoing, std::vector<char>& response) = 0;
+  /**
+   * @brief Prepare (and send) a request.
+   * @param remote_endpoint_name The endpoint to which this request should be sent.
+   * @param outgoing The data that should be sent to the endpoint. 
+   * @param request_id The request id, if this is zero this is automatically incremented by the client. Otherwise it is
+   *        used to get the future for endpoints that send by themselves without a request.
+   */
+  virtual std::shared_future<Data> request(const std::string& remote_endpoint_name, const Data& outgoing, size_t request_id = 0) = 0;
 
   virtual ~TransportClient();
   virtual bool isConnected() const = 0;
-  virtual void addClient(const std::shared_ptr<Client>& client);
-protected:
-  std::map<std::string, std::shared_ptr<Client>> clients_;
 };
 
 

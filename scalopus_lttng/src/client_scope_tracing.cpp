@@ -47,10 +47,11 @@ std::map<unsigned int, std::string> ClientScopeTracing::mapping()
     return {};  // @todo(iwanders) probably better to throw...
   }
 
-  std::vector<char> resp;
   std::map<unsigned int, std::string> res;
   size_t resp_index = 0;
-  if (transport->send(getName(), { 'm' }, resp))
+
+  std::vector<char> resp = transport->request(getName(), { 'm' }).get();
+  if (!resp.empty())
   {
     while (resp_index < resp.size())
     {
