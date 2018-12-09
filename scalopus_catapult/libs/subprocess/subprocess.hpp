@@ -87,6 +87,16 @@ public:
         in_filebuf->close();
     }
     
+
+    pid_t getPid()
+    {
+      return pid;
+    }
+
+    FILE* stdoutFile()
+    {
+      return out_filebuf->file();
+    }
     
 private:
     
