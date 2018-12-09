@@ -25,6 +25,7 @@
 */
 
 #include "scalopus_lttng/babeltrace_parser.h"
+#include <iostream>
 
 namespace scalopus
 {
@@ -64,6 +65,7 @@ void BabeltraceParser::process(FILE* stdout)
           if ((*it)->active == false)
           {
             // session went inactive, remove it.
+            std::cout << "callback inactive: " << (*it).get() << std::endl;
             it = sessions_recording_.erase(it);
             continue;
           }
@@ -98,6 +100,7 @@ void BabeltraceParser::halt()
 void BabeltraceParser::setCallback(const std::shared_ptr<EventCallback>& callback)
 {
   std::lock_guard<std::mutex> lock(mutex_);
+  std::cout << "Adding callback: " << callback.get() << std::endl;
   sessions_recording_.insert(callback);
 }
 

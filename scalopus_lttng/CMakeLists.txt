@@ -49,6 +49,9 @@ target_link_libraries(scalopus_babeltrace
   PRIVATE
     Threads::Threads
 )
+add_library(Scalopus::scalopus_babeltrace ALIAS scalopus_babeltrace)
+
+
 add_executable(babeltrace_test
   src/babeltrace_test.cpp)
 target_link_libraries(babeltrace_test
@@ -58,15 +61,18 @@ target_link_libraries(babeltrace_test
 
 
 export(
-  TARGETS scalopus_lttng
+  TARGETS scalopus_lttng scalopus_babeltrace
   NAMESPACE Scalopus::
   FILE ScalopusLttngConfig.cmake
 )
-install(TARGETS scalopus_lttng EXPORT ScalopusLttng
+install(TARGETS scalopus_lttng scalopus_babeltrace EXPORT ScalopusLttng
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT ScalopusLttng DESTINATION share/scalopus_lttng/cmake)
 
-enable_testing()
-add_subdirectory(test)
+include(CTest)
+if(BUILD_TESTING)
+  enable_testing()
+  add_subdirectory(test)
+endif()

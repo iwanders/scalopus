@@ -29,4 +29,5 @@ endmacro()
 add_subdirectory(scalopus_transport)
 add_subdirectory(scalopus_lttng)
 add_subdirectory(scalopus_examples)
+add_subdirectory(scalopus_catapult)
 

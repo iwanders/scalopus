@@ -2,7 +2,8 @@
 
 Retry the cmakelists:
 ```bash
+# build seasocks:
+rm -rf * && cmake ../../3rd_party/seasocks/ -DEFLATE_SUPPORT=off && make 
 # build scalopus:
-cmake ../../repo/ && VERBOSE=1 make -j3
-
+rm -rf * && nlohmann_json_DIR=$(pwd)/../json/ Seasocks_DIR=$(pwd)/../seasocks/ cmake ../../repo/  && make -j8
 ```
