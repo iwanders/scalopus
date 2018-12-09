@@ -11,6 +11,8 @@ if (!LTTngUST_FOUND)
   error("LTTNG could not be found")
 endif()
 
+include(FindThreads)
+
 # Create the library that provides the scope tracepoints 
 add_library(scalopus_lttng SHARED
   src/scope_tracepoint.cpp
@@ -36,6 +38,25 @@ target_link_libraries(scalopus_lttng
     ${LTTngUST_LIBRARIES}
 )
 
+
+add_library(scalopus_babeltrace
+  src/ctfevent.cpp
+  src/babeltrace_tool.cpp
+  src/babeltrace_parser.cpp)
+target_link_libraries(scalopus_babeltrace
+  PUBLIC
+    scalopus_lttng
+  PRIVATE
+    Threads::Threads
+)
+add_executable(babeltrace_test
+  src/babeltrace_test.cpp)
+target_link_libraries(babeltrace_test
+  PRIVATE
+    scalopus_babeltrace
+)
+
+
 export(
   TARGETS scalopus_lttng
   NAMESPACE Scalopus::
@@ -46,3 +67,6 @@ install(TARGETS scalopus_lttng EXPORT ScalopusLttng
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT ScalopusLttng DESTINATION share/scalopus_lttng/cmake)
+
+enable_testing()
+add_subdirectory(test)
