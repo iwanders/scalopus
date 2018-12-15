@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Create the named session in live output mode.
+lttng create scalopus_target_session --live
+
+# enable all userspace events.
+lttng enable-event -u -a
+
+# add the process id
+lttng add-context -u -t vpid
+
+# add the thread id
+lttng add-context -u -t pthread_id
+
+# Start tracing.
+lttng start

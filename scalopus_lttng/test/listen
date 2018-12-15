@@ -1,0 +1,5 @@
+#!/bin/bash
+
+lttng view scalopus_target_session -e "babeltrace --clock-seconds --clock-gmt --no-delta --input-format=lttng-live"
+
+# babeltrace -v --clock-seconds --clock-gmt --no-delta --input-format=lttng-live --input-format=lttng-live net://localhost/host/$(hostname)/scalopus_target_session
