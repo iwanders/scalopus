@@ -24,6 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <scalopus_transport/interface/endpoint.h>
+#include <iostream>
 
 namespace scalopus
 {
@@ -34,5 +35,18 @@ Endpoint::Endpoint()
 Endpoint::~Endpoint()
 {
 }
+
+bool Endpoint::handle(Transport& /* transport */, const Data& /* incoming */, Data& /* outgoing */)
+{
+  return false;
+}
+
+void Endpoint::setTransport(const std::shared_ptr<Transport>& transport)
+{
+  std::cout << "set Transport is called with: " << transport << std::endl;
+  transport_ = transport;
+  std::cout << "set transport_ is called with: " << transport_.lock() << std::endl;
+}
+
 
 }  // namespace scalopus

@@ -23,7 +23,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "transport_server_unix.h"
+#include "transport_unix.h"
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -32,12 +32,17 @@
 #include <algorithm>
 #include <cstring>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include "protocol.h"
 
 namespace scalopus
 {
-TransportServerUnix::TransportServerUnix()
+TransportUnix::TransportUnix()
+{
+}
+
+bool TransportUnix::serve()
 {
   // Create the server socket to work with.
   server_fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -45,7 +50,7 @@ TransportServerUnix::TransportServerUnix()
   if (server_fd_ == -1)
   {
     std::cerr << "[scalopus] Could not create socket." << std::endl;
-    // Should we continue if this happens?
+    return false;
   }
 
   // Create the socket struct.
@@ -65,38 +70,146 @@ TransportServerUnix::TransportServerUnix()
   if (bind(server_fd_, reinterpret_cast<sockaddr*>(&socket_config), static_cast<unsigned int>(path_length)) == -1)
   {
     std::cerr << "[scalopus] Could not bind socket." << std::endl;
+    return false;
   }
 
   // Listen for connections, with a queue of five.
   if (listen(server_fd_, 5) == -1)
   {
     std::cerr << "[scalopus] Could not start listening for connections." << std::endl;
+    return false;
   }
 
   std::cerr << "Server: " << server_fd_ << std::endl;
   connections_.insert(server_fd_);
 
   // If we get here, we are golden, we got a working unix domain socket and can start our worker thread.
-  if (server_fd_)
-  {
-    thread_ = std::thread([this]() { work(); });
-  }
-  else
-  {
-    running_ = false;
-  }
+  running_ = true;
+  thread_ = std::thread([this]() { work(); });
+  
+  return true;
 }
 
-TransportServerUnix::~TransportServerUnix()
+bool TransportUnix::connect(std::size_t pid, const std::string& suffix)
 {
+  client_fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
+
+  if (client_fd_ == -1)
+  {
+    std::cerr << "[scalopus] Could not create socket." << std::endl;
+    return false;
+  }
+
+  // Create the socket struct.
+  struct sockaddr_un socket_config;
+  std::memset(&socket_config, 0, sizeof(socket_config));
+  socket_config.sun_family = AF_UNIX;
+
+  std::stringstream ss;
+  ss << "" << pid << suffix;
+  std::strncpy(socket_config.sun_path + 1, ss.str().c_str(), sizeof(socket_config.sun_path) - 2);
+
+  std::size_t path_length = sizeof(socket_config.sun_family) + strlen(socket_config.sun_path + 1) + 1;
+  if (::connect(client_fd_, reinterpret_cast<sockaddr*>(&socket_config), static_cast<unsigned int>(path_length)) == -1)
+  {
+    std::cerr << "[scalopus] Could not connect socket." << std::endl;
+    return false;
+  }
+  connections_.insert(client_fd_);
+
+  running_ = true;
+  thread_ = std::thread([&](){work();});
+
+  return true;
+}
+
+std::shared_future<Data> TransportUnix::request(const std::string& remote_endpoint_name, const Data& outgoing, size_t request_id)
+{
+  if (request_id == 0)
+  {
+    request_id = request_counter_++;
+  }
+  protocol::Msg outgoing_msg;
+  outgoing_msg.endpoint = remote_endpoint_name;
+  outgoing_msg.data = outgoing;
+  outgoing_msg.request_id = request_id;
+
+  auto promise = std::promise<Data>();
+  auto shared_future = std::shared_future<Data>(promise.get_future());
+
+  {
+    std::lock_guard<std::mutex> lock(write_lock_);
+    if (!protocol::send(client_fd_, outgoing_msg))
+    {
+      promise.set_exception(std::make_exception_ptr(communication_error("Failed to send data.")));
+      return shared_future;
+    }
+  }
+
+  // Send succeeded, store the promise in the map, its result should be pending.
+  std::lock_guard<std::mutex> lock(request_lock_);
+  ongoing_requests_[{remote_endpoint_name, request_id}] = std::move(promise);
+  return shared_future;
+}
+
+bool TransportUnix::isConnected() const
+{
+  return client_fd_ != 0;
+}
+
+std::vector<std::size_t> TransportUnix::getProviders(const std::string& suffix)
+{
+  std::ifstream infile("/proc/net/unix");
+  std::vector<std::size_t> res;
+  //  Num       RefCount Protocol Flags    Type St Inode Path
+  //  0000000000000000: 00000002 00000000 00010000 0001 01 235190 @16121_scalopus
+  std::string line;
+  while (std::getline(infile, line))
+  {
+    if (line.size() < suffix.size())
+    {
+      continue;  // definitely is not a line we are interested in.
+    }
+    // std::basic_string::ends_with is c++20 :|
+    if (line.substr(line.size() - suffix.size()) == suffix)
+    {
+      // We got a hit, extract the process id.
+      const auto space_before_path = line.rfind(" ");
+      const auto path = line.substr(space_before_path + 2);  // + 2 for space and @ symbol.
+      const auto space_before_inode = line.rfind(" ", space_before_path - 1);
+      const auto inode_str = line.substr(space_before_inode, space_before_path - space_before_inode);
+      if (std::atoi(inode_str.c_str()) == 0)
+      {
+        // clients to the socket get this 0 inode address...
+        continue;
+      }
+      char* tmp;
+      res.emplace_back(std::strtoul(path.substr(0, path.size() - suffix.size()).c_str(), &tmp, 10));
+    }
+  }
+
+  return res;
+}
+
+TransportUnix::~TransportUnix()
+{
+  // First, stop the thread
+  running_ = false;
+  thread_.join();
+
+  // Then clean up all the connections.
   for (const auto& connection : connections_)
   {
     ::close(connection);
     ::shutdown(connection, 2);
   }
+  ::close(server_fd_);
+  ::shutdown(server_fd_, 2);
+  ::close(client_fd_);
+  ::shutdown(client_fd_, 2);
 }
 
-void TransportServerUnix::work()
+void TransportUnix::work()
 {
   fd_set read_fds;
   fd_set write_fds;
@@ -134,6 +247,28 @@ void TransportServerUnix::work()
       connections_.insert(client);
     }
 
+    // handle client readable:
+    if (FD_ISSET(client_fd_, &read_fds))
+    {
+      protocol::Msg incoming;
+      if (!protocol::receive(client_fd_, incoming))
+      {
+        // we failed reading data, if this happens we lost the connection.
+        running_ = false;
+        client_fd_ = 0;
+      }
+
+      // lock the requests map.
+      std::lock_guard<std::mutex> lock(request_lock_);
+      // Try to find a promise for the message we just received.
+      auto request_it = ongoing_requests_.find({incoming.endpoint, incoming.request_id});
+      if (request_it != ongoing_requests_.end())
+      {
+        request_it->second.set_value(incoming.data); // set the value into the promise.
+        ongoing_requests_.erase(request_it);  // remove the request promise from the map.
+      }
+    }
+
     if (FD_ISSET(server_fd_, &except_fds))
     {
       std::cout << "[scalopus] Exception on server " << std::endl;
@@ -143,7 +278,7 @@ void TransportServerUnix::work()
     const auto copy_of_connections = connections_;
     for (const auto& connection : copy_of_connections)
     {
-      if (connection == server_fd_)
+      if ((connection == server_fd_) || (connection == client_fd_))
       {
         continue;
       }
@@ -179,22 +314,24 @@ void TransportServerUnix::work()
   }
 }
 
-bool TransportServerUnix::processMsg(const protocol::Msg& request, protocol::Msg& response)
+bool TransportUnix::processMsg(const protocol::Msg& request, protocol::Msg& response)
 {
   response.endpoint = request.endpoint;
+  response.request_id = request.request_id;
   // Check if we have this endpoint.
   const auto it = endpoints_.find(request.endpoint);
   if (it != endpoints_.end())
   {
+    Data outgoing;
     // Let the endpoint handle the data and if necessary respond.
     return it->second->handle(*this, request.data, response.data);
   }
   return false;
 }
 
-std::unique_ptr<TransportServer> transportServerUnix()
+std::unique_ptr<Transport> transportUnix()
 {
-  return std::make_unique<TransportServerUnix>();
+  return std::make_unique<TransportUnix>();
 }
 
 }  // namespace scalopus

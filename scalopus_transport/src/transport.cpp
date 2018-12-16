@@ -23,31 +23,39 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef SCALOPUS_INTERFACE_CLIENT_H
-#define SCALOPUS_INTERFACE_CLIENT_H
-
-#include <string>
-#include <vector>
-#include <memory>
+#include <scalopus_transport/interface/transport.h>
 
 namespace scalopus
 {
-class TransportClient;
-
-class Client
+Transport::~Transport()
 {
-public:
-  using Ptr = std::shared_ptr<Client>;
-
-  Client();
-  virtual std::string getName() const = 0;
-  virtual void handle(const std::vector<char> incoming);
-  virtual ~Client();
-
-  void setTransport(const std::shared_ptr<TransportClient>& transport);
-protected:
-  std::weak_ptr<TransportClient> transport_;
-};
-
 }
-#endif  // SCALOPUS_INTERFACE_CLIENT_H
+
+void Transport::addEndpoint(const std::shared_ptr<Endpoint>& endpoint)
+{
+  std::lock_guard<std::mutex> lock(endpoint_mutex_);
+  endpoints_[endpoint->getName()] = endpoint;
+}
+
+std::vector<std::string> Transport::endpoints() const
+{
+  std::lock_guard<std::mutex> lock(endpoint_mutex_);
+  std::vector<std::string> keys;
+  for (const auto& name_endpoint : endpoints_)
+  {
+    keys.emplace_back(name_endpoint.first);
+  }
+  return keys;
+}
+
+Endpoint::Ptr Transport::getEndpoint(const std::string& name) const
+{
+  std::lock_guard<std::mutex> lock(endpoint_mutex_);
+  const auto it = endpoints_.find(name);
+  if (it != endpoints_.end())
+  {
+    return it->second;
+  }
+  return nullptr;
+}
+}  // namespace scalopus

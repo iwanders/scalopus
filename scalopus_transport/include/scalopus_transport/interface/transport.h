@@ -23,28 +23,32 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus_transport/interface/client.h>
-#include <iostream>
+
+#ifndef SCALOPUS_INTERFACE_TRANSPORT_H
+#define SCALOPUS_INTERFACE_TRANSPORT_H
+
+#include <scalopus_transport/interface/endpoint.h>
+#include <memory>
+#include <map>
+#include <vector>
+#include <mutex>
 
 namespace scalopus
 {
-Client::Client()
-{
-}
 
-Client::~Client()
+class Transport
 {
-}
+public:
+  virtual ~Transport();
+  virtual void addEndpoint(const std::shared_ptr<Endpoint>& endpoint);
+  std::vector<std::string> endpoints() const;
 
-void Client::handle(const std::vector<char> /* incoming */)
-{
-}
+  Endpoint::Ptr getEndpoint(const std::string& name) const;
+protected:
+  std::map<std::string, std::shared_ptr<Endpoint>> endpoints_;
+  mutable std::mutex endpoint_mutex_;
+};
 
-void Client::setTransport(const std::shared_ptr<TransportClient>& transport)
-{
-  std::cout << "set Transport is called with: " << transport << std::endl;
-  transport_ = transport;
-  std::cout << "set transport_ is called with: " << transport_.lock() << std::endl;
-}
 
 }  // namespace scalopus
+#endif  // SCALOPUS_INTERFACE_TRANSPORT_SERVER_H

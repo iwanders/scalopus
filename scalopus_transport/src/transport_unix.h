@@ -24,27 +24,60 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_INTERFACE_TRANSPORT_SERVER_H
-#define SCALOPUS_INTERFACE_TRANSPORT_SERVER_H
+#ifndef SCALOPUS_PROVIDER_H
+#define SCALOPUS_PROVIDER_H
 
 #include <scalopus_transport/interface/endpoint.h>
-#include <memory>
+#include <scalopus_transport/interface/transport.h>
 #include <map>
+#include <set>
+#include <thread>
+#include <future>
+#include <utility>
 #include <vector>
+#include "protocol.h"
 
 namespace scalopus
 {
-
-class TransportServer
+/**
+ * @brief The exposer class that is used to get the data about the trace mappings out of the proces.
+ */
+class TransportUnix : public Transport
 {
 public:
-  virtual ~TransportServer();
-  virtual void addEndpoint(const std::shared_ptr<Endpoint>& endpoint);
-  std::vector<std::string> endpoints() const;
-protected:
-  std::map<std::string, std::shared_ptr<Endpoint>> endpoints_;
+  TransportUnix();
+  ~TransportUnix();
+
+  bool serve();
+  bool connect(std::size_t pid, const std::string& suffix = "_scalopus");
+  void disconnect();
+
+  std::shared_future<Data> request(const std::string& remote_endpoint_name, const Data& outgoing, size_t request_id = 0);
+
+  bool isConnected() const;
+
+  static std::vector<std::size_t> getProviders(const std::string& suffix = "_scalopus");
+
+private:
+
+  std::thread thread_;
+  void work();
+  int server_fd_{ 0 };
+  int client_fd_{ 0 };
+  bool running_{ false };
+
+  std::set<int> connections_;
+
+  bool processMsg(const protocol::Msg& request, protocol::Msg& response);
+
+  size_t request_counter_{ 0 };
+  std::mutex write_lock_;  //!< Lock to ensure only one thread is writing to the socket.
+
+  std::mutex request_lock_; //!< Lock to guard modification of ongoing_requests_ map.
+  std::map<std::pair<std::string, size_t>, std::promise<Data>> ongoing_requests_;
 };
 
+std::unique_ptr<Transport> transportUnix();
 
 }  // namespace scalopus
-#endif  // SCALOPUS_INTERFACE_TRANSPORT_SERVER_H
+#endif  // SCALOPUS_PROVIDER_H

@@ -34,15 +34,25 @@
 namespace scalopus
 {
 
-class TransportServer;
+class Transport;
 
 class Endpoint
 {
 public:
+  using Ptr = std::shared_ptr<Endpoint>;
   Endpoint();
   virtual std::string getName() const = 0;
-  virtual bool handle(TransportServer& server, const Data request, Data& response) = 0;
+
+  /**
+   * @brief Handle data from the transport.
+   * @return True if outgoing should be returned over the transport. False if no outgoing message.
+   */
+  virtual bool handle(Transport& transport, const Data& incoming, Data& outgoing);
   virtual ~Endpoint();
+
+  void setTransport(const std::shared_ptr<Transport>& transport);
+protected:
+  std::weak_ptr<Transport> transport_;
 };
 
 }

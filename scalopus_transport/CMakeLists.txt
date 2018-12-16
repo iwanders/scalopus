@@ -4,15 +4,13 @@ include(FindThreads)
 
 # Create the library that provides the scope tracepoints 
 add_library(scalopus_transport SHARED
-  src/transport_server.cpp
-  src/transport_client.cpp
-  src/transport_server_unix.cpp
-  src/transport_client_unix.cpp
+  src/transport.cpp
+  src/transport_unix.cpp
   src/endpoint.cpp
-  src/client.cpp
+  #src/client.cpp
   src/protocol.cpp
-  src/client_introspect.cpp
-  src/endpoint_introspect.cpp
+  #src/client_introspect.cpp
+  #src/endpoint_introspect.cpp
 )
 add_library(Scalopus::scalopus_transport ALIAS scalopus_transport)
 
@@ -44,3 +42,10 @@ install(TARGETS scalopus_transport EXPORT ScalopusTransport
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT ScalopusTransport DESTINATION share/scalopus_transport/cmake)
+
+include(CTest)
+if(BUILD_TESTING)
+  enable_testing()
+  add_subdirectory(test)
+endif()
+
