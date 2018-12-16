@@ -70,7 +70,7 @@ private:
 
   bool processMsg(const protocol::Msg& request, protocol::Msg& response);
 
-  size_t request_counter_{ 0 };
+  size_t request_counter_{ 1 };  // 0 is reserved for broadcasts
   std::mutex write_lock_;  //!< Lock to ensure only one thread is writing to the socket.
 
   std::mutex request_lock_; //!< Lock to guard modification of ongoing_requests_ map.

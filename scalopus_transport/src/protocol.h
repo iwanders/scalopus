@@ -34,7 +34,7 @@ namespace protocol
 {
 struct Msg
 {
-  size_t request_id;       //!< The request id associated to this request.
+  size_t request_id { 0 };       //!< The request id associated to this request.
   std::string endpoint;    //!< Endpoint name for this message.
   std::vector<char> data;  //!< Data in this message.
 };

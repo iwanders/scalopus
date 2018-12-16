@@ -45,6 +45,10 @@ public:
 
   virtual std::shared_future<Data> request(const std::string& remote_endpoint_name, const Data& outgoing) = 0;
 
+  /**
+   * @brief Broadcast is an asynchronous call, this is queued for broadcast, the worker than sends it at it's discretion
+   */
+  virtual void broadcast(const std::string& remote_endpoint_name, const Data& outgoing);
 
 
   std::vector<std::string> endpoints() const;
@@ -52,6 +56,12 @@ public:
 protected:
   std::map<std::string, std::shared_ptr<Endpoint>> endpoints_;
   mutable std::mutex endpoint_mutex_;
+
+  std::pair<std::string, Data> popBroadcast();
+  bool haveBroadcast() const;
+
+  std::vector<std::pair<std::string, Data>> broadcast_messages_;
+  mutable std::mutex broadcast_message_mutex_;
 };
 
 

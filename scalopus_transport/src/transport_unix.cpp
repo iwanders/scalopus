@@ -312,6 +312,7 @@ void TransportUnix::work()
           if (processMsg(request, response))
           {
             // send response...
+            std::lock_guard<std::mutex> wlock(write_lock_);
             protocol::send(connection, response);
           }
         }
@@ -328,6 +329,23 @@ void TransportUnix::work()
         ::close(connection);
         ::shutdown(connection, 2);
         connections_.erase(connection);
+      }
+    }
+
+    while(haveBroadcast())
+    {
+      const auto name_payload = popBroadcast();
+      protocol::Msg broadcast;
+      broadcast.endpoint = name_payload.first;
+      broadcast.data = name_payload.second;
+      for (const auto& connection : connections_)
+      {
+        if (connection == server_fd_)
+        {
+          continue;
+        }
+        std::lock_guard<std::mutex> wlock(write_lock_);
+        protocol::send(connection, broadcast);
       }
     }
   }

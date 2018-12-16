@@ -31,6 +31,26 @@ Transport::~Transport()
 {
 }
 
+void Transport::broadcast(const std::string& remote_endpoint_name, const Data& outgoing)
+{
+  std::lock_guard<std::mutex> lock(broadcast_message_mutex_);
+  broadcast_messages_.emplace_back(remote_endpoint_name, outgoing);
+}
+
+std::pair<std::string, Data> Transport::popBroadcast()
+{
+  std::lock_guard<std::mutex> lock(broadcast_message_mutex_);
+  std::pair<std::string, Data> tmp = std::move(broadcast_messages_.back());
+  broadcast_messages_.pop_back();
+  return tmp;
+}
+
+bool Transport::haveBroadcast() const
+{
+  std::lock_guard<std::mutex> lock(broadcast_message_mutex_);
+  return !broadcast_messages_.empty();
+}
+
 void Transport::addEndpoint(const std::shared_ptr<Endpoint>& endpoint)
 {
   std::lock_guard<std::mutex> lock(endpoint_mutex_);
