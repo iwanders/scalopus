@@ -28,6 +28,9 @@
 #define SCALOPUS_ENDPOINT_SCOPE_TRACING_H
 
 #include <scalopus_transport/interface/endpoint.h>
+#include <scalopus_transport/interface/transport.h>
+#include <map>
+#include <string>
 
 namespace scalopus
 {
@@ -36,7 +39,8 @@ class EndpointScopeTracing : public Endpoint
 {
 public:
   std::string getName() const;
-  bool handle(TransportServer& server, const std::vector<char> request, std::vector<char>& response);
+  bool handle(Transport& server, const Data& request, Data& response);
+  std::map<unsigned int, std::string> mapping();
 };
 
 }

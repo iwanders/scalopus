@@ -1,7 +1,7 @@
 #include <scalopus_transport/transport_unix.h>
 #include <cstring>
 #include <iostream>
-#include "scalopus_lttng/client_scope_tracing.h"
+#include "scalopus_lttng/endpoint_scope_tracing.h"
 
 int main(int /* argc */, char** /* argv */)
 {
@@ -11,10 +11,7 @@ int main(int /* argc */, char** /* argv */)
     std::cout << pid << std::endl;
 
     auto transport = scalopus::transportClientUnix(pid);
-    auto tracing_client = std::make_shared<scalopus::ClientScopeTracing>();
-
-    std::cout << "Connected? " << transport->isConnected() << std::endl;
-
+    auto tracing_client = std::make_shared<scalopus::EndpointScopeTracing>();
     tracing_client->setTransport(transport);
     std::cout << transport << std::endl;
 

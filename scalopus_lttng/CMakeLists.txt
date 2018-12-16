@@ -19,7 +19,6 @@ add_library(scalopus_lttng SHARED
   src/scope_trace_raii.cpp
   src/scope_trace_tracker.cpp
   src/endpoint_scope_tracing.cpp
-  src/client_scope_tracing.cpp
 )
 
 target_include_directories(scalopus_lttng

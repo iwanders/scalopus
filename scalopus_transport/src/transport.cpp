@@ -31,6 +31,11 @@ Transport::~Transport()
 {
 }
 
+bool Transport::isConnected() const
+{
+  return false;
+}
+
 void Transport::broadcast(const std::string& remote_endpoint_name, const Data& outgoing)
 {
   std::lock_guard<std::mutex> lock(broadcast_message_mutex_);

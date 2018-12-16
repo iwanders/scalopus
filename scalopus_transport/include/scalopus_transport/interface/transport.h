@@ -50,6 +50,10 @@ public:
    */
   virtual void broadcast(const std::string& remote_endpoint_name, const Data& outgoing);
 
+  /**
+   * @brief 
+   */
+  bool isConnected() const;
 
   std::vector<std::string> endpoints() const;
   Endpoint::Ptr getEndpoint(const std::string& name) const;

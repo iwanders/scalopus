@@ -27,15 +27,13 @@
 #ifndef SCALOPUS_TRANSPORT_UNIX_H
 #define SCALOPUS_TRANSPORT_UNIX_H
 
-#include <scalopus_transport/interface/transport_server.h>
-#include <scalopus_transport/interface/transport_client.h>
+#include <scalopus_transport/interface/transport.h>
 #include <memory>
 
 namespace scalopus
 {
-  std::unique_ptr<TransportServer> transportServerUnix();
-
-  std::shared_ptr<TransportClient> transportClientUnix(const size_t pid);
+  std::shared_ptr<Transport> transportServerUnix();
+  std::shared_ptr<Transport> transportClientUnix(const size_t pid);
 
   std::vector<size_t> getTransportServersUnix();
 }

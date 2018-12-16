@@ -151,7 +151,7 @@ std::shared_future<Data> TransportUnix::request(const std::string& remote_endpoi
 
 bool TransportUnix::isConnected() const
 {
-  return client_fd_ != 0;
+  return (client_fd_ != 0) || (server_fd_ != 0);
 }
 
 std::vector<std::size_t> TransportUnix::getProviders(const std::string& suffix)
@@ -366,9 +366,30 @@ bool TransportUnix::processMsg(const protocol::Msg& request, protocol::Msg& resp
   return false;
 }
 
-std::unique_ptr<Transport> transportUnix()
+std::shared_ptr<Transport> transportServerUnix()
 {
-  return std::make_unique<TransportUnix>();
+  auto t = std::make_unique<TransportUnix>();
+  if (t->serve())
+  {
+    return t;
+  }
+  return nullptr;
+}
+
+std::shared_ptr<Transport> transportClientUnix(std::size_t pid)
+{
+  auto t = std::make_unique<TransportUnix>();
+  if (t->connect(pid))
+  {
+    return t;
+  }
+  return nullptr;
+}
+
+std::vector<size_t> getTransportServersUnix()
+{
+  return TransportUnix::getProviders();
 }
 
 }  // namespace scalopus
+

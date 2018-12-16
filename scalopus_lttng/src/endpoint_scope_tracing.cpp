@@ -26,6 +26,7 @@
 #include <scalopus_lttng/endpoint_scope_tracing.h>
 #include <scalopus_lttng/internal/scope_trace_tracker.h>
 #include <cstring>
+#include <iostream>
 
 namespace scalopus
 {
@@ -34,8 +35,7 @@ std::string EndpointScopeTracing::getName() const
   return "scope_tracing";
 }
 
-bool EndpointScopeTracing::handle(TransportServer& /* server */, const std::vector<char> request,
-                                  std::vector<char>& response)
+bool EndpointScopeTracing::handle(Transport& /* server */, const Data& request, Data& response)
 {
   auto mapping = scalopus::ScopeTraceTracker::getInstance().getEntryExitMapping();
   // cool, we have the mappings... now we need to serialize this...
@@ -68,6 +68,42 @@ bool EndpointScopeTracing::handle(TransportServer& /* server */, const std::vect
     return true;
   }
   return false;
+}
+
+std::map<unsigned int, std::string> EndpointScopeTracing::mapping()
+{
+  // send message...
+  auto transport = transport_.lock();
+  if (transport == nullptr)
+  {
+    std::cout << "No transport :( " << std::endl;
+    return {};  // @todo(iwanders) probably better to throw...
+  }
+
+  std::map<unsigned int, std::string> res;
+  size_t resp_index = 0;
+
+  std::vector<char> resp = transport->request(getName(), { 'm' }).get();
+  if (!resp.empty())
+  {
+    while (resp_index < resp.size())
+    {
+      // now we need to deserialize this...
+      unsigned int id = *reinterpret_cast<decltype(res)::key_type*>(&resp[resp_index]);
+      resp_index += sizeof(id);
+      std::string::size_type string_length =
+          *reinterpret_cast<decltype(res)::mapped_type::size_type*>(&resp[resp_index]);
+      resp_index += sizeof(string_length);
+
+      std::string name;
+      name.resize(string_length);
+      std::memcpy(&name[0], &resp[resp_index], string_length);
+      resp_index += string_length;
+      res[id] = name;
+    }
+  }
+
+  return res;
 }
 
 }  // namespace scalopus

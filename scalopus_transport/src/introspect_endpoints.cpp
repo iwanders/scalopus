@@ -1,6 +1,6 @@
 #include <cstring>
 #include <iostream>
-#include "scalopus_transport/client_introspect.h"
+#include "scalopus_transport/endpoint_introspect.h"
 #include "scalopus_transport/transport_unix.h"
 
 int main(int /* argc */, char** /* argv */)
@@ -11,9 +11,7 @@ int main(int /* argc */, char** /* argv */)
     std::cout << pid << std::endl;
 
     auto transport = scalopus::transportClientUnix(pid);
-    auto introspect_client = std::make_shared<scalopus::ClientIntrospect>();
-
-    std::cout << "Connected? " << transport->isConnected() << std::endl;
+    auto introspect_client = std::make_shared<scalopus::EndpointIntrospect>();
 
     introspect_client->setTransport(transport);
     std::cout << transport << std::endl;
