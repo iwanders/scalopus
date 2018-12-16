@@ -7,10 +7,8 @@ add_library(scalopus_transport SHARED
   src/transport.cpp
   src/transport_unix.cpp
   src/endpoint.cpp
-  #src/client.cpp
   src/protocol.cpp
-  #src/client_introspect.cpp
-  #src/endpoint_introspect.cpp
+  src/endpoint_introspect.cpp
 )
 add_library(Scalopus::scalopus_transport ALIAS scalopus_transport)
 

@@ -123,12 +123,9 @@ bool TransportUnix::connect(std::size_t pid, const std::string& suffix)
   return true;
 }
 
-std::shared_future<Data> TransportUnix::request(const std::string& remote_endpoint_name, const Data& outgoing, size_t request_id)
+std::shared_future<Data> TransportUnix::request(const std::string& remote_endpoint_name, const Data& outgoing)
 {
-  if (request_id == 0)
-  {
-    request_id = request_counter_++;
-  }
+  size_t request_id = request_counter_++;
   protocol::Msg outgoing_msg;
   outgoing_msg.endpoint = remote_endpoint_name;
   outgoing_msg.data = outgoing;
@@ -214,6 +211,10 @@ void TransportUnix::work()
   fd_set read_fds;
   fd_set write_fds;
   fd_set except_fds;
+  struct timeval tv;
+  tv.tv_sec = 0;
+  tv.tv_usec = 10000;
+
   while (running_)
   {
     FD_ZERO(&read_fds);
@@ -227,7 +228,7 @@ void TransportUnix::work()
     }
 
     const int nfds = *std::max_element(connections_.begin(), connections_.end()) + 1;
-    int select_result = select(nfds, &read_fds, &write_fds, &except_fds, nullptr);
+    int select_result = select(nfds, &read_fds, &write_fds, &except_fds, &tv);
 
     if (select_result == -1)
     {

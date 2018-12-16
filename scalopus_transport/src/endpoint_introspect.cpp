@@ -23,8 +23,9 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus_transport/endpoint_introspect.h>
-#include <scalopus_transport/interface/transport_server.h>
+#include "scalopus_transport/endpoint_introspect.h"
+#include "scalopus_transport/interface/transport.h"
+#include <iostream>
 
 namespace scalopus
 {
@@ -37,8 +38,7 @@ std::string EndpointIntrospect::getName() const
   return "introspect";
 }
 
-bool EndpointIntrospect::handle(TransportServer& server, const std::vector<char> /* request */,
-                                std::vector<char>& response)
+bool EndpointIntrospect::handle(Transport& server, const Data& /* request */, Data& response)
 {
   const auto endpoints = server.endpoints();
   for (const auto& name : endpoints)
@@ -47,6 +47,35 @@ bool EndpointIntrospect::handle(TransportServer& server, const std::vector<char>
     response.push_back('\n');
   }
   return true;
+}
+
+std::vector<std::string> EndpointIntrospect::supported()
+{
+  // send message...
+  auto transport = transport_.lock();
+  if (transport == nullptr)
+  {
+    std::cout << "No transport :( " << std::endl;
+    return {};  // @todo(iwanders) probably better to throw...
+  }
+
+  std::vector<std::string> endpoints{ "" };
+  auto future = transport->request(getName(), {'a'});
+  
+  Data resp = future.get();
+
+  resp.pop_back();
+  for (const auto z : resp)
+  {
+    if (z == '\n')
+    {
+      endpoints.push_back("");
+      continue;
+    }
+    endpoints.back() += z;
+  }
+
+  return endpoints;
 }
 
 }  // namespace scalopus

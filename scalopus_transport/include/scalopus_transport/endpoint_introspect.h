@@ -37,7 +37,8 @@ class EndpointIntrospect : public Endpoint
 public:
   EndpointIntrospect();
   std::string getName() const;
-  bool handle(TransportServer& server, const std::vector<char> request, std::vector<char>& response);
+  bool handle(Transport& transport, const Data& incoming, Data& outgoing);
+  std::vector<std::string> supported();
 };
 
 }

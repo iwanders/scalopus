@@ -30,6 +30,7 @@
 #include <scalopus_transport/interface/endpoint.h>
 #include <memory>
 #include <map>
+#include <future>
 #include <vector>
 #include <mutex>
 
@@ -41,8 +42,12 @@ class Transport
 public:
   virtual ~Transport();
   virtual void addEndpoint(const std::shared_ptr<Endpoint>& endpoint);
-  std::vector<std::string> endpoints() const;
 
+  virtual std::shared_future<Data> request(const std::string& remote_endpoint_name, const Data& outgoing) = 0;
+
+
+
+  std::vector<std::string> endpoints() const;
   Endpoint::Ptr getEndpoint(const std::string& name) const;
 protected:
   std::map<std::string, std::shared_ptr<Endpoint>> endpoints_;

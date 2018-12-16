@@ -52,7 +52,7 @@ public:
   bool connect(std::size_t pid, const std::string& suffix = "_scalopus");
   void disconnect();
 
-  std::shared_future<Data> request(const std::string& remote_endpoint_name, const Data& outgoing, size_t request_id = 0);
+  std::shared_future<Data> request(const std::string& remote_endpoint_name, const Data& outgoing);
 
   bool isConnected() const;
 
