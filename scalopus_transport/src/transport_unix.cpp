@@ -138,7 +138,8 @@ std::shared_future<Data> TransportUnix::request(const std::string& remote_endpoi
     std::lock_guard<std::mutex> lock(write_lock_);
     if (!protocol::send(client_fd_, outgoing_msg))
     {
-      promise.set_exception(std::make_exception_ptr(communication_error("Failed to send data.")));
+      //  promise.set_exception(std::make_exception_ptr(communication_error("Failed to send data.")));
+      throw communication_error("Failed to send data.");
       return shared_future;
     }
   }
@@ -200,10 +201,6 @@ TransportUnix::~TransportUnix()
     ::close(connection);
     ::shutdown(connection, 2);
   }
-  ::close(server_fd_);
-  ::shutdown(server_fd_, 2);
-  ::close(client_fd_);
-  ::shutdown(client_fd_, 2);
 }
 
 void TransportUnix::work()

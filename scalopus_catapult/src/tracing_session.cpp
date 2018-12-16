@@ -27,7 +27,7 @@
 
 #include "scalopus_catapult/tracing_session.h"
 #include "scalopus_lttng/ctfevent.h"
-#include "scalopus_lttng/client_scope_tracing.h"
+#include "scalopus_lttng/endpoint_scope_tracing.h"
 #include "scalopus_transport/transport_unix.h"
 #include <sstream>
 
@@ -170,7 +170,7 @@ std::map<unsigned long long, std::map<unsigned int, std::string>> TracingSession
   for (const auto& pid : providers)
   {
     auto transport = scalopus::transportClientUnix(pid);
-    auto tracing_client = std::make_shared<ClientScopeTracing>();
+    auto tracing_client = std::make_shared<EndpointScopeTracing>();
     tracing_client->setTransport(transport);
     res[pid] = tracing_client->mapping();
   }
