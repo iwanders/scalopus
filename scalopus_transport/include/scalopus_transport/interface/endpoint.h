@@ -44,10 +44,17 @@ public:
   virtual std::string getName() const = 0;
 
   /**
-   * @brief Handle data from the transport.
+   * @brief Handle data coming from the server.
    * @return True if outgoing should be returned over the transport. False if no outgoing message.
    */
   virtual bool handle(Transport& transport, const Data& incoming, Data& outgoing);
+
+  /**
+   * @brief Handle unsolicited data incoming over a client connection.
+   * In general this is to accept proactive / broadcast / publish style data.
+   */
+  virtual bool unsolicited(Transport& transport, const Data& incoming, Data& outgoing);
+  
   virtual ~Endpoint();
 
   void setTransport(const std::shared_ptr<Transport>& transport);

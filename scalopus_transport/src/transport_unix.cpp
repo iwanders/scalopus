@@ -268,6 +268,24 @@ void TransportUnix::work()
         request_it->second.set_value(incoming.data); // set the value into the promise.
         ongoing_requests_.erase(request_it);  // remove the request promise from the map.
       }
+      else
+      {
+        // no active request for this outstanding. Hand it off to the endpoint with this name.
+        std::lock_guard<std::mutex> elock(endpoint_mutex_);
+        const auto it = endpoints_.find(incoming.endpoint);
+        if (it != endpoints_.end())
+        {
+          protocol::Msg response;
+          response.endpoint = incoming.endpoint;
+          response.request_id = incoming.request_id;
+          Data outgoing;
+          if (it->second->unsolicited(*this, incoming.data, response.data))
+          {
+            std::lock_guard<std::mutex> wlock(write_lock_);
+            protocol::send(client_fd_, response);
+          }
+        }
+      }
     }
 
     if (FD_ISSET(server_fd_, &except_fds))

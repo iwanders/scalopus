@@ -40,6 +40,10 @@ bool Endpoint::handle(Transport& /* transport */, const Data& /* incoming */, Da
 {
   return false;
 }
+bool Endpoint::unsolicited(Transport& /* transport */, const Data& /* incoming */, Data& /* outgoing */)
+{
+  return false;
+}
 
 void Endpoint::setTransport(const std::shared_ptr<Transport>& transport)
 {
