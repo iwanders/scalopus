@@ -209,11 +209,11 @@ void TransportUnix::work()
   fd_set write_fds;
   fd_set except_fds;
   struct timeval tv;
-  tv.tv_sec = 0;
-  tv.tv_usec = 10000;
 
   while (running_)
   {
+    tv.tv_sec = 0;
+    tv.tv_usec = 10000;
     FD_ZERO(&read_fds);
     FD_ZERO(&write_fds);
     FD_ZERO(&except_fds);
