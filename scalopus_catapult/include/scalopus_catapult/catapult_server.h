@@ -25,8 +25,8 @@
 */
 
 
-#ifndef SCALOPUS_CATAPULT_TRACING_ENDPOINT_H
-#define SCALOPUS_CATAPULT_TRACING_ENDPOINT_H
+#ifndef SCALOPUS_CATAPULT_CATAPULT_SERVER_H
+#define SCALOPUS_CATAPULT_CATAPULT_SERVER_H
 
 #include <seasocks/PageHandler.h>
 #include <seasocks/WebSocket.h>
@@ -47,6 +47,8 @@
 #include <scalopus_lttng/ctfevent.h>
 #include <scalopus_catapult/tracing_session.h>
 
+#include "scalopus_catapult/endpoint_manager.h"
+
 namespace scalopus
 {
 using Json = nlohmann::json;
@@ -55,11 +57,11 @@ namespace ss = seasocks;
 /**
  * @brief The actual devtools protocol endpoint, this acts as both the webserver and websocket endpoint.
  */
-class TracingEndpoint : public ss::PageHandler, public ss::WebSocket::Handler
+class CatapultServer : public ss::PageHandler, public ss::WebSocket::Handler
 {
 public:
-  using Ptr = std::shared_ptr<TracingEndpoint>;
-  TracingEndpoint();
+  using Ptr = std::shared_ptr<CatapultServer>;
+  CatapultServer();
 
   // from PageHandler, this serves the http pages.
   std::shared_ptr<ss::Response> handle(const ss::Request& request) override;
@@ -74,10 +76,11 @@ public:
    * @brief Actually construct and initialise the mapping client and babeltrace tool.
    * @param path The path as passed to the babeltrace tool during init.
    */
-  void init(std::string path = "");
+  void init(const EndpointManager::Ptr& manager, std::string path = "");
 
 private:
   BabeltraceTool::Ptr tracing_tool_;                           //! Babeltrace tool, produces babeltrace sessions.
+  EndpointManager::Ptr manager_;  //!< Manager for connections.
 
   std::mutex session_mutex_;                                 //! Mutex for the session map.
   std::map<ss::WebSocket*, TracingSession::Ptr> sessions_;  //! Map of sessions by websockets.

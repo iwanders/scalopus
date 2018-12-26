@@ -24,11 +24,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scalopus_catapult/tracing_endpoint.h"
+#include "scalopus_catapult/catapult_server.h"
 
 namespace scalopus
 {
-std::shared_ptr<ss::Response> TracingEndpoint::handle(const ss::Request& request)
+std::shared_ptr<ss::Response> CatapultServer::handle(const ss::Request& request)
 {
   if (request.getRequestUri() == "/json/version")
   {
@@ -66,18 +66,18 @@ std::shared_ptr<ss::Response> TracingEndpoint::handle(const ss::Request& request
   return ss::Response::unhandled();
 }
 
-void TracingEndpoint::onConnect(ss::WebSocket* ws)
+void CatapultServer::onConnect(ss::WebSocket* ws)
 {
   std::cout << "Connection opened for " << ws << std::endl;
   makeSession(ws);
 }
 
-void TracingEndpoint::onData(ss::WebSocket* /* connection */, const uint8_t* /* data */, size_t /* length */)
+void CatapultServer::onData(ss::WebSocket* /* connection */, const uint8_t* /* data */, size_t /* length */)
 {
   std::cout << "Binary data is not handled." << std::endl;
 }
 
-void TracingEndpoint::onData(ss::WebSocket* ws, const char* data)
+void CatapultServer::onData(ss::WebSocket* ws, const char* data)
 {
   auto session = getSession(ws);
 
@@ -152,7 +152,7 @@ void TracingEndpoint::onData(ss::WebSocket* ws, const char* data)
   }
 }
 
-std::string TracingEndpoint::formatCollectedData(std::vector<Json> entries)
+std::string CatapultServer::formatCollectedData(std::vector<Json> entries)
 {
   std::stringstream ss;
   ss << "{ \"method\": \"Tracing.dataCollected\", \"params\": { \"value\": [\n";
@@ -170,7 +170,7 @@ std::string TracingEndpoint::formatCollectedData(std::vector<Json> entries)
   return ss.str();
 }
 
-std::string TracingEndpoint::makeBufferUsage(double value)
+std::string CatapultServer::makeBufferUsage(double value)
 {
   Json tmp;
   tmp["method"] = "Tracing.bufferUsage";
@@ -179,25 +179,25 @@ std::string TracingEndpoint::makeBufferUsage(double value)
   return tmp.dump();
 }
 
-void TracingEndpoint::onDisconnect(ss::WebSocket* ws)
+void CatapultServer::onDisconnect(ss::WebSocket* ws)
 {
   // Websocket was disconnected, remove the session.
   delSession(ws);
 }
 
-void TracingEndpoint::init(std::string path)
+void CatapultServer::init(const EndpointManager::Ptr& manager, std::string path)
 {
-
+  manager_ = manager;
   // Start the tracing tool.
   tracing_tool_ = std::make_shared<BabeltraceTool>();
   tracing_tool_->init(path);
 }
 
-TracingEndpoint::TracingEndpoint()
+CatapultServer::CatapultServer()
 {
 }
 
-TracingSession::Ptr TracingEndpoint::getSession(ss::WebSocket* ws)
+TracingSession::Ptr CatapultServer::getSession(ss::WebSocket* ws)
 {
   // Retrieve the session for this websocket.
   std::lock_guard<std::mutex> lock(session_mutex_);
@@ -209,7 +209,7 @@ TracingSession::Ptr TracingEndpoint::getSession(ss::WebSocket* ws)
   return nullptr;
 }
 
-void TracingEndpoint::delSession(ss::WebSocket* ws)
+void CatapultServer::delSession(ss::WebSocket* ws)
 {
   std::lock_guard<std::mutex> lock(session_mutex_);
   auto it = sessions_.find(ws);
@@ -219,7 +219,7 @@ void TracingEndpoint::delSession(ss::WebSocket* ws)
   }
 }
 
-void TracingEndpoint::makeSession(ss::WebSocket* ws)
+void CatapultServer::makeSession(ss::WebSocket* ws)
 {
   std::lock_guard<std::mutex> lock(session_mutex_);
   auto it = sessions_.find(ws);
@@ -230,7 +230,7 @@ void TracingEndpoint::makeSession(ss::WebSocket* ws)
     //  mapping_client_->setupMappingRetrieval();
     //  auto mappinglist = mapping_client_->getMappings();
     //  auto mappings = TracingSession::convertMappings(mappinglist);
-    sessions_[ws] = std::make_shared<TracingSession>(tracing_tool_);
+    sessions_[ws] = std::make_shared<TracingSession>(tracing_tool_, manager_);
   }
 }
 

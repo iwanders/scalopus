@@ -45,6 +45,7 @@ namespace scalopus
 class TransportUnix : public Transport
 {
 public:
+  using Ptr = std::shared_ptr<TransportUnix>;
   TransportUnix();
   ~TransportUnix();
 
@@ -56,7 +57,6 @@ public:
   bool isConnected() const;
 
   static std::vector<std::size_t> getProviders(const std::string& suffix = "_scalopus");
-
 private:
 
   std::thread thread_;
@@ -75,8 +75,6 @@ private:
   std::mutex request_lock_; //!< Lock to guard modification of ongoing_requests_ map.
   std::map<std::pair<std::string, size_t>, std::promise<Data>> ongoing_requests_;
 };
-
-std::unique_ptr<Transport> transportUnix();
 
 }  // namespace scalopus
 #endif  // SCALOPUS_PROVIDER_H

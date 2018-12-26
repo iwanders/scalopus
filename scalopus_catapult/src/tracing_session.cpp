@@ -33,9 +33,10 @@
 
 namespace scalopus
 {
-TracingSession::TracingSession(BabeltraceTool::Ptr tool)
+TracingSession::TracingSession(BabeltraceTool::Ptr tool, EndpointManager::Ptr manager)
 {
   tool_ = tool;
+  manager_ = manager;
 }
 
 void TracingSession::start()
@@ -60,8 +61,7 @@ void TracingSession::stop()
 std::vector<Json> TracingSession::events()
 {
   stop();
-
-  auto pid_callstack_mappings = getMappings();
+  updateMapping();
 
   std::vector<Json> result;
 
@@ -96,19 +96,13 @@ std::vector<Json> TracingSession::events()
       {
         id = event.eventData().at("id");
       }
-      auto pid_mapping = pid_callstack_mappings.find(event.pid());
-      if (pid_mapping != pid_callstack_mappings.end())
+      // try to retrieve the correct mapping for this trace point id.
+      auto entry_mapping = trace_mapping_.find(id);
+      if (entry_mapping != trace_mapping_.end())
       {
-        const auto mapping = pid_mapping->second;
-        // try to retrieve the correct mapping for this trace point id.
-        auto entry_mapping = mapping.find(id);
-        if (entry_mapping != mapping.end())
-        {
-          // yay! We found the appopriate mapping for this trace id.
-          name = entry_mapping->second;
-        }
+        // yay! We found the appopriate mapping for this trace id.
+        name = entry_mapping->second;
       }
-
       if (name.empty())
       {
         std::stringstream z;
@@ -163,18 +157,26 @@ std::vector<Json> TracingSession::metadata()
   return result;
 }
 
-std::map<unsigned long long, std::map<unsigned int, std::string>> TracingSession::getMappings()
+void TracingSession::updateMapping()
 {
-  std::map<unsigned long long, std::map<unsigned int, std::string>> res;
-  const auto providers = scalopus::getTransportServersUnix();
-  for (const auto& pid : providers)
+  auto endpoints = manager_->endpoints();
+  for (const auto& transport_endpoints: endpoints)
   {
-    auto transport = scalopus::transportClientUnix(pid);
-    auto tracing_client = std::make_shared<EndpointScopeTracing>();
-    tracing_client->setTransport(transport);
-    res[pid] = tracing_client->mapping();
+    auto it = transport_endpoints.second.find(scalopus::EndpointScopeTracing::name);
+    if (it != transport_endpoints.second.end())
+    {
+      // found a trace mapping endpoint.
+      const auto endpoint_scope_tracing = std::dynamic_pointer_cast<scalopus::EndpointScopeTracing>(it->second);
+      if (endpoint_scope_tracing != nullptr)
+      {
+        const auto mapping = endpoint_scope_tracing->mapping();
+        trace_mapping_.insert(mapping.begin(), mapping.end());
+      }
+      else
+      {
+        std::cerr << "[scalopus] Pointer cast did not result in correct pointer, this should not happen." << std::endl;
+      }
+    }
   }
-  return res;
 }
-
 }  // namespace scalopus

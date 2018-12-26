@@ -24,51 +24,52 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_INTERFACE_TRANSPORT_H
-#define SCALOPUS_INTERFACE_TRANSPORT_H
+#ifndef SCALOPUS_CATAPULT_ENDPOINT_MANANGER_H
+#define SCALOPUS_CATAPULT_ENDPOINT_MANANGER_H
 
 #include <scalopus_transport/interface/endpoint.h>
-#include <memory>
-#include <map>
-#include <future>
+#include <scalopus_transport/interface/transport.h>
+#include <string>
 #include <vector>
-#include <mutex>
+#include <memory>
+#include <functional>
+#include <map>
 
 namespace scalopus
 {
-
-class Transport
+/**
+ * @brief Something that discovers transport servers and manages enpoints over these transports.
+ * @TODO Refactor such that it is transport agnostic.
+ */
+class EndpointManager
 {
 public:
-  using Ptr = std::shared_ptr<Transport>;
-  virtual ~Transport();
-  virtual void addEndpoint(const std::shared_ptr<Endpoint>& endpoint);
+  using Ptr = std::shared_ptr<EndpointManager>;
+  using EndpointFactory = std::function<std::shared_ptr<Endpoint>(const std::shared_ptr<Transport>& transport)>;
+  using EndpointMap = std::map<std::string, Endpoint::Ptr>;
+  using TransportEndpoints = std::map<Transport::Ptr, EndpointMap>;
 
-  virtual std::shared_future<Data> request(const std::string& remote_endpoint_name, const Data& outgoing) = 0;
+  EndpointManager();
+  /**
+   * @brief This function should be called periodically to discover transports and connect.
+   */
+  void manage();
 
   /**
-   * @brief Broadcast is an asynchronous call, this is queued for broadcast, the worker than sends it at it's discretion
+   * @brief Return the map of the currently known endpoints.
    */
-  virtual void broadcast(const std::string& remote_endpoint_name, const Data& outgoing);
+  TransportEndpoints endpoints() const;
 
   /**
-   * @brief 
+   * @brief Add an endpoint factory function to the manager.
    */
-  virtual bool isConnected() const;
+  void addEndpointFactory(const std::string& name, EndpointFactory&& factory_function);
 
-  std::vector<std::string> endpoints() const;
-  Endpoint::Ptr getEndpoint(const std::string& name) const;
-protected:
-  std::map<std::string, std::shared_ptr<Endpoint>> endpoints_;
-  mutable std::mutex endpoint_mutex_;
-
-  std::pair<std::string, Data> popBroadcast();
-  bool haveBroadcast() const;
-
-  std::vector<std::pair<std::string, Data>> broadcast_messages_;
-  mutable std::mutex broadcast_message_mutex_;
+private:
+  mutable std::mutex mutex_;
+  std::map<std::string, EndpointFactory> endpoint_factories_;   //!< Map of factory functions to construct endpoints.
+  TransportEndpoints endpoints_;
+  std::map<std::size_t, Transport::Ptr> transports_;
 };
-
-
-}  // namespace scalopus
-#endif  // SCALOPUS_INTERFACE_TRANSPORT_SERVER_H
+}  // namescape scalopus
+#endif

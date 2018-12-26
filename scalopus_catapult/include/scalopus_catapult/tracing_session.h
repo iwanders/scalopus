@@ -28,6 +28,7 @@
 #define SCALOPUS_CATAPULT_TRACING_SESSION_H
 
 #include <scalopus_lttng/babeltrace_tool.h>
+#include "scalopus_catapult/endpoint_manager.h"
 #include <nlohmann/json.hpp>
 #include <map>
 
@@ -47,7 +48,7 @@ public:
    * @param mappings The mappings as retrieved from the services calls and converted with convertMappings.
    * @param babel_session The session to obtain the events from.
    */
-  TracingSession(BabeltraceTool::Ptr tool);
+  TracingSession(BabeltraceTool::Ptr tool, EndpointManager::Ptr manager);
 
   /**
    * @brief When recording is started in the catapult interface, this is called.
@@ -71,15 +72,14 @@ public:
    */
   std::vector<Json> metadata();
 
-  /**
-   * @brief horrible function, gets all the mappings... blocking, spins up a threads and needs a refactor.
-   */
-  static std::map<unsigned long long, std::map<unsigned int, std::string>> getMappings();
-
 private:
   BabeltraceTool::Ptr tool_;
+  EndpointManager::Ptr manager_;
   std::vector<CTFEvent> events_;
   std::shared_ptr<BabeltraceParser::EventCallback> callback_;
+
+  void updateMapping();
+  std::map<unsigned int, std::string> trace_mapping_;
 };
 
 }  // namespace scalopus

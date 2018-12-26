@@ -47,9 +47,7 @@ bool Endpoint::unsolicited(Transport& /* transport */, const Data& /* incoming *
 
 void Endpoint::setTransport(const std::shared_ptr<Transport>& transport)
 {
-  std::cout << "set Transport is called with: " << transport << std::endl;
   transport_ = transport;
-  std::cout << "set transport_ is called with: " << transport_.lock() << std::endl;
 }
 
 

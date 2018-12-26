@@ -38,6 +38,7 @@ namespace scalopus
 class EndpointScopeTracing : public Endpoint
 {
 public:
+  constexpr static const char* name = "scope_tracing";
   std::string getName() const;
   bool handle(Transport& server, const Data& request, Data& response);
   std::map<unsigned int, std::string> mapping();

@@ -24,7 +24,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scalopus_catapult/tracing_endpoint.h"
+#include "scalopus_catapult/catapult_server.h"
+#include "scalopus_catapult/endpoint_manager.h"
+#include <scalopus_lttng/endpoint_scope_tracing.h>
 
 #include <seasocks/PrintfLogger.h>
 #include <seasocks/Server.h>
@@ -32,8 +34,21 @@
 #include <thread>
 #include <chrono>
 
+#include <cstdlib>
+#include <signal.h>
+
+// Signal handling.
+bool running { true };
+void sigint_handler(int /* s */)
+{
+  running = false;
+}
+
 int main(int /* argc */, char** /* argv */)
 {
+  // hook control+c for graceful quitting
+  ::signal(SIGINT, &sigint_handler);
+
   // retrieve the port number to bind the webserver on
   int port = 9222;  // 9222 is default chrom(e/ium) remote debugging port.
   std::cout << "Using port: " << port << ", 9222 is default, it is default remote debugging port" << std::endl;
@@ -43,10 +58,20 @@ int main(int /* argc */, char** /* argv */)
   std::cout << "Using path: \"" << path << "\"  (empty defaults to lttng view scalopus_target_session)" << std::endl;
 
   // Create the devtools endpoint
-  scalopus::TracingEndpoint::Ptr endpoint = std::make_shared<scalopus::TracingEndpoint>();
+  auto catapult_server = std::make_shared<scalopus::CatapultServer>();
 
   // Start it on the path provided.
-  endpoint->init(path);
+  auto manager = std::make_shared<scalopus::EndpointManager>();
+
+  // Add scope tracing endpoint factory function.
+  manager->addEndpointFactory(scalopus::EndpointScopeTracing::name, [](const auto& transport)
+  {
+    auto tracing_endpoint = std::make_shared<scalopus::EndpointScopeTracing>();
+    tracing_endpoint->setTransport(transport);
+    return tracing_endpoint;
+  });
+
+  catapult_server->init(manager, path);
 
   // Make a webserver and add the endpoints
   namespace ss = seasocks;
@@ -57,10 +82,10 @@ int main(int /* argc */, char** /* argv */)
   // This is a workaround for client buffer overflows, proper fix requires a substantial refactor (CORE-11125).
   server.setClientBufferSize(128 * 1024 * 1024u);
 
-  server.addWebSocketHandler("/devtools/page/bar", endpoint);  // needed for chrom(e/ium) 65.0+
-  server.addWebSocketHandler("/devtools/browser", endpoint);   // needed for chrome 60.0
+  server.addWebSocketHandler("/devtools/page/bar", catapult_server);  // needed for chrom(e/ium) 65.0+
+  server.addWebSocketHandler("/devtools/browser", catapult_server);   // needed for chrome 60.0
 
-  server.addPageHandler(endpoint);  // This is retrieved in the overview page.
+  server.addPageHandler(catapult_server);  // This is retrieved in the overview page.
 
   // Start the server in a separate thread.
   server.startListening(port);
@@ -69,9 +94,11 @@ int main(int /* argc */, char** /* argv */)
   std::cout << "Everything started, falling into idle loop. Use ctrl+c to quit." << std::endl;
 
   // block while we serve requests.
+  while (running)
   {
     using namespace std::chrono_literals;
-    std::this_thread::sleep_for(2000s);
+    std::this_thread::sleep_for(1s);
+    manager->manage();
   }
 
   std::cout << "Shutting down." << std::endl;

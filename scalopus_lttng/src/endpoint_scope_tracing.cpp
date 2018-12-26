@@ -32,7 +32,7 @@ namespace scalopus
 {
 std::string EndpointScopeTracing::getName() const
 {
-  return "scope_tracing";
+  return name;
 }
 
 bool EndpointScopeTracing::handle(Transport& /* server */, const Data& request, Data& response)
