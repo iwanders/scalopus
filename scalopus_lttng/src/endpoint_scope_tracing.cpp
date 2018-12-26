@@ -76,8 +76,7 @@ std::map<unsigned int, std::string> EndpointScopeTracing::mapping()
   auto transport = transport_.lock();
   if (transport == nullptr)
   {
-    std::cout << "No transport :( " << std::endl;
-    return {};  // @todo(iwanders) probably better to throw...
+    throw communication_error("No transport provided to endpoint, cannot communicate.");
   }
 
   std::map<unsigned int, std::string> res;

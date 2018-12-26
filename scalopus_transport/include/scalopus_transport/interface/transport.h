@@ -42,8 +42,16 @@ class Transport
 public:
   using Ptr = std::shared_ptr<Transport>;
   virtual ~Transport();
+
+  /**
+   * @brief Add an endpoitn to this transport, this allows endpoints to receive broadcast messages.
+   */
   virtual void addEndpoint(const std::shared_ptr<Endpoint>& endpoint);
 
+  /**
+   * @brief Send a request to a remote endpoint.
+   * @return A future with the response for this request.
+   */
   virtual std::shared_future<Data> request(const std::string& remote_endpoint_name, const Data& outgoing) = 0;
 
   /**
@@ -52,21 +60,40 @@ public:
   virtual void broadcast(const std::string& remote_endpoint_name, const Data& outgoing);
 
   /**
-   * @brief 
+   * @brief Is this transport serving or connecting to a client?
    */
   virtual bool isConnected() const;
 
+  /**
+   * @brief The list of endpoints that are stored by this transport.
+   */
   std::vector<std::string> endpoints() const;
-  Endpoint::Ptr getEndpoint(const std::string& name) const;
-protected:
-  std::map<std::string, std::shared_ptr<Endpoint>> endpoints_;
-  mutable std::mutex endpoint_mutex_;
 
-  std::pair<std::string, Data> popBroadcast();
+  /**
+   * @brief Retrieve an endpoint by a name.
+   * @return Pointer to the endpoint that has the provided name, or nullptr if not found.
+   */
+  Endpoint::Ptr getEndpoint(const std::string& name) const;
+
+protected:
+
+  /**
+   * @brief Returns whether or not there are any broadcasts in the queue to be sent out.
+   * @return True if there are pending broadcasts in the queue and calling popBroadcast() would be valid.
+   */
   bool haveBroadcast() const;
 
-  std::vector<std::pair<std::string, Data>> broadcast_messages_;
+  /**
+   * @brief Return an entry from the broadcast queue.
+   * @note This function may only be called if haveBroadcast() is true.
+   */
+  std::pair<std::string, Data> popBroadcast();
+
+  std::vector<std::pair<std::string, Data>> broadcast_messages_;  //!< List of broadcast messages to send out.
   mutable std::mutex broadcast_message_mutex_;
+
+  std::map<std::string, Endpoint::Ptr> endpoints_;   //!< Endpoints known by this transport, key is their name.
+  mutable std::mutex endpoint_mutex_;
 };
 
 

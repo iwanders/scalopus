@@ -90,7 +90,7 @@ bool TransportUnix::serve()
   return true;
 }
 
-bool TransportUnix::connect(std::size_t pid, const std::string& suffix)
+bool TransportUnix::connect(std::size_t pid)
 {
   client_fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
 
@@ -106,7 +106,7 @@ bool TransportUnix::connect(std::size_t pid, const std::string& suffix)
   socket_config.sun_family = AF_UNIX;
 
   std::stringstream ss;
-  ss << "" << pid << suffix;
+  ss << "" << pid << "_scalopus";
   std::strncpy(socket_config.sun_path + 1, ss.str().c_str(), sizeof(socket_config.sun_path) - 2);
 
   std::size_t path_length = sizeof(socket_config.sun_family) + strlen(socket_config.sun_path + 1) + 1;
@@ -155,10 +155,11 @@ bool TransportUnix::isConnected() const
   return (client_fd_ != 0) || (server_fd_ != 0);
 }
 
-std::vector<std::size_t> TransportUnix::getProviders(const std::string& suffix)
+std::vector<std::size_t> TransportUnix::getTransportServers()
 {
   std::ifstream infile("/proc/net/unix");
   std::vector<std::size_t> res;
+  std::string suffix = "_scalopus";
   //  Num       RefCount Protocol Flags    Type St Inode Path
   //  0000000000000000: 00000002 00000000 00010000 0001 01 235190 @16121_scalopus
   std::string line;
@@ -329,6 +330,7 @@ void TransportUnix::work()
       }
     }
 
+    // Process the broadcast queue.
     while(haveBroadcast())
     {
       const auto name_payload = popBroadcast();
@@ -385,7 +387,7 @@ std::shared_ptr<Transport> transportClientUnix(std::size_t pid)
 
 std::vector<size_t> getTransportServersUnix()
 {
-  return TransportUnix::getProviders();
+  return TransportUnix::getTransportServers();
 }
 
 }  // namespace scalopus

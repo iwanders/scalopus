@@ -39,9 +39,14 @@ class EndpointScopeTracing : public Endpoint
 {
 public:
   constexpr static const char* name = "scope_tracing";
+
+  /**
+   * @brief Return the trace id to name mappings from the endpoint.
+   */
+  std::map<unsigned int, std::string> mapping();
+
   std::string getName() const;
   bool handle(Transport& server, const Data& request, Data& response);
-  std::map<unsigned int, std::string> mapping();
 };
 
 }

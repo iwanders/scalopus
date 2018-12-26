@@ -225,11 +225,7 @@ void CatapultServer::makeSession(ss::WebSocket* ws)
   auto it = sessions_.find(ws);
   if (it == sessions_.end())
   {
-    // New websocket, update the mappings.
-    //  mapping_client_->updateServiceList();
-    //  mapping_client_->setupMappingRetrieval();
-    //  auto mappinglist = mapping_client_->getMappings();
-    //  auto mappings = TracingSession::convertMappings(mappinglist);
+    // New sessions, create the tracing session to use.
     sessions_[ws] = std::make_shared<TracingSession>(tracing_tool_, manager_);
   }
 }

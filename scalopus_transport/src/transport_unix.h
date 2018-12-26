@@ -40,7 +40,10 @@
 namespace scalopus
 {
 /**
- * @brief The exposer class that is used to get the data about the trace mappings out of the proces.
+ * @brief A transport using unix domain sockets. This creates abstract unix domain socket. The name of which is
+ * ss << "" << ::getpid() << "_scalopus". Discovery is performed via parsing of "/proc/net/unix".
+ * Each request is associated with a request id on while on the wire. This allows interleaved communication. Broadcasts
+ * always use request id 0.
  */
 class TransportUnix : public Transport
 {
@@ -49,30 +52,50 @@ public:
   TransportUnix();
   ~TransportUnix();
 
+  /**
+   * @brief Bind the transport as a server.
+   * @return true on success, false on error.
+   */
   bool serve();
-  bool connect(std::size_t pid, const std::string& suffix = "_scalopus");
 
+  /**
+   * @brief Connect to a server.
+   * @param pid The process id to connect to.
+   */
+  bool connect(std::size_t pid);
+
+  /**
+   * @brief Return a list of transport server process id's that are currently running.
+   */
+  static std::vector<std::size_t> getTransportServers();
+
+  // From Transport superclass.
   std::shared_future<Data> request(const std::string& remote_endpoint_name, const Data& outgoing);
-
   bool isConnected() const;
 
-  static std::vector<std::size_t> getProviders(const std::string& suffix = "_scalopus");
 private:
+  std::thread thread_;  //!< Worker thread to handle connections and communication.
+  void work();   //!< Function for the worker thread.
+  int server_fd_{ 0 };  //!< File descriptor from the server bind.
+  int client_fd_{ 0 };  //!< File descriptor from connecting to a server.
 
-  std::thread thread_;
-  void work();
-  int server_fd_{ 0 };
-  int client_fd_{ 0 };
-  bool running_{ false };
+  bool running_{ false };  //!< Boolean to quit the worker thread.
 
-  std::set<int> connections_;
+  std::set<int> connections_;  //!< Open connections, also holds server_fd_ and client_fd_.
 
+  /**
+   * @brief Processes an incoming message by forwarding it to the appropriate endpoint and providing the response
+   *        from the endpoint back to the caller.
+   * @return true if a response was populated and should be sent back.
+   */
   bool processMsg(const protocol::Msg& request, protocol::Msg& response);
 
   size_t request_counter_{ 1 };  // 0 is reserved for broadcasts
   std::mutex write_lock_;  //!< Lock to ensure only one thread is writing to the socket.
 
   std::mutex request_lock_; //!< Lock to guard modification of ongoing_requests_ map.
+
+  //! The outstanding requests and their promised data.
   std::map<std::pair<std::string, size_t>, std::promise<Data>> ongoing_requests_;
 };
 

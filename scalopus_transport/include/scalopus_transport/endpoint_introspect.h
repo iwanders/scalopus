@@ -35,10 +35,15 @@ namespace scalopus
 class EndpointIntrospect : public Endpoint
 {
 public:
-  EndpointIntrospect();
+  constexpr static const char* name = "introspect";
+
+  /**
+   * @brief Provide a list of endpoint names supported by the remote endpoint.
+   */
+  std::vector<std::string> supported();
+
   std::string getName() const;
   bool handle(Transport& transport, const Data& incoming, Data& outgoing);
-  std::vector<std::string> supported();
 };
 
 }

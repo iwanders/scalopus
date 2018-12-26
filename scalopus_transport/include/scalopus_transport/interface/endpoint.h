@@ -57,6 +57,9 @@ public:
   
   virtual ~Endpoint();
 
+  /**
+   * @brief Set the transport to be used by this endpoint.
+   */
   void setTransport(const std::shared_ptr<Transport>& transport);
 protected:
   std::weak_ptr<Transport> transport_;

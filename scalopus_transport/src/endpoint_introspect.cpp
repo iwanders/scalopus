@@ -29,18 +29,16 @@
 
 namespace scalopus
 {
-EndpointIntrospect::EndpointIntrospect()
-{
-}
-
 std::string EndpointIntrospect::getName() const
 {
-  return "introspect";
+  return name;
 }
 
 bool EndpointIntrospect::handle(Transport& server, const Data& /* request */, Data& response)
 {
   const auto endpoints = server.endpoints();
+
+  // Serialize the data
   for (const auto& name : endpoints)
   {
     response.insert(response.end(), name.begin(), name.end());
@@ -55,15 +53,16 @@ std::vector<std::string> EndpointIntrospect::supported()
   auto transport = transport_.lock();
   if (transport == nullptr)
   {
-    std::cout << "No transport :( " << std::endl;
-    return {};  // @todo(iwanders) probably better to throw...
+    throw communication_error("No transport provided to endpoint, cannot communicate.");
   }
 
   std::vector<std::string> endpoints{ "" };
-  auto future = transport->request(getName(), {'a'});
-  
+
+  // Obtain the response data
+  auto future = transport->request(name, {});
   Data resp = future.get();
 
+  // Deserialize it
   resp.pop_back();
   for (const auto z : resp)
   {

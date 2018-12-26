@@ -30,6 +30,11 @@
 
 namespace scalopus
 {
+
+/**
+ * @brief Simple fixed length protocol for use in the unix domain socket transport. The format on the wire is:
+ * request_id | endpoint_name_length | endpoint_name | data_length | data.
+ */
 namespace protocol
 {
 struct Msg
@@ -41,6 +46,7 @@ struct Msg
 
 /**
  * @brief Read fixed length data from a socket and place it in incoming.
+ * @return True if success, false if error occured and the socket can be closed.
  */
 bool readData(int fd, size_t length, std::vector<char>& incoming);
 
