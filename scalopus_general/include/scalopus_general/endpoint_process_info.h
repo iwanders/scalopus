@@ -41,15 +41,20 @@ namespace scalopus
 class EndpointProcessInfo : public Endpoint
 {
 public:
-  EndpointProcessInfo();
   constexpr static const char* name = "process_info";
 
+  //! Struct used to represent the data from the endpoint.
   struct ProcessInfo
   {
-    std::string name;
-    std::map<unsigned long, std::string> threads;
-    unsigned long id;
+    std::string name;                              //!< Name of this process.
+    std::map<unsigned long, std::string> threads;  //!< Names of the threads in this process.
+    unsigned long id;                              //!< Process id.
   };
+
+  /**
+   * @brief Constructor sets the process id.
+   */
+  EndpointProcessInfo();
 
   //  ------ Server ------
   /**
@@ -67,7 +72,7 @@ public:
   std::string getName() const;
   bool handle(Transport& server, const Data& request, Data& response);
 private:
-  ProcessInfo info_;
+  ProcessInfo info_;  //!< The process info.
 };
 
 }

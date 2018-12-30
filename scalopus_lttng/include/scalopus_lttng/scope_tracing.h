@@ -24,6 +24,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef SCALOPUS_LTTNG_SCOPE_TRACING_H
+#define SCALOPUS_LTTNG_SCOPE_TRACING_H
+
 #include <scalopus_lttng/internal/scope_tracing.h>
 #include <scalopus_lttng/internal/scope_trace_raii.h>
 #include <scalopus_lttng/internal/scope_trace_tracker.h>
@@ -56,4 +59,4 @@
   {                                                                                                                    \
   } while (0)
 
-// comment here for style check reasons.
+#endif  // SCALOPUS_LTTNG_SCOPE_TRACING_H

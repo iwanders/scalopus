@@ -34,7 +34,7 @@
 namespace scalopus
 {
 /**
- * @brief Helper thread-safe class for arbritrary mapping.
+ * @brief Thread-safe class for arbritrary mapping.
  */
 template <typename Key, typename Value>
 class MapTracker
@@ -50,7 +50,7 @@ public:
    */
   void insert(const Key& key, const Value& value)
   {
-    std::unique_lock<decltype(entry_exit_mutex_)> lock(entry_exit_mutex_);
+    std::unique_lock<decltype(mutex_)> lock(mutex_);
     mapping_[key] = value;
   }
 
@@ -60,13 +60,13 @@ public:
    */
   std::map<Key, Value> getMap() const
   {
-    std::shared_lock<decltype(entry_exit_mutex_)> lock(entry_exit_mutex_);
+    std::shared_lock<decltype(mutex_)> lock(mutex_);
     return mapping_;
   }
 
 private:
   std::map<Key, Value> mapping_;
-  mutable std::shared_timed_mutex entry_exit_mutex_;  //! Mutex for the mapping container.
+  mutable std::shared_timed_mutex mutex_;  //! Mutex for the mapping container.
 
 protected:
   //! Make constructor private such that we can ensure it is a singleton.
