@@ -28,9 +28,12 @@
 #include <cstring>
 #include <type_traits>
 #include <iostream>
+#include <nlohmann/json.hpp>
 
 namespace scalopus
 {
+using Json = nlohmann::json;
+
 std::string EndpointScopeTracing::getName() const
 {
   return name;
@@ -59,7 +62,7 @@ std::map<unsigned int, std::string> EndpointScopeTracing::mapping()
   }
 
 
-  std::vector<char> resp = transport->request(getName(), { 'm' }).get();
+  Data resp = transport->request(getName(), { 'm' }).get();
   if (!resp.empty())
   {
     return deserializeMapping(resp);
@@ -70,53 +73,17 @@ std::map<unsigned int, std::string> EndpointScopeTracing::mapping()
 
 Data EndpointScopeTracing::serializeMapping(const std::map<unsigned int, std::string>& mapping)
 {
-  Data response;
-  size_t resp_index = 0;
-  response.resize(0);
-  for (const auto& id_name : mapping)
-  {
-    const auto& id = id_name.first;
-    const auto& name = id_name.second;
-
-    // Pack the id number
-    response.resize(response.size() + sizeof(id));
-    *reinterpret_cast<std::remove_reference_t<decltype(mapping)>::key_type*>(&response[resp_index]) = id;
-    resp_index += sizeof(id);
-
-    // Pack the string length.
-    auto string_length = name.size();
-    response.resize(response.size() + sizeof(string_length));
-    *reinterpret_cast<decltype(string_length)*>(&response[resp_index]) = string_length;
-    resp_index += sizeof(string_length);
-
-    // Finally, we write the string.
-    response.resize(response.size() + string_length);
-    std::memcpy(&response[resp_index], name.c_str(), string_length);
-    resp_index += string_length;
-  }
-  return response;
+  Json jdata = Json::object();
+  jdata["mapping"] = mapping;  // need to serialize an object, not an array.
+  return Json::to_bson(jdata);
 }
 
 
 std::map<unsigned int, std::string> EndpointScopeTracing::deserializeMapping(const Data& data)
 {
   std::map<unsigned int, std::string> res;
-  size_t resp_index = 0;
-  while (resp_index < data.size())
-  {
-    // now we need to deserialize this...
-    unsigned int id = *reinterpret_cast<const decltype(res)::key_type*>(&data[resp_index]);
-    resp_index += sizeof(id);
-    std::string::size_type string_length =
-        *reinterpret_cast<const decltype(res)::mapped_type::size_type*>(&data[resp_index]);
-    resp_index += sizeof(string_length);
-
-    std::string name;
-    name.resize(string_length);
-    std::memcpy(&name[0], &data[resp_index], string_length);
-    resp_index += string_length;
-    res[id] = name;
-  }
+  Json jdata = Json::from_bson(data);  // This line may throw
+  res = jdata["mapping"].get<decltype(res)>();
   return res;
 }
 

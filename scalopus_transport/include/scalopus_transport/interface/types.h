@@ -32,7 +32,7 @@
 
 namespace scalopus
 {
-using Data = std::vector<char>;
+using Data = std::vector<std::uint8_t>;
 }  // namespace scalopus
 
 #endif

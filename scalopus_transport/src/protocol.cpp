@@ -37,7 +37,7 @@ namespace scalopus
 {
 namespace protocol
 {
-bool readData(int fd, size_t length, std::vector<char>& incoming)
+bool readData(int fd, size_t length, Data& incoming)
 {
   // Technically this doesn't need to read in chunks anymore... since we always know the length.
   const size_t chunk_size = 4096;
@@ -91,7 +91,7 @@ bool receive(int fd, Msg& incoming)
   // uint32_t length_of_payload;
   // char[length_of_payload] payload;
 
-  std::vector<char> tmp;
+  Data tmp;
 
   // Read the request id.
   if (readData(fd, sizeof(incoming.request_id), tmp))

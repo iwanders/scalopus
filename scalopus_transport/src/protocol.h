@@ -27,6 +27,7 @@
 #define SCALOPUS_PROTOCOL_H
 #include <string>
 #include <vector>
+#include "scalopus_transport/interface/types.h"
 
 namespace scalopus
 {
@@ -41,14 +42,14 @@ struct Msg
 {
   size_t request_id { 0 };       //!< The request id associated to this request.
   std::string endpoint;    //!< Endpoint name for this message.
-  std::vector<char> data;  //!< Data in this message.
+  Data data;  //!< Data in this message.
 };
 
 /**
  * @brief Read fixed length data from a socket and place it in incoming.
  * @return True if success, false if error occured and the socket can be closed.
  */
-bool readData(int fd, size_t length, std::vector<char>& incoming);
+bool readData(int fd, size_t length, Data& incoming);
 
 /**
  * @brief Receive a message from a socket.

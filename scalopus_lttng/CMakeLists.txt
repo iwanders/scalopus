@@ -7,6 +7,8 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(LTTngUST lttng-ust)
 endif()
 
+find_package(nlohmann_json 3.2.0 REQUIRED)
+
 if (!LTTngUST_FOUND)
   error("LTTNG could not be found")
 endif()
@@ -34,6 +36,7 @@ target_link_libraries(scalopus_lttng
   PUBLIC
     Scalopus::scalopus_transport
   PRIVATE
+    nlohmann_json::nlohmann_json
     ${LTTngUST_LIBRARIES}
 )
 
