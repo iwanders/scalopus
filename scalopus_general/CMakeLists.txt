@@ -8,6 +8,7 @@ include(FindThreads)
 
 add_library(scalopus_general SHARED
   src/endpoint_process_info.cpp
+  src/thread_name_tracker.cpp
 )
 
 target_include_directories(scalopus_general
@@ -31,7 +32,7 @@ target_link_libraries(scalopus_general
 export(
   TARGETS scalopus_general
   NAMESPACE Scalopus::
-  FILE ScalopusLttngConfig.cmake
+  FILE ScalopusGeneralConfig.cmake
 )
 install(TARGETS scalopus_general EXPORT ScalopusGeneral
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

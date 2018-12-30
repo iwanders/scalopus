@@ -26,22 +26,33 @@
 
 #ifndef SCALOPUS_SCOPE_THREAD_NAME_TRACKER_H
 #define SCALOPUS_SCOPE_THREAD_NAME_TRACKER_H
+
 #include "scalopus_general/map_tracker.h"
 
 namespace scalopus
 {
 /**
- * @brief A singleton class that keeps track of the mapping between the ID's stored in the trace and the user-provided
-          name for them.
+ * @brief A singleton class to keep track of thread names.
  */
 class ThreadNameTracker : public MapTracker<unsigned long, std::string>
 {
 public:
-  static ThreadNameTracker& getInstance()
-  {
-    static ThreadNameTracker tracker;
-    return tracker;
-  }
-}
+  static ThreadNameTracker& getInstance();
 
+  /**
+   * @brief Set the thread name of the calling thread.
+   * @param name The name to assign to the calling thread.
+   */
+  void setCurrentName(const std::string& name);
+
+  /**
+   * @brief Update an arbritrary entry in the thread name map. This can be useful if the thread itself cannot use the
+   *        macro for whatever reason.
+   * @param thread_id The thread id, static_cast<unsigned long>(pthread_self()) in general.
+   * @param name The name to assign to the thread by this id.
+   */
+  void setThreadName(unsigned long thread_id, const std::string& name);
+};
+
+}
 #endif

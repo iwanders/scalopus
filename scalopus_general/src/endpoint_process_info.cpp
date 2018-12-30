@@ -24,9 +24,13 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <scalopus_general/endpoint_process_info.h>
+#include <scalopus_general/internal/thread_name_tracker.h>
 #include <cstring>
 #include <iostream>
 #include <nlohmann/json.hpp>
+
+#include <sys/types.h>
+#include <unistd.h>
 
 namespace scalopus
 {
@@ -37,20 +41,34 @@ std::string EndpointProcessInfo::getName() const
   return name;
 }
 
-bool EndpointProcessInfo::handle(Transport& /* server */, const Data& /* request */, Data& /* response */)
+EndpointProcessInfo::EndpointProcessInfo()
 {
-  //  auto mapping = scalopus::ThreadNameTracker::getInstance().getMap();
-  // cool, we have the mappings... now we need to serialize this...
+  info_.id = ::getpid();
+}
 
-  //  if (request.front() == 'm')
-  //  {
-    //  response = serializeMapping(mapping);
-    //  return true;
-  //  }
+void EndpointProcessInfo::setProcessName(const std::string& name)
+{
+  info_.name = name;
+}
+
+bool EndpointProcessInfo::handle(Transport& /* server */, const Data& request, Data& response)
+{
+  json req = json::from_bson(request);
+  
+  // Request is process name:
+  if (req["cmd"].get<std::string>() == "info")
+  {
+    json jdata = json::object();
+    jdata["id"] = info_.id;
+    jdata["name"] = info_.name;
+    jdata["threads"] = scalopus::ThreadNameTracker::getInstance().getMap();
+    response = json::to_bson(jdata);
+    return true;
+  }
   return false;
 }
 
-std::map<unsigned long, std::string> EndpointProcessInfo::threadNames()
+EndpointProcessInfo::ProcessInfo EndpointProcessInfo::processInfo()
 {
   // send message...
   auto transport = transport_.lock();
@@ -59,14 +77,19 @@ std::map<unsigned long, std::string> EndpointProcessInfo::threadNames()
     throw communication_error("No transport provided to endpoint, cannot communicate.");
   }
 
+  ProcessInfo info;
+  json request = json::object();
+  request["cmd"] = "info";
+  Data data = transport->request(getName(), json::to_bson(request)).get();
+  if (!data.empty())
+  {
+    json jdata = json::from_bson(data);  // This line may throw
+    info.name = jdata["name"].get<decltype(info.name)>();
+    info.threads = jdata["threads"].get<decltype(info.threads)>();
+    info.id = jdata["id"].get<decltype(info.id)>();
+  }
 
-  Data resp = transport->request(getName(), { 'm' }).get();
-  //  if (!resp.empty())
-  //  {
-    //  return deserializeMapping(resp);
-  //  }
-
-  return {};
+  return info;
 }
 
 }  // namespace scalopus

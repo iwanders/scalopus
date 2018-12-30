@@ -30,6 +30,8 @@
 #include <string>
 #include <thread>
 
+#include <scalopus_general/thread_naming.h>
+#include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_lttng/endpoint_scope_tracing.h>
 #include <scalopus_lttng/scope_tracing.h>
 #include <scalopus_transport/endpoint_introspect.h>
@@ -73,11 +75,16 @@ void a()
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
-int main(int /* argc */, char** /* argv */)
+int main(int /* argc */, char** argv)
 {
   const auto provider = scalopus::transportServerUnix();
   provider->addEndpoint(std::make_unique<scalopus::EndpointScopeTracing>());
   provider->addEndpoint(std::make_unique<scalopus::EndpointIntrospect>());
+  auto endpoint_process_info = std::make_shared<scalopus::EndpointProcessInfo>();
+  endpoint_process_info->setProcessName(argv[0]);
+  provider->addEndpoint(endpoint_process_info);
+
+  TRACE_THREAD_NAME("main");
 
   scalopus::scope_entry(0);
   scalopus::scope_exit(0);

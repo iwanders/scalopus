@@ -27,6 +27,7 @@
 #include "scalopus_catapult/catapult_server.h"
 #include "scalopus_catapult/endpoint_manager.h"
 #include <scalopus_lttng/endpoint_scope_tracing.h>
+#include <scalopus_general/endpoint_process_info.h>
 
 #include <seasocks/PrintfLogger.h>
 #include <seasocks/Server.h>
@@ -69,6 +70,13 @@ int main(int /* argc */, char** /* argv */)
     auto tracing_endpoint = std::make_shared<scalopus::EndpointScopeTracing>();
     tracing_endpoint->setTransport(transport);
     return tracing_endpoint;
+  });
+
+  manager->addEndpointFactory(scalopus::EndpointProcessInfo::name, [](const auto& transport)
+  {
+    auto endpoint = std::make_shared<scalopus::EndpointProcessInfo>();
+    endpoint->setTransport(transport);
+    return endpoint;
   });
 
   catapult_server->init(manager, path);

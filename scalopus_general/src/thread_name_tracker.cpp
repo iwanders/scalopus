@@ -23,53 +23,25 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#ifndef SCALOPUS_ENDPOINT_PROCESS_INFO_H
-#define SCALOPUS_ENDPOINT_PROCESS_INFO_H
-
-#include <scalopus_transport/interface/endpoint.h>
-#include <scalopus_transport/interface/transport.h>
-#include <map>
-#include <string>
+#include "scalopus_general/internal/thread_name_tracker.h"
 
 namespace scalopus
 {
 
-/**
- * @brief This endpoint provides the thread names and process name.
- */
-class EndpointProcessInfo : public Endpoint
+ThreadNameTracker& ThreadNameTracker::getInstance()
 {
-public:
-  EndpointProcessInfo();
-  constexpr static const char* name = "process_info";
-
-  struct ProcessInfo
-  {
-    std::string name;
-    std::map<unsigned long, std::string> threads;
-    unsigned long id;
-  };
-
-  //  ------ Server ------
-  /**
-   * @brief Provide a name to use for this process.
-   */
-  void setProcessName(const std::string& name);
-
-  //  ------   Client ------
-  /**
-   * @brief Return the process info from the endpoint.
-   */
-  ProcessInfo processInfo();
-
-  // From the endpoint
-  std::string getName() const;
-  bool handle(Transport& server, const Data& request, Data& response);
-private:
-  ProcessInfo info_;
-};
-
+  static ThreadNameTracker instance;
+  return instance;
 }
 
-#endif  // SCALOPUS_ENDPOINT_PROCESS_INFO_H
+void ThreadNameTracker::setCurrentName(const std::string& name)
+{
+  setThreadName(static_cast<unsigned long>(pthread_self()), name);
+}
+
+void ThreadNameTracker::setThreadName(unsigned long thread_id, const std::string& name)
+{
+  insert(thread_id, name);
+}
+
+}  // namespace scalopus

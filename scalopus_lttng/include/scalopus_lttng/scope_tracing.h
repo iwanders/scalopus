@@ -24,7 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <scalopus_lttng/internal/scope_internal_macros.h>
+#include <scalopus_lttng/internal/scope_tracing.h>
 #include <scalopus_lttng/internal/scope_trace_raii.h>
 #include <scalopus_lttng/internal/scope_trace_tracker.h>
 #include <scalopus_lttng/internal/compile_time_crc.hpp>

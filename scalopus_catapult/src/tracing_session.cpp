@@ -97,11 +97,15 @@ std::vector<json> TracingSession::events()
         id = event.eventData().at("id");
       }
       // try to retrieve the correct mapping for this trace point id.
-      auto entry_mapping = trace_mapping_.find(id);
-      if (entry_mapping != trace_mapping_.end())
+      auto pid_info = process_info_.find(event.pid());
+      if (pid_info != process_info_.end())
       {
-        // yay! We found the appopriate mapping for this trace id.
-        name = entry_mapping->second;
+        auto entry_mapping = pid_info->second.trace_ids.find(id);
+        if (entry_mapping != pid_info->second.trace_ids.end())
+        {
+          // yay! We found the appopriate mapping for this trace id.
+          name = entry_mapping->second;
+        }
       }
       if (name.empty())
       {
@@ -130,30 +134,30 @@ std::vector<json> TracingSession::metadata()
 {
   std::vector<json> result;
   // Iterate over all mappings by process ID.
-  //  for (const auto pid_mapping : mappings_)
-  //  {
+  for (const auto pid_process_info : process_info_)
+  {
 
     // make a metadata entry to name a process.
     json process_entry;
     process_entry["tid"] = 0;
     process_entry["ph"] = "M";
     process_entry["name"] = "process_name";
-    process_entry["args"] = { { "name", "processName" } };
-    process_entry["pid"] = 0;
+    process_entry["args"] = { { "name", pid_process_info.second.info.name } };
+    process_entry["pid"] = pid_process_info.first;
     result.push_back(process_entry);
 
     // For all thread mappings, make a metadata entry to name the thread.
-    //  for (const auto thread_mapping : mapping.thread_name_mapping)
-    //  {
+    for (const auto thread_mapping : pid_process_info.second.info.threads)
+    {
       json tid_entry;
-      tid_entry["tid"] = 0;
+      tid_entry["tid"] = thread_mapping.first;
       tid_entry["ph"] = "M";
       tid_entry["name"] = "thread_name";
-      tid_entry["pid"] = 0;
-      tid_entry["args"] = { { "name", "threadName" } };
+      tid_entry["pid"] = pid_process_info.first;
+      tid_entry["args"] = { { "name", thread_mapping.second } };
       result.push_back(tid_entry);
-    //  }
-  //  }
+    }
+  }
   return result;
 }
 
@@ -162,21 +166,42 @@ void TracingSession::updateMapping()
   auto endpoints = manager_->endpoints();
   for (const auto& transport_endpoints: endpoints)
   {
-    auto it = transport_endpoints.second.find(scalopus::EndpointScopeTracing::name);
-    if (it != transport_endpoints.second.end())
+    ProcessMapping remote_info;
+    // try to find the EndpointProcessInfo
     {
-      // found a trace mapping endpoint.
-      const auto endpoint_scope_tracing = std::dynamic_pointer_cast<scalopus::EndpointScopeTracing>(it->second);
-      if (endpoint_scope_tracing != nullptr)
+      auto it = transport_endpoints.second.find(scalopus::EndpointProcessInfo::name);
+      if (it != transport_endpoints.second.end())
       {
-        const auto mapping = endpoint_scope_tracing->mapping();
-        trace_mapping_.insert(mapping.begin(), mapping.end());
-      }
-      else
-      {
-        std::cerr << "[scalopus] Pointer cast did not result in correct pointer, this should not happen." << std::endl;
+        const auto endpoint_instance = std::dynamic_pointer_cast<scalopus::EndpointProcessInfo>(it->second);
+        if (endpoint_instance != nullptr)
+        {
+          remote_info.info = endpoint_instance->processInfo();
+        }
+        else
+        {
+          std::cerr << "[scalopus] Pointer cast did not result in correct pointer, this should not happen." << std::endl;
+        }
       }
     }
+
+    // Try to find the scope tracing endpoint and obtain its data.
+    {
+      auto it = transport_endpoints.second.find(scalopus::EndpointScopeTracing::name);
+      if (it != transport_endpoints.second.end())
+      {
+        // found a trace mapping endpoint.
+        const auto endpoint_scope_tracing = std::dynamic_pointer_cast<scalopus::EndpointScopeTracing>(it->second);
+        if (endpoint_scope_tracing != nullptr)
+        {
+          remote_info.trace_ids = endpoint_scope_tracing->mapping();
+        }
+        else
+        {
+          std::cerr << "[scalopus] Pointer cast did not result in correct pointer, this should not happen." << std::endl;
+        }
+      }
+    }
+    process_info_[remote_info.info.id] = remote_info;
   }
 }
 }  // namespace scalopus

@@ -28,6 +28,7 @@
 #define SCALOPUS_CATAPULT_TRACING_SESSION_H
 
 #include <scalopus_lttng/babeltrace_tool.h>
+#include <scalopus_general/endpoint_process_info.h>
 #include "scalopus_catapult/endpoint_manager.h"
 #include <nlohmann/json.hpp>
 #include <map>
@@ -73,13 +74,19 @@ public:
   std::vector<json> metadata();
 
 private:
+  struct ProcessMapping
+  {
+    std::map<unsigned int, std::string> trace_ids;
+    EndpointProcessInfo::ProcessInfo info;
+  };
+
   BabeltraceTool::Ptr tool_;
   EndpointManager::Ptr manager_;
   std::vector<CTFEvent> events_;
   std::shared_ptr<BabeltraceParser::EventCallback> callback_;
 
   void updateMapping();
-  std::map<unsigned int, std::string> trace_mapping_;
+  std::map<unsigned int, ProcessMapping> process_info_;
 };
 
 }  // namespace scalopus
