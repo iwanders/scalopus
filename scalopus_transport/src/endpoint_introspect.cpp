@@ -26,9 +26,12 @@
 #include "scalopus_transport/endpoint_introspect.h"
 #include "scalopus_transport/interface/transport.h"
 #include <iostream>
+#include <nlohmann/json.hpp>
 
 namespace scalopus
 {
+using json = nlohmann::json;
+
 std::string EndpointIntrospect::getName() const
 {
   return name;
@@ -38,12 +41,9 @@ bool EndpointIntrospect::handle(Transport& server, const Data& /* request */, Da
 {
   const auto endpoints = server.endpoints();
 
-  // Serialize the data
-  for (const auto& name : endpoints)
-  {
-    response.insert(response.end(), name.begin(), name.end());
-    response.push_back('\n');
-  }
+  json jdata = json::object();
+  jdata["endpoints"] = endpoints;
+  response = json::to_bson(jdata);
   return true;
 }
 
@@ -56,25 +56,12 @@ std::vector<std::string> EndpointIntrospect::supported()
     throw communication_error("No transport provided to endpoint, cannot communicate.");
   }
 
-  std::vector<std::string> endpoints{ "" };
-
   // Obtain the response data
   auto future = transport->request(name, {});
   Data resp = future.get();
 
-  // Deserialize it
-  resp.pop_back();
-  for (const auto z : resp)
-  {
-    if (z == '\n')
-    {
-      endpoints.push_back("");
-      continue;
-    }
-    endpoints.back() += z;
-  }
-
-  return endpoints;
+  json jdata = json::from_bson(resp);  // This line may throw
+  return jdata["endpoints"].get<std::vector<std::string>>();
 }
 
 }  // namespace scalopus

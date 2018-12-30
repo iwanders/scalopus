@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5.0)
 
 include(FindThreads)
+find_package(nlohmann_json 3.2.0 REQUIRED)
 
 # Create the library that provides the scope tracepoints 
 add_library(scalopus_transport SHARED
@@ -23,6 +24,8 @@ target_include_directories(scalopus_transport
 target_link_libraries(scalopus_transport
   PRIVATE
     Threads::Threads
+  PRIVATE
+    nlohmann_json::nlohmann_json
 )
 
 add_executable(introspect_endpoints
