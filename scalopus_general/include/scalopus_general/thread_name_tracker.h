@@ -24,14 +24,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_SCOPE_TRACE_TRACKER_H
-#define SCALOPUS_SCOPE_TRACE_TRACKER_H
-
-#include <scalopus_general/map_tracker.h>
-#include <map>
-#include <mutex>
-#include <shared_mutex>
-#include <string>
+#ifndef SCALOPUS_SCOPE_THREAD_NAME_TRACKER_H
+#define SCALOPUS_SCOPE_THREAD_NAME_TRACKER_H
+#include "scalopus_general/map_tracker.h"
 
 namespace scalopus
 {
@@ -39,15 +34,14 @@ namespace scalopus
  * @brief A singleton class that keeps track of the mapping between the ID's stored in the trace and the user-provided
           name for them.
  */
-class ScopeTraceTracker : public MapTracker<unsigned int, std::string>
+class ThreadNameTracker : public MapTracker<unsigned long, std::string>
 {
 public:
-  /**
-   * @brief Static method through which the singleton instance can be retrieved.
-   * @return Returns the singleton instance of the ScopeTraceTracker object.
-   */
-  static ScopeTraceTracker& getInstance();
-};
-}  // namespace scalopus
+  static ThreadNameTracker& getInstance()
+  {
+    static ThreadNameTracker tracker;
+    return tracker;
+  }
+}
 
-#endif  // SCALOPUS_SCOPE_TRACE_TRACKER_H
+#endif

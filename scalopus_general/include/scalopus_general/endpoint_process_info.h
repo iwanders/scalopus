@@ -24,30 +24,33 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_SCOPE_TRACE_TRACKER_H
-#define SCALOPUS_SCOPE_TRACE_TRACKER_H
+#ifndef SCALOPUS_ENDPOINT_PROCESS_INFO_H
+#define SCALOPUS_ENDPOINT_PROCESS_INFO_H
 
-#include <scalopus_general/map_tracker.h>
+#include <scalopus_transport/interface/endpoint.h>
+#include <scalopus_transport/interface/transport.h>
 #include <map>
-#include <mutex>
-#include <shared_mutex>
 #include <string>
 
 namespace scalopus
 {
-/**
- * @brief A singleton class that keeps track of the mapping between the ID's stored in the trace and the user-provided
-          name for them.
- */
-class ScopeTraceTracker : public MapTracker<unsigned int, std::string>
+
+class EndpointProcessInfo : public Endpoint
 {
 public:
-  /**
-   * @brief Static method through which the singleton instance can be retrieved.
-   * @return Returns the singleton instance of the ScopeTraceTracker object.
-   */
-  static ScopeTraceTracker& getInstance();
-};
-}  // namespace scalopus
+  constexpr static const char* name = "process_info";
 
-#endif  // SCALOPUS_SCOPE_TRACE_TRACKER_H
+  /**
+   * @brief Return the trace id to name mappings from the endpoint.
+   */
+  std::map<unsigned long, std::string> threadNames();
+  std::string processName();
+
+  // From the endpoint
+  std::string getName() const;
+  bool handle(Transport& server, const Data& request, Data& response);
+};
+
+}
+
+#endif  // SCALOPUS_ENDPOINT_PROCESS_INFO_H

@@ -17,7 +17,7 @@ add_compile_options("-Werror;-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-Wpedanti
 include(GNUInstallDirs)
 
 # https://youtu.be/bsXLMQ6WgIk?t=3170
-set(as_subproject ScalopusTransport ScalopusLttng)
+set(as_subproject ScalopusTransport ScalopusLttng ScalopusGeneral)
 macro(find_package)
   if(NOT "${ARGV0}" IN_LIST as_subproject)
     _find_package(${ARGV})
@@ -30,4 +30,5 @@ add_subdirectory(scalopus_transport)
 add_subdirectory(scalopus_lttng)
 add_subdirectory(scalopus_examples)
 add_subdirectory(scalopus_catapult)
+add_subdirectory(scalopus_general)
 

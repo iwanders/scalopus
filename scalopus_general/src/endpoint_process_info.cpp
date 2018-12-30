@@ -23,31 +23,50 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#ifndef SCALOPUS_SCOPE_TRACE_TRACKER_H
-#define SCALOPUS_SCOPE_TRACE_TRACKER_H
-
-#include <scalopus_general/map_tracker.h>
-#include <map>
-#include <mutex>
-#include <shared_mutex>
-#include <string>
+#include <scalopus_general/endpoint_process_info.h>
+#include <cstring>
+#include <iostream>
+#include <nlohmann/json.hpp>
 
 namespace scalopus
 {
-/**
- * @brief A singleton class that keeps track of the mapping between the ID's stored in the trace and the user-provided
-          name for them.
- */
-class ScopeTraceTracker : public MapTracker<unsigned int, std::string>
-{
-public:
-  /**
-   * @brief Static method through which the singleton instance can be retrieved.
-   * @return Returns the singleton instance of the ScopeTraceTracker object.
-   */
-  static ScopeTraceTracker& getInstance();
-};
-}  // namespace scalopus
+using json = nlohmann::json;
 
-#endif  // SCALOPUS_SCOPE_TRACE_TRACKER_H
+std::string EndpointProcessInfo::getName() const
+{
+  return name;
+}
+
+bool EndpointProcessInfo::handle(Transport& /* server */, const Data& /* request */, Data& /* response */)
+{
+  //  auto mapping = scalopus::ThreadNameTracker::getInstance().getMap();
+  // cool, we have the mappings... now we need to serialize this...
+
+  //  if (request.front() == 'm')
+  //  {
+    //  response = serializeMapping(mapping);
+    //  return true;
+  //  }
+  return false;
+}
+
+std::map<unsigned long, std::string> EndpointProcessInfo::threadNames()
+{
+  // send message...
+  auto transport = transport_.lock();
+  if (transport == nullptr)
+  {
+    throw communication_error("No transport provided to endpoint, cannot communicate.");
+  }
+
+
+  Data resp = transport->request(getName(), { 'm' }).get();
+  //  if (!resp.empty())
+  //  {
+    //  return deserializeMapping(resp);
+  //  }
+
+  return {};
+}
+
+}  // namespace scalopus

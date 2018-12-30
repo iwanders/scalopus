@@ -26,7 +26,6 @@
 #include <scalopus_lttng/endpoint_scope_tracing.h>
 #include <scalopus_lttng/internal/scope_trace_tracker.h>
 #include <cstring>
-#include <type_traits>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
@@ -41,7 +40,7 @@ std::string EndpointScopeTracing::getName() const
 
 bool EndpointScopeTracing::handle(Transport& /* server */, const Data& request, Data& response)
 {
-  auto mapping = scalopus::ScopeTraceTracker::getInstance().getEntryExitMapping();
+  auto mapping = scalopus::ScopeTraceTracker::getInstance().getMap();
   // cool, we have the mappings... now we need to serialize this...
 
   if (request.front() == 'm')

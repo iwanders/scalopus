@@ -21,7 +21,7 @@
   if (!have_done_setup_varname)                                                                                        \
   {                                                                                                                    \
     have_done_setup_varname = true;                                                                                    \
-    scalopus::ScopeTraceTracker::getInstance().trackEntryExitName(id, name);                                           \
+    scalopus::ScopeTraceTracker::getInstance().insert(id, name);                                                       \
   }
 
 // Macro to create a tracked RAII tracepoint. The tracepoint itself will store only the ID, but the singleton trace

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5.0)
 
 find_package(ScalopusTransport REQUIRED)
+find_package(ScalopusGeneral REQUIRED)
 
 include (FindPkgConfig)
 if (PKG_CONFIG_FOUND)
@@ -35,6 +36,7 @@ add_library(Scalopus::scalopus_lttng ALIAS scalopus_lttng)
 target_link_libraries(scalopus_lttng
   PUBLIC
     Scalopus::scalopus_transport
+    Scalopus::scalopus_general
   PRIVATE
     nlohmann_json::nlohmann_json
     ${LTTngUST_LIBRARIES}

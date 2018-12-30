@@ -27,23 +27,6 @@
 
 namespace scalopus
 {
-ScopeTraceTracker::ScopeTraceTracker()
-{
-}
-
-void ScopeTraceTracker::trackEntryExitName(unsigned int id, std::string name)
-{
-  // For writing we require a unique lock on the mutex.
-  std::unique_lock<decltype(entry_exit_mutex_)> lock(entry_exit_mutex_);
-  entry_exit_mapping_[id] = name;
-}
-
-std::map<unsigned int, std::string> ScopeTraceTracker::getEntryExitMapping()
-{
-  std::shared_lock<decltype(entry_exit_mutex_)> lock(entry_exit_mutex_);
-  return entry_exit_mapping_;
-}
-
 ScopeTraceTracker& ScopeTraceTracker::getInstance()
 {
   static ScopeTraceTracker instance;

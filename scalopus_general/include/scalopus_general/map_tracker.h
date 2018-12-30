@@ -24,30 +24,54 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_SCOPE_TRACE_TRACKER_H
-#define SCALOPUS_SCOPE_TRACE_TRACKER_H
+#ifndef SCALOPUS_SCOPE_MAP_TRACKER_H
+#define SCALOPUS_SCOPE_MAP_TRACKER_H
 
-#include <scalopus_general/map_tracker.h>
 #include <map>
-#include <mutex>
 #include <shared_mutex>
 #include <string>
 
 namespace scalopus
 {
 /**
- * @brief A singleton class that keeps track of the mapping between the ID's stored in the trace and the user-provided
-          name for them.
+ * @brief Helper thread-safe class for arbritrary mapping.
  */
-class ScopeTraceTracker : public MapTracker<unsigned int, std::string>
+template <typename Key, typename Value>
+class MapTracker
 {
 public:
+  MapTracker(MapTracker const&) = delete;    //! Delete the copy constructor.
+  void operator=(MapTracker const&) = delete;  //! Delete the assigment operator.
+
   /**
-   * @brief Static method through which the singleton instance can be retrieved.
-   * @return Returns the singleton instance of the ScopeTraceTracker object.
+   * @brief Function to insert an key->value pair. Is thread safe.
+   * @param key The key to store in the map.
+   * @param value The value to associate to this key.
    */
-  static ScopeTraceTracker& getInstance();
+  void insert(const Key& key, const Value& value)
+  {
+    std::unique_lock<decltype(entry_exit_mutex_)> lock(entry_exit_mutex_);
+    mapping_[key] = value;
+  }
+
+  /**
+   * @brief Function to retrieve the mapping between entry and exit ids and provided names.
+   * @return Map that holds trace point id - trace name mapping.
+   */
+  std::map<Key, Value> getMap() const
+  {
+    std::shared_lock<decltype(entry_exit_mutex_)> lock(entry_exit_mutex_);
+    return mapping_;
+  }
+
+private:
+  std::map<Key, Value> mapping_;
+  mutable std::shared_timed_mutex entry_exit_mutex_;  //! Mutex for the mapping container.
+
+protected:
+  //! Make constructor private such that we can ensure it is a singleton.
+  MapTracker() = default;
 };
 }  // namespace scalopus
 
-#endif  // SCALOPUS_SCOPE_TRACE_TRACKER_H
+#endif  // SCALOPUS_SCOPE_MAP_TRACKER_H
