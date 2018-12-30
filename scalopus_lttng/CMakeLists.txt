@@ -58,7 +58,6 @@ target_link_libraries(babeltrace_test
     scalopus_babeltrace
 )
 
-
 export(
   TARGETS scalopus_lttng scalopus_babeltrace
   NAMESPACE Scalopus::

@@ -26,6 +26,7 @@
 #include <scalopus_lttng/endpoint_scope_tracing.h>
 #include <scalopus_lttng/internal/scope_trace_tracker.h>
 #include <cstring>
+#include <type_traits>
 #include <iostream>
 
 namespace scalopus
@@ -42,29 +43,7 @@ bool EndpointScopeTracing::handle(Transport& /* server */, const Data& request, 
 
   if (request.front() == 'm')
   {
-    size_t resp_index = 0;
-    response.resize(0);
-    for (const auto& id_name : mapping)
-    {
-      const auto& id = id_name.first;
-      const auto& name = id_name.second;
-
-      // Pack the id number
-      response.resize(response.size() + sizeof(id));
-      *reinterpret_cast<decltype(mapping)::key_type*>(&response[resp_index]) = id;
-      resp_index += sizeof(id);
-
-      // Pack the string length.
-      auto string_length = name.size();
-      response.resize(response.size() + sizeof(string_length));
-      *reinterpret_cast<decltype(string_length)*>(&response[resp_index]) = string_length;
-      resp_index += sizeof(string_length);
-
-      // Finally, we write the string.
-      response.resize(response.size() + string_length);
-      std::memcpy(&response[resp_index], name.c_str(), string_length);
-      resp_index += string_length;
-    }
+    response = serializeMapping(mapping);
     return true;
   }
   return false;
@@ -79,29 +58,65 @@ std::map<unsigned int, std::string> EndpointScopeTracing::mapping()
     throw communication_error("No transport provided to endpoint, cannot communicate.");
   }
 
-  std::map<unsigned int, std::string> res;
-  size_t resp_index = 0;
 
   std::vector<char> resp = transport->request(getName(), { 'm' }).get();
   if (!resp.empty())
   {
-    while (resp_index < resp.size())
-    {
-      // now we need to deserialize this...
-      unsigned int id = *reinterpret_cast<decltype(res)::key_type*>(&resp[resp_index]);
-      resp_index += sizeof(id);
-      std::string::size_type string_length =
-          *reinterpret_cast<decltype(res)::mapped_type::size_type*>(&resp[resp_index]);
-      resp_index += sizeof(string_length);
-
-      std::string name;
-      name.resize(string_length);
-      std::memcpy(&name[0], &resp[resp_index], string_length);
-      resp_index += string_length;
-      res[id] = name;
-    }
+    return deserializeMapping(resp);
   }
 
+  return {};
+}
+
+Data EndpointScopeTracing::serializeMapping(const std::map<unsigned int, std::string>& mapping)
+{
+  Data response;
+  size_t resp_index = 0;
+  response.resize(0);
+  for (const auto& id_name : mapping)
+  {
+    const auto& id = id_name.first;
+    const auto& name = id_name.second;
+
+    // Pack the id number
+    response.resize(response.size() + sizeof(id));
+    *reinterpret_cast<std::remove_reference_t<decltype(mapping)>::key_type*>(&response[resp_index]) = id;
+    resp_index += sizeof(id);
+
+    // Pack the string length.
+    auto string_length = name.size();
+    response.resize(response.size() + sizeof(string_length));
+    *reinterpret_cast<decltype(string_length)*>(&response[resp_index]) = string_length;
+    resp_index += sizeof(string_length);
+
+    // Finally, we write the string.
+    response.resize(response.size() + string_length);
+    std::memcpy(&response[resp_index], name.c_str(), string_length);
+    resp_index += string_length;
+  }
+  return response;
+}
+
+
+std::map<unsigned int, std::string> EndpointScopeTracing::deserializeMapping(const Data& data)
+{
+  std::map<unsigned int, std::string> res;
+  size_t resp_index = 0;
+  while (resp_index < data.size())
+  {
+    // now we need to deserialize this...
+    unsigned int id = *reinterpret_cast<const decltype(res)::key_type*>(&data[resp_index]);
+    resp_index += sizeof(id);
+    std::string::size_type string_length =
+        *reinterpret_cast<const decltype(res)::mapped_type::size_type*>(&data[resp_index]);
+    resp_index += sizeof(string_length);
+
+    std::string name;
+    name.resize(string_length);
+    std::memcpy(&name[0], &data[resp_index], string_length);
+    resp_index += string_length;
+    res[id] = name;
+  }
   return res;
 }
 

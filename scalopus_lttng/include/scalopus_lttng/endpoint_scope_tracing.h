@@ -45,8 +45,13 @@ public:
    */
   std::map<unsigned int, std::string> mapping();
 
+  // From the endpoint
   std::string getName() const;
   bool handle(Transport& server, const Data& request, Data& response);
+
+  // Conversion methods used internally.
+  static Data serializeMapping(const std::map<unsigned int, std::string>& mapping);
+  static std::map<unsigned int, std::string> deserializeMapping(const Data& data);
 };
 
 }
