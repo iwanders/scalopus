@@ -58,12 +58,12 @@ void TracingSession::stop()
 }
 
 
-std::vector<Json> TracingSession::events()
+std::vector<json> TracingSession::events()
 {
   stop();
   updateMapping();
 
-  std::vector<Json> result;
+  std::vector<json> result;
 
   if (events_.empty())
   {
@@ -83,7 +83,7 @@ std::vector<Json> TracingSession::events()
       // exit of scope:
       // , {"name": "function name", "pid": 5976, "ts": 77118.0, "cat": "PERF", "tid": 140501248366336, "ph": "E"}
 
-      Json entry;
+      json entry;
       entry["ts"] = ts * 1e6;  // Time is specified in microseconds in devtools tracing format.
       entry["cat"] = "PERF";
       entry["tid"] = event.tid();
@@ -126,15 +126,15 @@ std::vector<Json> TracingSession::events()
   return result;
 }
 
-std::vector<Json> TracingSession::metadata()
+std::vector<json> TracingSession::metadata()
 {
-  std::vector<Json> result;
+  std::vector<json> result;
   // Iterate over all mappings by process ID.
   //  for (const auto pid_mapping : mappings_)
   //  {
 
     // make a metadata entry to name a process.
-    Json process_entry;
+    json process_entry;
     process_entry["tid"] = 0;
     process_entry["ph"] = "M";
     process_entry["name"] = "process_name";
@@ -145,7 +145,7 @@ std::vector<Json> TracingSession::metadata()
     // For all thread mappings, make a metadata entry to name the thread.
     //  for (const auto thread_mapping : mapping.thread_name_mapping)
     //  {
-      Json tid_entry;
+      json tid_entry;
       tid_entry["tid"] = 0;
       tid_entry["ph"] = "M";
       tid_entry["name"] = "thread_name";

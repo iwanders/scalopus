@@ -32,7 +32,7 @@
 
 namespace scalopus
 {
-using Json = nlohmann::json;
+using json = nlohmann::json;
 
 std::string EndpointScopeTracing::getName() const
 {
@@ -73,16 +73,16 @@ std::map<unsigned int, std::string> EndpointScopeTracing::mapping()
 
 Data EndpointScopeTracing::serializeMapping(const std::map<unsigned int, std::string>& mapping)
 {
-  Json jdata = Json::object();
+  json jdata = json::object();
   jdata["mapping"] = mapping;  // need to serialize an object, not an array.
-  return Json::to_bson(jdata);
+  return json::to_bson(jdata);
 }
 
 
 std::map<unsigned int, std::string> EndpointScopeTracing::deserializeMapping(const Data& data)
 {
   std::map<unsigned int, std::string> res;
-  Json jdata = Json::from_bson(data);  // This line may throw
+  json jdata = json::from_bson(data);  // This line may throw
   res = jdata["mapping"].get<decltype(res)>();
   return res;
 }

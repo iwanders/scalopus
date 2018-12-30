@@ -51,7 +51,7 @@
 
 namespace scalopus
 {
-using Json = nlohmann::json;
+using json = nlohmann::json;
 namespace ss = seasocks;
 
 /**
@@ -108,7 +108,7 @@ private:
    * @brief Formats the collected json entries into a correct collectedData return, with newlines.
    * @note Catapult is pedantic about requiring just one newline in the data per entry.
    */
-  static std::string formatCollectedData(std::vector<Json> entries);
+  static std::string formatCollectedData(std::vector<json> entries);
 
   /**
    * @brief Make a message that shows the current buffer usage.

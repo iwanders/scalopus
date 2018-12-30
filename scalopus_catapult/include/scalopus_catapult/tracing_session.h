@@ -34,7 +34,7 @@
 
 namespace scalopus
 {
-using Json = nlohmann::json;
+using json = nlohmann::json;
 
 /**
  * @brief The session that is used to hangle / process one websocket.
@@ -62,15 +62,15 @@ public:
 
   /**
    * @brief Convert the recorded events present in the babel_session into the trace event format accepted by catapult.
-   * @return Vector of Json representations for each event.
+   * @return Vector of json representations for each event.
    * @warn The json representation MUST have newline after every trace event, otherwise catapult doesn't accept it.
    */
-  std::vector<Json> events();
+  std::vector<json> events();
 
   /**
    * @brief Return a vector of json objects representing the metadata.
    */
-  std::vector<Json> metadata();
+  std::vector<json> metadata();
 
 private:
   BabeltraceTool::Ptr tool_;

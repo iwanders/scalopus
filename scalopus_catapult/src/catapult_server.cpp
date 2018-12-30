@@ -33,7 +33,7 @@ std::shared_ptr<ss::Response> CatapultServer::handle(const ss::Request& request)
   if (request.getRequestUri() == "/json/version")
   {
     // This URL is retrieved on the chrome://inspect?tracing page and it is the bold text.
-    Json j2 = {
+    json j2 = {
       { "Browser", "Scalopus Devtools Target" },
       { "Protocol-Version", "1.2" },
       { "User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu "
@@ -49,7 +49,7 @@ std::shared_ptr<ss::Response> CatapultServer::handle(const ss::Request& request)
   if (request.getRequestUri() == "/json")
   {
     // This fakes a page display on this target, this makes it clear the target active and available.
-    Json j2 = { {
+    json j2 = { {
         // chrome://inspect/inspect.js
         { "description", "Scalopus Operational" },
         { "devtoolsFrontendUrl", "/devtools/inspector.html?ws=127.0.0.1:9222/devtools/p" },
@@ -89,14 +89,14 @@ void CatapultServer::onData(ss::WebSocket* ws, const char* data)
 
   std::cout << "Incoming data: " << data << std::endl;
 
-  auto msg = Json::parse(data);
+  auto msg = json::parse(data);
 
   if (msg["method"] == "Tracing.getCategories")
   {
     // This method is on the first record click, when we can specify the capture profile.
     // We can specify categories here, but they client does also show the default catapult categories.
     // So it's of limited use.
-    Json res = { { "id", msg["id"] },
+    json res = { { "id", msg["id"] },
                  { "result", { { "categories", { "!foo", "!bar", "disabled-by-default-lololo" } } } } };
     ws->send(res.dump());
   }
@@ -104,7 +104,7 @@ void CatapultServer::onData(ss::WebSocket* ws, const char* data)
   if (msg["method"] == "Tracing.start")
   {
     // Tracing was started by catapult.
-    Json res = { { "id", msg["id"] }, { "result", {} } };
+    json res = { { "id", msg["id"] }, { "result", {} } };
     session->start();
     ws->send(res.dump());
     std::cout << res.dump() << std::endl;
@@ -121,12 +121,12 @@ void CatapultServer::onData(ss::WebSocket* ws, const char* data)
     session->stop();
     std::cout << "Tracing stopped on " << ws << std::endl;
 
-    Json res = { { "id", msg["id"] }, { "result", nullptr } };
+    json res = { { "id", msg["id"] }, { "result", nullptr } };
     ws->send(res.dump());
 
     // conjure data and pass this as a tracingComplete field.
     // So, now we send the client data in chunks, needs to be in chunks because the webserver buffer is 16 mb.
-    Json data_collected;
+    json data_collected;
     auto events = session->events();
     size_t event_count = events.size();
     const size_t chunk_size = 10000;
@@ -134,7 +134,7 @@ void CatapultServer::onData(ss::WebSocket* ws, const char* data)
     for (size_t i = 0; i < chunks_needed; i++)
     {
       size_t start_position = i * chunk_size;
-      std::vector<Json> sliced{
+      std::vector<json> sliced{
         std::next(events.begin(), start_position),
         std::next(events.begin(), start_position + std::min<size_t>(chunk_size, events.size() - start_position))
       };
@@ -152,7 +152,7 @@ void CatapultServer::onData(ss::WebSocket* ws, const char* data)
   }
 }
 
-std::string CatapultServer::formatCollectedData(std::vector<Json> entries)
+std::string CatapultServer::formatCollectedData(std::vector<json> entries)
 {
   std::stringstream ss;
   ss << "{ \"method\": \"Tracing.dataCollected\", \"params\": { \"value\": [\n";
@@ -172,7 +172,7 @@ std::string CatapultServer::formatCollectedData(std::vector<Json> entries)
 
 std::string CatapultServer::makeBufferUsage(double value)
 {
-  Json tmp;
+  json tmp;
   tmp["method"] = "Tracing.bufferUsage";
   tmp["params"] = { { "percentFull", 0.05 }, { "eventCount", 512 }, { "value", value } };  // value is actually
                                                                                            // displayed %.
