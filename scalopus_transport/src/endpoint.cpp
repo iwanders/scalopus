@@ -50,5 +50,4 @@ void Endpoint::setTransport(const std::shared_ptr<Transport>& transport)
   transport_ = transport;
 }
 
-
 }  // namespace scalopus

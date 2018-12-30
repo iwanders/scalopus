@@ -1,11 +1,11 @@
-#include "scalopus_lttng/endpoint_scope_tracing.h"
 #include <iostream>
+#include "scalopus_lttng/endpoint_scope_tracing.h"
 
 template <typename A, typename B>
 void test(const A& a, const B& b)
 {
-  bool equal = (a.size() == b.size()) && std::equal(a.begin(), a.end(), b.begin(),  [] (auto& c, auto& d)
-                                                   { return c.first == d.first; });
+  bool equal = (a.size() == b.size()) &&
+               std::equal(a.begin(), a.end(), b.begin(), [](auto& c, auto& d) { return c.first == d.first; });
   if (!equal)
   {
     ::exit(1);

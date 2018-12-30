@@ -24,9 +24,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_transport/endpoint_introspect.h"
-#include "scalopus_transport/interface/transport.h"
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include "scalopus_transport/interface/transport.h"
 
 namespace scalopus
 {

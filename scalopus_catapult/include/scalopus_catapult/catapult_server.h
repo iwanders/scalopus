@@ -24,7 +24,6 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #ifndef SCALOPUS_CATAPULT_CATAPULT_SERVER_H
 #define SCALOPUS_CATAPULT_CATAPULT_SERVER_H
 
@@ -43,9 +42,9 @@
 #include <string>
 #include <thread>
 
+#include <scalopus_catapult/tracing_session.h>
 #include <scalopus_lttng/babeltrace_tool.h>
 #include <scalopus_lttng/ctfevent.h>
-#include <scalopus_catapult/tracing_session.h>
 
 #include "scalopus_catapult/endpoint_manager.h"
 
@@ -79,10 +78,10 @@ public:
   void init(const EndpointManager::Ptr& manager, std::string path = "");
 
 private:
-  BabeltraceTool::Ptr tracing_tool_;                           //! Babeltrace tool, produces babeltrace sessions.
-  EndpointManager::Ptr manager_;  //!< Manager for connections.
+  BabeltraceTool::Ptr tracing_tool_;  //! Babeltrace tool, produces babeltrace sessions.
+  EndpointManager::Ptr manager_;      //!< Manager for connections.
 
-  std::mutex session_mutex_;                                 //! Mutex for the session map.
+  std::mutex session_mutex_;                                //! Mutex for the session map.
   std::map<ss::WebSocket*, TracingSession::Ptr> sessions_;  //! Map of sessions by websockets.
 
   /**

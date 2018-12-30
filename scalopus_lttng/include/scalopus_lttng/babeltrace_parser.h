@@ -28,13 +28,13 @@
 #define SCALOPUS_LTTNG_BABELTRACE_PARSER_H
 
 #include <atomic>
+#include <functional>
 #include <iostream>
 #include <istream>
-#include <mutex>
-#include <string>
-#include <functional>
-#include <set>
 #include <memory>
+#include <mutex>
+#include <set>
+#include <string>
 
 #include "scalopus_lttng/ctfevent.h"
 
@@ -48,8 +48,8 @@ class BabeltraceParser
 public:
   struct EventCallback
   {
-    bool active { true };
-    std::function<void (const CTFEvent& event)> callback;
+    bool active{ true };
+    std::function<void(const CTFEvent& event)> callback;
 
     void disable()
     {
@@ -57,7 +57,6 @@ public:
       callback = nullptr;
     }
   };
-
 
   using Ptr = std::shared_ptr<BabeltraceParser>;
 
@@ -93,7 +92,7 @@ public:
 private:
   std::atomic_bool processing_;  //! Bool to check on each while loop in the process function.
 
-  std::mutex mutex_;                                     //! Mutex for the recording sessions set.
+  std::mutex mutex_;                                             //! Mutex for the recording sessions set.
   std::set<std::shared_ptr<EventCallback>> sessions_recording_;  //! Set of sessions that are actively recording.
 };
 

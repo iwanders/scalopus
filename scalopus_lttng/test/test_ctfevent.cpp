@@ -1,5 +1,5 @@
-#include "scalopus_lttng/ctfevent.h"
 #include <iostream>
+#include "scalopus_lttng/ctfevent.h"
 
 template <typename A, typename B>
 void test(const A& a, const B& b)
@@ -12,8 +12,9 @@ void test(const A& a, const B& b)
 }
 int main(int /* argc */, char** /* argv */)
 {
-  std::string line{"[1544361620.739021131] eagle scalopus_scope_id:exit: { cpu_id = 2 }, { vpid = 14897, pthread_id = 139688084124608 }, { id = 4144779573 }"};
-  scalopus::CTFEvent event{line};
+  std::string line{ "[1544361620.739021131] eagle scalopus_scope_id:exit: { cpu_id = 2 }, { vpid = 14897, pthread_id = "
+                    "139688084124608 }, { id = 4144779573 }" };
+  scalopus::CTFEvent event{ line };
   std::cout << event << std::endl;
   test(event.time(), 1544361620.739021131);
   test(event.tid(), 139688084124608U);

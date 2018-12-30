@@ -32,21 +32,20 @@
 
 namespace scalopus
 {
-  /**
-   * @brief Create a unix domain socket transport server.
-   */
-  std::shared_ptr<Transport> transportServerUnix();
+/**
+ * @brief Create a unix domain socket transport server.
+ */
+std::shared_ptr<Transport> transportServerUnix();
 
-  /**
-   * @brief Return a unix domain socket transport connected to a server.
-   */
-  std::shared_ptr<Transport> transportClientUnix(const size_t pid);
+/**
+ * @brief Return a unix domain socket transport connected to a server.
+ */
+std::shared_ptr<Transport> transportClientUnix(const size_t pid);
 
-  /**
-   * @brief Obtain a list of process id's that are providing unix domain socket transport servers.
-   */
-  std::vector<size_t> getTransportServersUnix();
-}
-
+/**
+ * @brief Obtain a list of process id's that are providing unix domain socket transport servers.
+ */
+std::vector<size_t> getTransportServersUnix();
+}  // namespace scalopus
 
 #endif  // SCALOPUS_TRANSPORT_UNIX_H

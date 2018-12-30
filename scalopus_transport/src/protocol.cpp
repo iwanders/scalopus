@@ -159,7 +159,7 @@ bool send(int fd, const Msg& outgoing)
   {
     return false;
   }
-  
+
   // Send endpoint length
   if (::write(fd, &length_endpoint_name, sizeof(length_endpoint_name)) !=
       static_cast<ssize_t>(sizeof(length_endpoint_name)))

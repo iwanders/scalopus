@@ -28,15 +28,14 @@
 #define SCALOPUS_INTERFACE_TRANSPORT_H
 
 #include <scalopus_transport/interface/endpoint.h>
-#include <memory>
-#include <map>
 #include <future>
-#include <vector>
+#include <map>
+#include <memory>
 #include <mutex>
+#include <vector>
 
 namespace scalopus
 {
-
 class Transport
 {
 public:
@@ -76,7 +75,6 @@ public:
   Endpoint::Ptr getEndpoint(const std::string& name) const;
 
 protected:
-
   /**
    * @brief Returns whether or not there are any broadcasts in the queue to be sent out.
    * @return True if there are pending broadcasts in the queue and calling popBroadcast() would be valid.
@@ -92,10 +90,9 @@ protected:
   std::vector<std::pair<std::string, Data>> broadcast_messages_;  //!< List of broadcast messages to send out.
   mutable std::mutex broadcast_message_mutex_;
 
-  std::map<std::string, Endpoint::Ptr> endpoints_;   //!< Endpoints known by this transport, key is their name.
+  std::map<std::string, Endpoint::Ptr> endpoints_;  //!< Endpoints known by this transport, key is their name.
   mutable std::mutex endpoint_mutex_;
 };
-
 
 }  // namespace scalopus
 #endif  // SCALOPUS_INTERFACE_TRANSPORT_SERVER_H

@@ -27,11 +27,11 @@
 #ifndef SCALOPUS_CATAPULT_TRACING_SESSION_H
 #define SCALOPUS_CATAPULT_TRACING_SESSION_H
 
-#include <scalopus_lttng/babeltrace_tool.h>
 #include <scalopus_general/endpoint_process_info.h>
-#include "scalopus_catapult/endpoint_manager.h"
-#include <nlohmann/json.hpp>
+#include <scalopus_lttng/babeltrace_tool.h>
 #include <map>
+#include <nlohmann/json.hpp>
+#include "scalopus_catapult/endpoint_manager.h"
 
 namespace scalopus
 {

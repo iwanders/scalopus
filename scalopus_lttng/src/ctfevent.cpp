@@ -24,7 +24,6 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #include "scalopus_lttng/ctfevent.h"
 
 namespace scalopus
@@ -32,7 +31,8 @@ namespace scalopus
 CTFEvent::CTFEvent(std::string line)
 {
   // Line we are matching is:
-  // "[1544361620.739021131] eagle scalopus_scope_id:exit: { cpu_id = 2 }, { vpid = 14897, pthread_id = 139688084124608 }, { id = 4144779573 }"
+  // "[1544361620.739021131] eagle scalopus_scope_id:exit: { cpu_id = 2 }, { vpid = 14897, pthread_id = 139688084124608
+  // }, { id = 4144779573 }"
 
   line_ = line;
 

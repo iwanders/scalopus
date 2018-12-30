@@ -29,11 +29,11 @@
 
 #include <scalopus_transport/interface/endpoint.h>
 #include <scalopus_transport/interface/transport.h>
-#include <string>
-#include <vector>
-#include <memory>
 #include <functional>
 #include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace scalopus
 {
@@ -67,9 +67,9 @@ public:
 
 private:
   mutable std::mutex mutex_;
-  std::map<std::string, EndpointFactory> endpoint_factories_;   //!< Map of factory functions to construct endpoints.
+  std::map<std::string, EndpointFactory> endpoint_factories_;  //!< Map of factory functions to construct endpoints.
   TransportEndpoints endpoints_;
   std::map<std::size_t, Transport::Ptr> transports_;
 };
-}  // namescape scalopus
+}  // namespace scalopus
 #endif

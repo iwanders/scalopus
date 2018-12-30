@@ -27,16 +27,15 @@
 #include "scalopus_catapult/endpoint_manager.h"
 #include <scalopus_transport/endpoint_introspect.h>
 #include <scalopus_transport/transport_unix.h>
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 
 namespace scalopus
 {
 EndpointManager::EndpointManager()
 {
   std::lock_guard<std::mutex> lock(mutex_);
-  endpoint_factories_[EndpointIntrospect::name] = [](const auto& transport)
-  {
+  endpoint_factories_[EndpointIntrospect::name] = [](const auto& transport) {
     auto introspect_client = std::make_shared<EndpointIntrospect>();
     introspect_client->setTransport(transport);
     return introspect_client;
@@ -55,10 +54,8 @@ void EndpointManager::manage()
     {
       std::cerr << "[scalopus] Cleaning up transport to: " << transport.first << std::endl;
       transports_.erase(transport.first);
-      endpoints_.erase(std::find_if(endpoints_.begin(), endpoints_.end(), [&](const auto& v)
-      {
-        return v.first == transport.second;
-      }));
+      endpoints_.erase(std::find_if(endpoints_.begin(), endpoints_.end(),
+                                    [&](const auto& v) { return v.first == transport.second; }));
     }
   }
 
@@ -109,7 +106,6 @@ EndpointManager::TransportEndpoints EndpointManager::endpoints() const
   std::lock_guard<std::mutex> lock(mutex_);
   return endpoints_;
 }
-
 
 void EndpointManager::addEndpointFactory(const std::string& name, EndpointFactory&& factory_function)
 {

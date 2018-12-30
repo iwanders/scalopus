@@ -27,9 +27,9 @@
 #ifndef SCALOPUS_LTTNG_SCOPE_TRACING_H
 #define SCALOPUS_LTTNG_SCOPE_TRACING_H
 
-#include <scalopus_lttng/internal/scope_tracing.h>
 #include <scalopus_lttng/internal/scope_trace_raii.h>
 #include <scalopus_lttng/internal/scope_trace_tracker.h>
+#include <scalopus_lttng/internal/scope_tracing.h>
 #include <scalopus_lttng/internal/compile_time_crc.hpp>
 
 /**

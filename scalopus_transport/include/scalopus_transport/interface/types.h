@@ -27,8 +27,8 @@
 #ifndef SCALOPUS_INTERFACE_TYPES_H
 #define SCALOPUS_INTERFACE_TYPES_H
 
-#include "scalopus_transport/interface/exceptions.h"
 #include <vector>
+#include "scalopus_transport/interface/exceptions.h"
 
 namespace scalopus
 {

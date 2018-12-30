@@ -31,7 +31,6 @@
 
 namespace scalopus
 {
-
 class EndpointIntrospect : public Endpoint
 {
 public:
@@ -46,7 +45,6 @@ public:
   bool handle(Transport& transport, const Data& incoming, Data& outgoing);
 };
 
-}
-
+}  // namespace scalopus
 
 #endif  // SCALOPUS_ENDPOINT_INTROSPECT_H

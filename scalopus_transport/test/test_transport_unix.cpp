@@ -1,8 +1,8 @@
-#include "transport_unix.h"
-#include "scalopus_transport/endpoint_introspect.h"
-#include <iostream>
-#include <chrono>
 #include <unistd.h>
+#include <chrono>
+#include <iostream>
+#include "scalopus_transport/endpoint_introspect.h"
+#include "transport_unix.h"
 
 template <typename A, typename B>
 void test(const A& a, const B& b)
@@ -21,7 +21,7 @@ class EndpointTest : public Endpoint
 public:
   std::function<bool(Transport& transport, const Data& incoming, Data& outgoing)> handle_;
   std::function<bool(Transport& transport, const Data& incoming, Data& outgoing)> unsolicited_;
-  std::string name_{"endpoint_test"};
+  std::string name_{ "endpoint_test" };
   std::string getName() const
   {
     return name_;
@@ -45,7 +45,7 @@ public:
     return false;
   }
 };
-}
+}  // namespace scalopus
 
 int main(int /* argc */, char** /* argv */)
 {
@@ -73,15 +73,16 @@ int main(int /* argc */, char** /* argv */)
   // Add an endpoint to the client that allows us to detect broadcasts.
   const auto test_endpoint = std::make_shared<scalopus::EndpointTest>();
   char received_unsolicited = 0;
-  test_endpoint->unsolicited_ = [&](scalopus::Transport& /* transport */, const scalopus::Data& incoming, scalopus::Data& /* outgoing */) -> bool
-  {
+  test_endpoint->unsolicited_ = [&](scalopus::Transport& /* transport */, const scalopus::Data& incoming,
+                                    scalopus::Data &
+                                    /* outgoing */) -> bool {
     received_unsolicited = incoming.front();
     return false;
   };
   client0->addEndpoint(test_endpoint);
 
   // next, send a broadcast.
-  server->broadcast(test_endpoint->name_, scalopus::Data{'a', 'b'});
+  server->broadcast(test_endpoint->name_, scalopus::Data{ 'a', 'b' });
 
   // Wait for the broadcast to propagate.
   std::this_thread::sleep_for(std::chrono::milliseconds(200));

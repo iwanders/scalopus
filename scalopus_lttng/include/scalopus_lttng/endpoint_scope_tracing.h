@@ -34,7 +34,6 @@
 
 namespace scalopus
 {
-
 class EndpointScopeTracing : public Endpoint
 {
 public:
@@ -54,7 +53,6 @@ public:
   static std::map<unsigned int, std::string> deserializeMapping(const Data& data);
 };
 
-}
-
+}  // namespace scalopus
 
 #endif  // SCALOPUS_ENDPOINT_SCOPE_TRACING_H

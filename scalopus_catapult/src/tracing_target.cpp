@@ -24,22 +24,22 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <scalopus_general/endpoint_process_info.h>
+#include <scalopus_lttng/endpoint_scope_tracing.h>
 #include "scalopus_catapult/catapult_server.h"
 #include "scalopus_catapult/endpoint_manager.h"
-#include <scalopus_lttng/endpoint_scope_tracing.h>
-#include <scalopus_general/endpoint_process_info.h>
 
 #include <seasocks/PrintfLogger.h>
 #include <seasocks/Server.h>
 
-#include <thread>
 #include <chrono>
+#include <thread>
 
-#include <cstdlib>
 #include <signal.h>
+#include <cstdlib>
 
 // Signal handling.
-bool running { true };
+bool running{ true };
 void sigint_handler(int /* s */)
 {
   running = false;
@@ -65,15 +65,13 @@ int main(int /* argc */, char** /* argv */)
   auto manager = std::make_shared<scalopus::EndpointManager>();
 
   // Add scope tracing endpoint factory function.
-  manager->addEndpointFactory(scalopus::EndpointScopeTracing::name, [](const auto& transport)
-  {
+  manager->addEndpointFactory(scalopus::EndpointScopeTracing::name, [](const auto& transport) {
     auto tracing_endpoint = std::make_shared<scalopus::EndpointScopeTracing>();
     tracing_endpoint->setTransport(transport);
     return tracing_endpoint;
   });
 
-  manager->addEndpointFactory(scalopus::EndpointProcessInfo::name, [](const auto& transport)
-  {
+  manager->addEndpointFactory(scalopus::EndpointProcessInfo::name, [](const auto& transport) {
     auto endpoint = std::make_shared<scalopus::EndpointProcessInfo>();
     endpoint->setTransport(transport);
     return endpoint;

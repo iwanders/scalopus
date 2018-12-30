@@ -29,10 +29,10 @@
 
 #include <scalopus_transport/interface/endpoint.h>
 #include <scalopus_transport/interface/transport.h>
+#include <future>
 #include <map>
 #include <set>
 #include <thread>
-#include <future>
 #include <utility>
 #include <vector>
 #include "protocol.h"
@@ -75,7 +75,7 @@ public:
 
 private:
   std::thread thread_;  //!< Worker thread to handle connections and communication.
-  void work();   //!< Function for the worker thread.
+  void work();          //!< Function for the worker thread.
   int server_fd_{ 0 };  //!< File descriptor from the server bind.
   int client_fd_{ 0 };  //!< File descriptor from connecting to a server.
 
@@ -91,9 +91,9 @@ private:
   bool processMsg(const protocol::Msg& request, protocol::Msg& response);
 
   size_t request_counter_{ 1 };  // 0 is reserved for broadcasts
-  std::mutex write_lock_;  //!< Lock to ensure only one thread is writing to the socket.
+  std::mutex write_lock_;        //!< Lock to ensure only one thread is writing to the socket.
 
-  std::mutex request_lock_; //!< Lock to guard modification of ongoing_requests_ map.
+  std::mutex request_lock_;  //!< Lock to guard modification of ongoing_requests_ map.
 
   //! The outstanding requests and their promised data.
   std::map<std::pair<std::string, size_t>, std::promise<Data>> ongoing_requests_;

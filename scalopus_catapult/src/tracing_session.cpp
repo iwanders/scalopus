@@ -24,12 +24,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #include "scalopus_catapult/tracing_session.h"
+#include <sstream>
 #include "scalopus_lttng/ctfevent.h"
 #include "scalopus_lttng/endpoint_scope_tracing.h"
 #include "scalopus_transport/transport_unix.h"
-#include <sstream>
 
 namespace scalopus
 {
@@ -42,10 +41,7 @@ TracingSession::TracingSession(BabeltraceTool::Ptr tool, EndpointManager::Ptr ma
 void TracingSession::start()
 {
   stop();
-  callback_ = tool_->addCallback([this](const CTFEvent& event)
-  {
-    events_.push_back(event);
-  });
+  callback_ = tool_->addCallback([this](const CTFEvent& event) { events_.push_back(event); });
 }
 
 void TracingSession::stop()
@@ -56,7 +52,6 @@ void TracingSession::stop()
     callback_.reset();
   }
 }
-
 
 std::vector<json> TracingSession::events()
 {
@@ -136,7 +131,6 @@ std::vector<json> TracingSession::metadata()
   // Iterate over all mappings by process ID.
   for (const auto pid_process_info : process_info_)
   {
-
     // make a metadata entry to name a process.
     json process_entry;
     process_entry["tid"] = 0;
@@ -164,7 +158,7 @@ std::vector<json> TracingSession::metadata()
 void TracingSession::updateMapping()
 {
   auto endpoints = manager_->endpoints();
-  for (const auto& transport_endpoints: endpoints)
+  for (const auto& transport_endpoints : endpoints)
   {
     ProcessMapping remote_info;
     // try to find the EndpointProcessInfo
@@ -179,7 +173,8 @@ void TracingSession::updateMapping()
         }
         else
         {
-          std::cerr << "[scalopus] Pointer cast did not result in correct pointer, this should not happen." << std::endl;
+          std::cerr << "[scalopus] Pointer cast did not result in correct pointer, this should not happen."
+                    << std::endl;
         }
       }
     }
@@ -197,7 +192,8 @@ void TracingSession::updateMapping()
         }
         else
         {
-          std::cerr << "[scalopus] Pointer cast did not result in correct pointer, this should not happen." << std::endl;
+          std::cerr << "[scalopus] Pointer cast did not result in correct pointer, this should not happen."
+                    << std::endl;
         }
       }
     }

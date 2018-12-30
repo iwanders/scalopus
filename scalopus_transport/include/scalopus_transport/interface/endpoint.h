@@ -27,13 +27,12 @@
 #define SCALOPUS_INTERFACE_ENDPOINT_H
 
 #include <scalopus_transport/interface/types.h>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace scalopus
 {
-
 class Transport;
 
 class Endpoint
@@ -54,16 +53,17 @@ public:
    * In general this is to accept proactive / broadcast / publish style data.
    */
   virtual bool unsolicited(Transport& transport, const Data& incoming, Data& outgoing);
-  
+
   virtual ~Endpoint();
 
   /**
    * @brief Set the transport to be used by this endpoint.
    */
   void setTransport(const std::shared_ptr<Transport>& transport);
+
 protected:
   std::weak_ptr<Transport> transport_;
 };
 
-}
+}  // namespace scalopus
 #endif  // SCALOPUS_INTERFACE_ENDPOINT_H

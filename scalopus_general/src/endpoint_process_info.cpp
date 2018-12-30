@@ -54,7 +54,7 @@ void EndpointProcessInfo::setProcessName(const std::string& name)
 bool EndpointProcessInfo::handle(Transport& /* server */, const Data& request, Data& response)
 {
   json req = json::from_bson(request);
-  
+
   // Request is process name:
   if (req["cmd"].get<std::string>() == "info")
   {

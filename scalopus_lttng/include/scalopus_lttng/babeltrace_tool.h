@@ -66,7 +66,7 @@ public:
    * @brief Create a session and set its callbacks up correctly such that starting record and stopping it adds and
    *        removes its state from the parser.
    */
-  std::shared_ptr<BabeltraceParser::EventCallback> addCallback(std::function<void (const CTFEvent& event)> fun);
+  std::shared_ptr<BabeltraceParser::EventCallback> addCallback(std::function<void(const CTFEvent& event)> fun);
 
 private:
   std::shared_ptr<subprocess::popen> process_;  //! Babeltrace subprocess.

@@ -27,7 +27,6 @@
 
 namespace scalopus
 {
-
 ThreadNameTracker& ThreadNameTracker::getInstance()
 {
   static ThreadNameTracker instance;

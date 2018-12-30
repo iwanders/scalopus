@@ -31,7 +31,6 @@
 
 namespace scalopus
 {
-
 /**
  * @brief Simple fixed length protocol for use in the unix domain socket transport. The format on the wire is:
  * request_id | endpoint_name_length | endpoint_name | data_length | data.
@@ -40,9 +39,9 @@ namespace protocol
 {
 struct Msg
 {
-  size_t request_id { 0 };       //!< The request id associated to this request.
+  size_t request_id{ 0 };  //!< The request id associated to this request.
   std::string endpoint;    //!< Endpoint name for this message.
-  Data data;  //!< Data in this message.
+  Data data;               //!< Data in this message.
 };
 
 /**

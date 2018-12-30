@@ -24,22 +24,19 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scalopus_lttng/babeltrace_tool.h"
 #include <chrono>
 #include <iostream>
+#include "scalopus_lttng/babeltrace_tool.h"
 
-int main(int /*argc*/, const char* /*argv*/[]) {
-
+int main(int /*argc*/, const char* /*argv*/[])
+{
   scalopus::BabeltraceTool x;
   x.init();
   {
     using namespace std::chrono_literals;
     std::this_thread::sleep_for(1s);
   }
-  auto eventCallback0 = [](const auto& event)
-  {
-    std::cout << "First callback:: " << event << std::endl;
-  };
+  auto eventCallback0 = [](const auto& event) { std::cout << "First callback:: " << event << std::endl; };
 
   auto session = x.addCallback(eventCallback0);
   {
@@ -48,10 +45,7 @@ int main(int /*argc*/, const char* /*argv*/[]) {
   }
   session->disable();
 
-  auto eventCallback1 = [](const auto& event)
-  {
-    std::cout << "Second callback:: " << event << std::endl;
-  };
+  auto eventCallback1 = [](const auto& event) { std::cout << "Second callback:: " << event << std::endl; };
 
   auto session1 = x.addCallback(eventCallback1);
   {
@@ -59,7 +53,6 @@ int main(int /*argc*/, const char* /*argv*/[]) {
     std::this_thread::sleep_for(2s);
   }
   session1->disable();
-
 
   x.halt();
 

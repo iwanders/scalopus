@@ -34,7 +34,6 @@
 
 namespace scalopus
 {
-
 /**
  * @brief This endpoint provides the thread names and process name.
  */
@@ -71,10 +70,11 @@ public:
   // From the endpoint
   std::string getName() const;
   bool handle(Transport& server, const Data& request, Data& response);
+
 private:
   ProcessInfo info_;  //!< The process info.
 };
 
-}
+}  // namespace scalopus
 
 #endif  // SCALOPUS_ENDPOINT_PROCESS_INFO_H

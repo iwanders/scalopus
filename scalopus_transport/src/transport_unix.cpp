@@ -31,8 +31,8 @@
 #include <unistd.h>
 #include <algorithm>
 #include <cstring>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include "protocol.h"
 
@@ -86,7 +86,7 @@ bool TransportUnix::serve()
   // If we get here, we are golden, we got a working unix domain socket and can start our worker thread.
   running_ = true;
   thread_ = std::thread([this]() { work(); });
-  
+
   return true;
 }
 
@@ -118,7 +118,7 @@ bool TransportUnix::connect(std::size_t pid)
   connections_.insert(client_fd_);
 
   running_ = true;
-  thread_ = std::thread([&](){work();});
+  thread_ = std::thread([&]() { work(); });
 
   return true;
 }
@@ -146,7 +146,7 @@ std::shared_future<Data> TransportUnix::request(const std::string& remote_endpoi
 
   // Send succeeded, store the promise in the map, its result should be pending.
   std::lock_guard<std::mutex> lock(request_lock_);
-  ongoing_requests_[{remote_endpoint_name, request_id}] = std::move(promise);
+  ongoing_requests_[{ remote_endpoint_name, request_id }] = std::move(promise);
   return shared_future;
 }
 
@@ -260,11 +260,11 @@ void TransportUnix::work()
       // lock the requests map.
       std::lock_guard<std::mutex> lock(request_lock_);
       // Try to find a promise for the message we just received.
-      auto request_it = ongoing_requests_.find({incoming.endpoint, incoming.request_id});
+      auto request_it = ongoing_requests_.find({ incoming.endpoint, incoming.request_id });
       if (request_it != ongoing_requests_.end())
       {
-        request_it->second.set_value(incoming.data); // set the value into the promise.
-        ongoing_requests_.erase(request_it);  // remove the request promise from the map.
+        request_it->second.set_value(incoming.data);  // set the value into the promise.
+        ongoing_requests_.erase(request_it);          // remove the request promise from the map.
       }
       else
       {
@@ -331,7 +331,7 @@ void TransportUnix::work()
     }
 
     // Process the broadcast queue.
-    while(haveBroadcast())
+    while (haveBroadcast())
     {
       const auto name_payload = popBroadcast();
       protocol::Msg broadcast;
@@ -391,4 +391,3 @@ std::vector<size_t> getTransportServersUnix()
 }
 
 }  // namespace scalopus
-

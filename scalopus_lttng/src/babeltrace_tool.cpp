@@ -43,14 +43,16 @@ void BabeltraceTool::init(std::string path)
   if (path.empty())
   {
     // lttng view call, eliminates need for hostname:$ lttng view test_session -e "babeltrace --input-format=lttng-live"
-    process_ = std::make_shared<subprocess::popen>(
-        "lttng",
-        std::vector<std::string>{ "view", "scalopus_target_session", "-e", "babeltrace --clock-seconds --clock-gmt "
-                                                                           "--no-delta --input-format=lttng-live" });
+    process_ =
+        std::make_shared<subprocess::popen>("lttng", std::vector<std::string>{ "view", "scalopus_target_session", "-e",
+                                                                               "babeltrace --clock-seconds --clock-gmt "
+                                                                               "--no-delta "
+                                                                               "--input-format=lttng-live" });
   }
   else
   {
-    // Direct babeltrace call:$ babeltrace -v --input-format=lttng-live net://localhost/host/eagle/scalopus_target_session
+    // Direct babeltrace call:$ babeltrace -v --input-format=lttng-live
+    // net://localhost/host/eagle/scalopus_target_session
     process_ = std::make_shared<subprocess::popen>(
         "babeltrace",
         std::vector<std::string>{ "--clock-seconds", "--clock-gmt", "--no-delta", "--input-format=lttng-live", path });
@@ -86,7 +88,8 @@ void BabeltraceTool::halt()
   }
 }
 
-std::shared_ptr<BabeltraceParser::EventCallback> BabeltraceTool::addCallback(std::function<void (const CTFEvent& event)> fun)
+std::shared_ptr<BabeltraceParser::EventCallback>
+BabeltraceTool::addCallback(std::function<void(const CTFEvent& event)> fun)
 {
   if (!parser_->isProcessing())
   {

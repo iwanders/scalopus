@@ -27,16 +27,14 @@
 #ifndef SCALOPUS_LTTNG_INTERNAL_SCOPE_TRACING_H
 #define SCALOPUS_LTTNG_INTERNAL_SCOPE_TRACING_H
 
-#include <scalopus_lttng/internal/compile_time_crc.hpp>
 #include <scalopus_general/internal/helper_macros.h>
-
+#include <scalopus_lttng/internal/compile_time_crc.hpp>
 
 // Create a unique ID based on the crc32 of the filename and the line number.
 #define SCALOPUS_TRACKED_TRACE_ID_CREATOR() (CRC32_STR(__FILE__) + __LINE__)
 
 // Create a unique ID based on the crc32 of the filename and the provided string.
 #define SCALOPUS_TRACKED_TRACE_ID_STRING(s) (CRC32_STR(__FILE__) + CRC32_STR(s))
-
 
 // Macro that ensures that tracking the map between name and id is only performed once, this is achieved by using a
 // static boolean.

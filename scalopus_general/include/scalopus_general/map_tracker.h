@@ -40,7 +40,7 @@ template <typename Key, typename Value>
 class MapTracker
 {
 public:
-  MapTracker(MapTracker const&) = delete;    //! Delete the copy constructor.
+  MapTracker(MapTracker const&) = delete;      //! Delete the copy constructor.
   void operator=(MapTracker const&) = delete;  //! Delete the assigment operator.
 
   /**

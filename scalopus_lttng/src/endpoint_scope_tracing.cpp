@@ -60,7 +60,6 @@ std::map<unsigned int, std::string> EndpointScopeTracing::mapping()
     throw communication_error("No transport provided to endpoint, cannot communicate.");
   }
 
-
   Data resp = transport->request(getName(), { 'm' }).get();
   if (!resp.empty())
   {
@@ -76,7 +75,6 @@ Data EndpointScopeTracing::serializeMapping(const std::map<unsigned int, std::st
   jdata["mapping"] = mapping;  // need to serialize an object, not an array.
   return json::to_bson(jdata);
 }
-
 
 std::map<unsigned int, std::string> EndpointScopeTracing::deserializeMapping(const Data& data)
 {
