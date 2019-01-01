@@ -57,11 +57,14 @@ std::vector<std::string> EndpointIntrospect::supported()
   }
 
   // Obtain the response data
-  auto future = transport->request(name, {});
-  Data resp = future->get();
+  auto future_ptr = transport->request(name, {});
+  if (future_ptr->wait_for(std::chrono::milliseconds(200)) == std::future_status::ready)
+  {
+    json jdata = json::from_bson(future_ptr->get());  // This line may throw
+    return jdata["endpoints"].get<std::vector<std::string>>();
+  }
 
-  json jdata = json::from_bson(resp);  // This line may throw
-  return jdata["endpoints"].get<std::vector<std::string>>();
+  return {};
 }
 
 }  // namespace scalopus

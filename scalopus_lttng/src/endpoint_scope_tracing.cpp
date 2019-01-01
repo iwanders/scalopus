@@ -60,10 +60,10 @@ std::map<unsigned int, std::string> EndpointScopeTracing::mapping()
     throw communication_error("No transport provided to endpoint, cannot communicate.");
   }
 
-  Data resp = transport->request(getName(), { 'm' })->get();
-  if (!resp.empty())
+  auto future_ptr = transport->request(getName(), { 'm' });
+  if (future_ptr->wait_for(std::chrono::milliseconds(200)) == std::future_status::ready)
   {
-    return deserializeMapping(resp);
+    return deserializeMapping(future_ptr->get());
   }
 
   return {};

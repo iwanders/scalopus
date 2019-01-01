@@ -80,10 +80,11 @@ EndpointProcessInfo::ProcessInfo EndpointProcessInfo::processInfo()
   ProcessInfo info;
   json request = json::object();
   request["cmd"] = "info";
-  Data data = transport->request(getName(), json::to_bson(request))->get();
-  if (!data.empty())
+  auto future_ptr = transport->request(getName(), json::to_bson(request));
+
+  if (future_ptr->wait_for(std::chrono::milliseconds(200)) == std::future_status::ready)
   {
-    json jdata = json::from_bson(data);  // This line may throw
+    json jdata = json::from_bson(future_ptr->get());  // This line may throw
     info.name = jdata["name"].get<decltype(info.name)>();
     info.threads = jdata["threads"].get<decltype(info.threads)>();
     info.id = jdata["id"].get<decltype(info.id)>();
