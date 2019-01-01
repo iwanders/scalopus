@@ -70,10 +70,14 @@ public:
   static std::vector<std::size_t> getTransportServers();
 
   // From Transport superclass.
-  std::shared_future<Data> request(const std::string& remote_endpoint_name, const Data& outgoing);
+  PendingResponse request(const std::string& remote_endpoint_name, const Data& outgoing);
+  std::size_t pendingRequests() const;
+
   bool isConnected() const;
 
 private:
+  using PendingRequest = std::pair<std::promise<Data>, std::weak_ptr<std::future<Data>>>;
+
   std::thread thread_;  //!< Worker thread to handle connections and communication.
   void work();          //!< Function for the worker thread.
   int server_fd_{ 0 };  //!< File descriptor from the server bind.
@@ -91,12 +95,12 @@ private:
   bool processMsg(const protocol::Msg& request, protocol::Msg& response);
 
   size_t request_counter_{ 1 };  // 0 is reserved for broadcasts
-  std::mutex write_lock_;        //!< Lock to ensure only one thread is writing to the socket.
+  mutable std::mutex write_lock_;        //!< Lock to ensure only one thread is writing to the socket.
 
-  std::mutex request_lock_;  //!< Lock to guard modification of ongoing_requests_ map.
+  mutable std::mutex request_lock_;  //!< Lock to guard modification of ongoing_requests_ map.
 
   //! The outstanding requests and their promised data.
-  std::map<std::pair<std::string, size_t>, std::promise<Data>> ongoing_requests_;
+  std::map<std::pair<std::string, size_t>, PendingRequest> ongoing_requests_;
 };
 
 }  // namespace scalopus

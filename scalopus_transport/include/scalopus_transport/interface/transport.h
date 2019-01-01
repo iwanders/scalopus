@@ -40,6 +40,8 @@ class Transport
 {
 public:
   using Ptr = std::shared_ptr<Transport>;
+  using PendingResponse = std::shared_ptr<std::future<Data>>;
+
   virtual ~Transport();
 
   /**
@@ -49,12 +51,20 @@ public:
 
   /**
    * @brief Send a request to a remote endpoint.
-   * @return A future with the response for this request.
+   * @return A pointer to the future that may be fulfilled by this request.
+   * Callee may let the future go out of scope, in that case the request will be dropped.
+   * @note It is not wise to block without timeout, in case the request goes unfulfilled by the endpoint this would
+   *       block indefinitely.
    */
-  virtual std::shared_future<Data> request(const std::string& remote_endpoint_name, const Data& outgoing) = 0;
+  virtual PendingResponse request(const std::string& remote_endpoint_name, const Data& outgoing) = 0;
 
   /**
-   * @brief Broadcast is an asynchronous call, this is queued for broadcast, the worker than sends it at it's discretion
+   * @brief Returnt the number of oustanding requests.
+   */
+  virtual std::size_t pendingRequests() const = 0;
+
+  /**
+   * @brief Broadcast is a non-blocking call, this is queued for broadcast, the worker than sends it at it's discretion
    */
   virtual void broadcast(const std::string& remote_endpoint_name, const Data& outgoing);
 

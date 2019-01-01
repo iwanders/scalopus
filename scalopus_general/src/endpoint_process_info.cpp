@@ -80,7 +80,7 @@ EndpointProcessInfo::ProcessInfo EndpointProcessInfo::processInfo()
   ProcessInfo info;
   json request = json::object();
   request["cmd"] = "info";
-  Data data = transport->request(getName(), json::to_bson(request)).get();
+  Data data = transport->request(getName(), json::to_bson(request))->get();
   if (!data.empty())
   {
     json jdata = json::from_bson(data);  // This line may throw

@@ -123,7 +123,7 @@ bool TransportUnix::connect(std::size_t pid)
   return true;
 }
 
-std::shared_future<Data> TransportUnix::request(const std::string& remote_endpoint_name, const Data& outgoing)
+Transport::PendingResponse TransportUnix::request(const std::string& remote_endpoint_name, const Data& outgoing)
 {
   size_t request_id = request_counter_++;
   protocol::Msg outgoing_msg;
@@ -132,22 +132,21 @@ std::shared_future<Data> TransportUnix::request(const std::string& remote_endpoi
   outgoing_msg.request_id = request_id;
 
   auto promise = std::promise<Data>();
-  auto shared_future = std::shared_future<Data>(promise.get_future());
+  auto response = std::make_shared<std::future<Data>>(promise.get_future());
 
   {
     std::lock_guard<std::mutex> lock(write_lock_);
     if (!protocol::send(client_fd_, outgoing_msg))
     {
-      //  promise.set_exception(std::make_exception_ptr(communication_error("Failed to send data.")));
-      throw communication_error("Failed to send data.");
-      return shared_future;
+      promise.set_exception(std::make_exception_ptr(communication_error("Failed to send data.")));
+      return response;
     }
   }
 
   // Send succeeded, store the promise in the map, its result should be pending.
   std::lock_guard<std::mutex> lock(request_lock_);
-  ongoing_requests_[{ remote_endpoint_name, request_id }] = std::move(promise);
-  return shared_future;
+  ongoing_requests_[{ remote_endpoint_name, request_id }] = {std::move(promise), response};
+  return response;
 }
 
 bool TransportUnix::isConnected() const
@@ -263,7 +262,11 @@ void TransportUnix::work()
       auto request_it = ongoing_requests_.find({ incoming.endpoint, incoming.request_id });
       if (request_it != ongoing_requests_.end())
       {
-        request_it->second.set_value(incoming.data);  // set the value into the promise.
+        auto ptr = request_it->second.second.lock();
+        if (ptr != nullptr)
+        {
+          request_it->second.first.set_value(incoming.data);  // set the value into the promise.
+        }
         ongoing_requests_.erase(request_it);          // remove the request promise from the map.
       }
       else
@@ -347,7 +350,30 @@ void TransportUnix::work()
         protocol::send(connection, broadcast);
       }
     }
+
+    {
+      // clean up any dropped requests.
+      std::lock_guard<std::mutex> lock(request_lock_);
+      
+      for (auto it = ongoing_requests_.begin(); it != ongoing_requests_.end();)
+      {
+        if (it->second.second.expired())
+        {
+          // request went out of scope.
+          it = ongoing_requests_.erase(it);
+        }
+        else
+        {
+          it++;
+        }
+      }
+    }
   }
+}
+std::size_t TransportUnix::pendingRequests() const
+{
+  std::lock_guard<std::mutex> lock(request_lock_);
+  return ongoing_requests_.size();
 }
 
 bool TransportUnix::processMsg(const protocol::Msg& request, protocol::Msg& response)

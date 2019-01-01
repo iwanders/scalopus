@@ -58,7 +58,7 @@ std::vector<std::string> EndpointIntrospect::supported()
 
   // Obtain the response data
   auto future = transport->request(name, {});
-  Data resp = future.get();
+  Data resp = future->get();
 
   json jdata = json::from_bson(resp);  // This line may throw
   return jdata["endpoints"].get<std::vector<std::string>>();
