@@ -40,7 +40,6 @@ public:
 
   virtual void startInterval();
   virtual void stopInterval();
-  virtual std::vector<json> sendableEvents();
   virtual std::vector<json> finishInterval();
   virtual void work();
 

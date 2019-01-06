@@ -37,11 +37,6 @@ void TraceEventSource::stopInterval()
 {
 }
 
-std::vector<json> TraceEventSource::sendableEvents()
-{
-  return {};
-}
-
 std::vector<json> TraceEventSource::finishInterval()
 {
   return {};

@@ -45,7 +45,6 @@ public:
   void startInterval();
   void stopInterval();
   void work();
-  std::vector<json> sendableEvents();
   std::vector<json> finishInterval();
 
   virtual ~LttngSource();
@@ -57,16 +56,10 @@ private:
   std::mutex event_mutex_;
   std::shared_ptr<BabeltraceParser::EventCallback> callback_;
 
-  double start_time_ { 0 };
-
   /**
-   * @brief 
-   * @param halt_on_fail If true, stops conversion if the scope name cannot be resolved. This value is set to true
-   *        if mapping retrieval failed.
+   * @brief Convert events as 
    */
-  std::vector<json> convertEvents(bool& halt_on_fail);
-
-  bool update_mapping_needed_ { false };
+  std::vector<json> convertEvents();
 
 };
 }

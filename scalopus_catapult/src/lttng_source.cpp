@@ -43,13 +43,9 @@ LttngSource::~LttngSource()
 void LttngSource::startInterval()
 {
   stopInterval();
-
-  start_time_ = 0;
-  provider_->updateMapping();
-
+  events_.clear();
   callback_ = tool_->addCallback([this](const CTFEvent& event)
   {
-    std::lock_guard<decltype(event_mutex_)> lock(event_mutex_);
     events_.push_back(event);
   });
 }
@@ -63,38 +59,17 @@ void LttngSource::stopInterval()
   }
 }
 
-std::vector<json> LttngSource::sendableEvents()
-{
-  std::lock_guard<decltype(event_mutex_)> lock(event_mutex_);
-  // consume events as far as possible.
-  bool halt_on_fail = true;
-  std::vector<json> result = convertEvents(halt_on_fail);
-  if (halt_on_fail)
-  {
-    // we failed resolving a mapping...
-    update_mapping_needed_ = true;
-  }
-
-  return result;
-}
 
 void LttngSource::work()
 {
-  if (update_mapping_needed_)
-  {
-    provider_->updateMapping();
-  }
 }
 
 std::vector<json> LttngSource::finishInterval()
 {
   stopInterval();
-  std::lock_guard<decltype(event_mutex_)> lock(event_mutex_);
 
   provider_->updateMapping();
-
-  bool halt_on_fail = false;
-  std::vector<json> result = convertEvents(halt_on_fail);
+  std::vector<json> result = convertEvents();
 
   auto mapping = provider_->getMapping();
 
@@ -123,26 +98,25 @@ std::vector<json> LttngSource::finishInterval()
     }
   }
 
-  events_.clear();
-
   return result;
 }
 
-std::vector<json> LttngSource::convertEvents(bool& halt_on_fail)
+std::vector<json> LttngSource::convertEvents()
 {
-  std::vector<json> result;
-  bool had_resolve_fail = false;
-  auto it = events_.begin();
-  for (; it != events_.end(); it++)
+  if (events_.empty())
   {
-    auto& event = *it;
+    return {};
+  }
+  
+  std::vector<json> result;
+  result.reserve(events_.size());
 
-    if (start_time_ == 0)
-    {
-      start_time_ = event.time();
-    }
+  double start_time = events_.front().time();
+
+  for (auto& event : events_)
+  {
     // Time stamp, relative to start.
-    double ts = event.time() - start_time_;
+    double ts = event.time() - start_time;
 
     if (event.domain() == "scalopus_scope_id")
     {
@@ -165,12 +139,8 @@ std::vector<json> LttngSource::convertEvents(bool& halt_on_fail)
         id = event.eventData().at("id");
       }
 
-      if ((!provider_->getScopeName(event.pid(), id, name)) && (halt_on_fail))
-      {
-        // erase everything that has been procesed.
-        break;
-        had_resolve_fail = true;
-      }
+      // Populate the name
+      provider_->getScopeName(event.pid(), id, name);
       entry["name"] = name;  // assign the name.
 
       if (event.name() == "entry")
@@ -184,11 +154,6 @@ std::vector<json> LttngSource::convertEvents(bool& halt_on_fail)
       result.push_back(entry);
     }
   }
-  // Remove all events that are processed.
-  events_.erase(events_.begin(), it);
-
-  // Set the resolve failure return bool
-  halt_on_fail = had_resolve_fail;
 
   // Return converted entries
   return result;

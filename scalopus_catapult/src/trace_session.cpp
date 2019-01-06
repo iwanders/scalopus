@@ -87,18 +87,6 @@ void TraceSession::loop()
       source->work();
     }
 
-    // Check any sources for data to be transmitted.
-    std::vector<json> events;
-    for (auto& source : sources_)
-    {
-      auto sendable = source->sendableEvents();
-      events.insert(events.end(), sendable.begin(), sendable.end());
-    }
-    if (!events.empty())
-    {
-      chunkedTransmit(events);
-    }
-
     // Finally, block a bit just to prevent spinning.
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   };
@@ -169,7 +157,7 @@ void TraceSession::chunkedTransmit(const std::vector<json>& events)
       std::next(events.begin(), start_position),
       std::next(events.begin(), start_position + std::min<size_t>(CHUNK_SIZE, events.size() - start_position))
     };
-    outgoing(formatEvents(sliced));
+    response_(formatEvents(sliced));
   }
 }
 
