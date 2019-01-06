@@ -42,9 +42,9 @@
 #include <string>
 #include <thread>
 
-#include "scalopus_catapult/trace_session.h"
 #include "scalopus_catapult/endpoint_manager.h"
 #include "scalopus_catapult/trace_event_provider.h"
+#include "scalopus_catapult/trace_session.h"
 
 namespace scalopus
 {
@@ -86,9 +86,9 @@ public:
   void onDisconnect(ss::WebSocket* connection) override;
 
 private:
-  std::mutex session_mutex_;                                //! Mutex for the session map.
+  std::mutex session_mutex_;                              //! Mutex for the session map.
   std::map<ss::WebSocket*, TraceSession::Ptr> sessions_;  //! Map of sessions by websockets.
-  std::vector<TraceEventProvider::Ptr> providers_;   //!< List of available data providers.
+  std::vector<TraceEventProvider::Ptr> providers_;        //!< List of available data providers.
   ExecuteFunction executor_;  //!< Function that allows registering functions for execution on the server thread.
 
   /**
@@ -109,7 +109,6 @@ private:
    * @param ws The websocket to remove.
    */
   void delSession(ss::WebSocket* ws);
-
 };
 
 }  // namespace scalopus

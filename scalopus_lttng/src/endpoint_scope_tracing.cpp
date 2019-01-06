@@ -25,11 +25,11 @@
 */
 #include <scalopus_lttng/endpoint_scope_tracing.h>
 #include <scalopus_lttng/internal/scope_trace_tracker.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <cstring>
 #include <iostream>
 #include <nlohmann/json.hpp>
-#include <sys/types.h>
-#include <unistd.h>
 
 namespace scalopus
 {
@@ -42,7 +42,7 @@ std::string EndpointScopeTracing::getName() const
 
 bool EndpointScopeTracing::handle(Transport& /* server */, const Data& request, Data& response)
 {
-  ProcessTraceMap mapping = {{::getpid(), scalopus::ScopeTraceTracker::getInstance().getMap()}};
+  ProcessTraceMap mapping = { { ::getpid(), scalopus::ScopeTraceTracker::getInstance().getMap() } };
   // cool, we have the mappings... now we need to serialize this...
 
   if (request.front() == 'm')

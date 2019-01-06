@@ -28,8 +28,8 @@
 #include <scalopus_lttng/endpoint_scope_tracing.h>
 #include "scalopus_catapult/catapult_backend.h"
 #include "scalopus_catapult/endpoint_manager.h"
-#include "scalopus_catapult/lttng_provider.h"
 #include "scalopus_catapult/general_provider.h"
+#include "scalopus_catapult/lttng_provider.h"
 
 #include <seasocks/PrintfLogger.h>
 #include <seasocks/Server.h>
@@ -60,7 +60,6 @@ int main(int /* argc */, char** /* argv */)
   std::string path = "";  // empty path defaults to 'lttng view'
   std::cout << "Using path: \"" << path << "\"  (empty defaults to lttng view scalopus_target_session)" << std::endl;
 
-
   // Create the transport & endpoint manager.
   auto manager = std::make_shared<scalopus::EndpointManager>();
 
@@ -82,7 +81,6 @@ int main(int /* argc */, char** /* argv */)
   std::vector<scalopus::TraceEventProvider::Ptr> providers;
   providers.push_back(std::make_shared<scalopus::LttngProvider>(path, manager));
   providers.push_back(std::make_shared<scalopus::GeneralProvider>(manager));
-  
 
   // Create the catapult backend.
   auto backend = std::make_shared<scalopus::CatapultBackend>(providers);
@@ -93,17 +91,15 @@ int main(int /* argc */, char** /* argv */)
   ss::Server server(logger);
 
   // Set the function that's to be used to execute functions on the seasocks thread.
-  backend->setExecutor([&server](scalopus::CatapultBackend::Runnable&& runnable)
-  {
-    server.execute(std::move(runnable));
-  });
+  backend->setExecutor(
+      [&server](scalopus::CatapultBackend::Runnable&& runnable) { server.execute(std::move(runnable)); });
 
   // Set the send buffer to 128 mb. At the end of the trace, the json representation needs to fit in this buffer.
   server.setClientBufferSize(128 * 1024 * 1024u);
 
   server.addWebSocketHandler("/devtools/page/bar", backend);  // needed for chrom(e/ium) 65.0+
   server.addWebSocketHandler("/devtools/browser", backend);   // needed for chrome 60.0
-  server.addPageHandler(backend);  // This is retrieved in the overview page.
+  server.addPageHandler(backend);                             // This is retrieved in the overview page.
 
   // Start the server in a separate thread.
   server.startListening(port);

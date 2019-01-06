@@ -31,7 +31,6 @@
 
 namespace scalopus
 {
-
 GeneralProvider::GeneralProvider(EndpointManager::Ptr manager) : manager_(manager)
 {
 }
@@ -64,6 +63,5 @@ void GeneralProvider::updateMapping()
     }
   }
 }
-
 
 }  // namespace scalopus

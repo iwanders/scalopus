@@ -27,14 +27,12 @@
 #ifndef SCALOPUS_CATAPULT_LTTNG_SOURCE_H
 #define SCALOPUS_CATAPULT_LTTNG_SOURCE_H
 
-#include "scalopus_catapult/trace_event_source.h"
-#include "scalopus_catapult/lttng_provider.h"
 #include <scalopus_lttng/babeltrace_tool.h>
-
+#include "scalopus_catapult/lttng_provider.h"
+#include "scalopus_catapult/trace_event_source.h"
 
 namespace scalopus
 {
-
 /**
  * @brief The actual lttng source that provides the trace event format json entries.
  */
@@ -58,8 +56,9 @@ public:
   std::vector<json> finishInterval();
 
   ~LttngSource();
+
 private:
-  BabeltraceTool::Ptr tool_;  //!< Pointer to the babeltrace tool.
+  BabeltraceTool::Ptr tool_;     //!< Pointer to the babeltrace tool.
   LttngProvider::Ptr provider_;  //!< Pointer to the provider.
 
   //! Vector of the events of this interval, between start and stop the BabeltraceTool will freely write into this
@@ -72,7 +71,6 @@ private:
    * @brief Convert the stored events into the trace event format representation.
    */
   std::vector<json> convertEvents();
-
 };
-}
+}  // namespace scalopus
 #endif  // SCALOPUS_CATAPULT_LTTNG_SOURCE_H

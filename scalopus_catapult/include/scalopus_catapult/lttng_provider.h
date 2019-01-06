@@ -30,16 +30,14 @@
 #include "scalopus_catapult/trace_event_provider.h"
 
 #include <scalopus_general/endpoint_process_info.h>
-#include <scalopus_lttng/endpoint_scope_tracing.h>
 #include <scalopus_lttng/babeltrace_tool.h>
 #include <scalopus_lttng/ctfevent.h>
+#include <scalopus_lttng/endpoint_scope_tracing.h>
 
 #include "scalopus_catapult/endpoint_manager.h"
 
-
 namespace scalopus
 {
-
 /**
  * @brief This is the provider for the lttng data source. It creates the babeltrace process and parses that. It also
  *        provides functionality to the sessions for resolving trace id's into scope names.
@@ -72,18 +70,18 @@ public:
    */
   std::string getScopeName(unsigned int pid, unsigned int trace_id);
 
-
   // From TraceEventProvider.
   TraceEventSource::Ptr makeSource();
 
   ~LttngProvider();
+
 private:
   BabeltraceTool::Ptr tracing_tool_;  //! Babeltrace tool, produces babeltrace sessions.
   EndpointManager::Ptr manager_;      //!< Manager for connections.
 
-  std::mutex mapping_mutex_;   //!< Mutex for the mapping.
+  std::mutex mapping_mutex_;                       //!< Mutex for the mapping.
   EndpointScopeTracing::ProcessTraceMap mapping_;  //!< The currently known mappings.
 };
 
-}
+}  // namespace scalopus
 #endif  // SCALOPUS_CATAPULT_LTTNG_PROVIDER_H

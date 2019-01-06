@@ -21,7 +21,7 @@ int main(int /* argc */, char** /* argv */)
   scalopus::EndpointScopeTracing::ProcessTraceMap process_mapping;
   process_mapping[5] = test_mapping;
   process_mapping[11] = test_mapping;
-  process_mapping[10] = {{3,"foo"}};
+  process_mapping[10] = { { 3, "foo" } };
 
   auto serialized = scalopus::EndpointScopeTracing::serializeMapping(process_mapping);
   auto deserialized = scalopus::EndpointScopeTracing::deserializeMapping(serialized);

@@ -30,7 +30,6 @@
 #include "scalopus_catapult/trace_event_source.h"
 namespace scalopus
 {
-
 /**
  * @brief This is the abstract base class for a data provider that's used in the catapult backend.
  *        It can create Trace Event Sources that are used by a session.
@@ -47,5 +46,5 @@ public:
   virtual ~TraceEventProvider() = default;
 };
 
-}
+}  // namespace scalopus
 #endif  // SCALOPUS_CATAPULT_TRACE_EVENT_PROVIDER_H

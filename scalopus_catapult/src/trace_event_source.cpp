@@ -28,7 +28,6 @@
 
 namespace scalopus
 {
-
 void TraceEventSource::startInterval()
 {
 }

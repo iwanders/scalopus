@@ -89,7 +89,7 @@ public:
 private:
   mutable std::mutex mutex_;
   std::map<std::string, EndpointFactory> endpoint_factories_;  //!< Map of factory functions to construct endpoints.
-  TransportEndpoints endpoints_;   //!< Map of endpoints, each endpoint holds a map of [name] = endpoint
+  TransportEndpoints endpoints_;  //!< Map of endpoints, each endpoint holds a map of [name] = endpoint
 
   //! Map to keep track of which transport is already created, this is not transport agnostic.
   std::map<std::size_t, Transport::Ptr> transports_;

@@ -25,19 +25,14 @@
 */
 
 #include "scalopus_catapult/trace_session.h"
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 namespace scalopus
 {
-
-
 TraceSession::TraceSession(ResponseFunction&& response_function) : response_(response_function)
 {
-  worker_ = std::thread([&]()
-  {
-    loop();
-  });
+  worker_ = std::thread([&]() { loop(); });
 }
 
 TraceSession::~TraceSession()
@@ -94,7 +89,7 @@ void TraceSession::loop()
 
 void TraceSession::processMessage(const std::string& incoming_msg)
 {
-  std::cout << "[session " << this <<  "] <- " << incoming_msg << std::endl;
+  std::cout << "[session " << this << "] <- " << incoming_msg << std::endl;
   auto msg = json::parse(incoming_msg);
 
   if (msg["method"] == "Tracing.getCategories")
@@ -146,7 +141,7 @@ void TraceSession::processMessage(const std::string& incoming_msg)
 
 void TraceSession::chunkedTransmit(const std::vector<json>& events)
 {
-  std::cout << "[session " << this <<  "] -> events: " << events.size() << std::endl;
+  std::cout << "[session " << this << "] -> events: " << events.size() << std::endl;
   // So, now we send the client data in chunks, needs to be in chunks because the webserver buffer is 16 mb.
   size_t event_count = events.size();
   const size_t chunks_needed = ((event_count / CHUNK_SIZE) + 1);
@@ -163,7 +158,7 @@ void TraceSession::chunkedTransmit(const std::vector<json>& events)
 
 void TraceSession::outgoing(const std::string& msg)
 {
-  std::cout << "[session " << this <<  "] -> " << msg << std::endl;
+  std::cout << "[session " << this << "] -> " << msg << std::endl;
   response_(msg);
 }
 

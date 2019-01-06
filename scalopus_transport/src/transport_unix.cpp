@@ -145,7 +145,7 @@ Transport::PendingResponse TransportUnix::request(const std::string& remote_endp
 
   // Send succeeded, store the promise in the map, its result should be pending.
   std::lock_guard<std::mutex> lock(request_lock_);
-  ongoing_requests_[{ remote_endpoint_name, request_id }] = {std::move(promise), response};
+  ongoing_requests_[{ remote_endpoint_name, request_id }] = { std::move(promise), response };
   return response;
 }
 
@@ -267,7 +267,7 @@ void TransportUnix::work()
         {
           request_it->second.first.set_value(incoming.data);  // set the value into the promise.
         }
-        ongoing_requests_.erase(request_it);          // remove the request promise from the map.
+        ongoing_requests_.erase(request_it);  // remove the request promise from the map.
       }
       else
       {
@@ -354,7 +354,7 @@ void TransportUnix::work()
     {
       // clean up any dropped requests.
       std::lock_guard<std::mutex> lock(request_lock_);
-      
+
       for (auto it = ongoing_requests_.begin(); it != ongoing_requests_.end();)
       {
         if (it->second.second.expired())

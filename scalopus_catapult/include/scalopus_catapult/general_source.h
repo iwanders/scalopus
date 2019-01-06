@@ -27,12 +27,11 @@
 #ifndef SCALOPUS_CATAPULT_GENERAL_SOURCE_H
 #define SCALOPUS_CATAPULT_GENERAL_SOURCE_H
 
-#include "scalopus_catapult/trace_event_source.h"
 #include "scalopus_catapult/general_provider.h"
+#include "scalopus_catapult/trace_event_source.h"
 
 namespace scalopus
 {
-
 /**
  * @brief The source that provides the trace event formatted json entries to name the thread and processes.
  */
@@ -49,8 +48,9 @@ public:
 
   // From TraceEventSource
   std::vector<json> finishInterval();
+
 private:
   GeneralProvider::Ptr provider_;  //!< Pointer to the provider.
 };
-}
+}  // namespace scalopus
 #endif  // SCALOPUS_CATAPULT_GENERAL_SOURCE_H

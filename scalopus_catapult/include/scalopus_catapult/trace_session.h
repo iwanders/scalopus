@@ -27,16 +27,15 @@
 #ifndef SCALOPUS_CATAPULT_TRACE_SESSION_H
 #define SCALOPUS_CATAPULT_TRACE_SESSION_H
 
-#include "scalopus_catapult/trace_event_source.h"
 #include <functional>
 #include <list>
+#include <mutex>
 #include <string>
 #include <thread>
-#include <mutex>
+#include "scalopus_catapult/trace_event_source.h"
 
 namespace scalopus
 {
-
 /**
  * @brief This class is created for every individual websocket connection. It uses its own thread to perform actions and
  *        accepts messages from the websocket. It responds at its discretion or initiates communication from its worker
@@ -45,6 +44,7 @@ namespace scalopus
 class TraceSession
 {
   static const size_t CHUNK_SIZE = 1000;
+
 public:
   using ResponseFunction = std::function<void(std::string)>;
   using Ptr = std::shared_ptr<TraceSession>;
@@ -72,7 +72,7 @@ private:
 
   std::vector<TraceEventSource::Ptr> sources_;  //!< The active sources in this session.
 
-  mutable std::mutex incoming_mutex_;  //!< Mutex for list of incoming messages that are pending processing.
+  mutable std::mutex incoming_mutex_;    //!< Mutex for list of incoming messages that are pending processing.
   std::list<std::string> incoming_msg_;  //!< List of incoming messages that will be processed by the worker thread.
   /**
    * @brief Function to check whether there are messages pending in incoming.
@@ -93,8 +93,8 @@ private:
    */
   void outgoing(const std::string& msg);
 
-  std::thread worker_;  //!< Worker thread for this session.
-  bool running_ { true };  //!< Bool to quit the worker thread gracefully.
+  std::thread worker_;    //!< Worker thread for this session.
+  bool running_{ true };  //!< Bool to quit the worker thread gracefully.
 
   /**
    * @brief The function executed by the worker thread.
@@ -121,5 +121,5 @@ private:
   static std::string formatEvents(const std::vector<json>& entries);
 };
 
-}
+}  // namespace scalopus
 #endif  // SCALOPUS_CATAPULT_TRACE_SESSION_H

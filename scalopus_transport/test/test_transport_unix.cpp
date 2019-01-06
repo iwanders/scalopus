@@ -88,10 +88,9 @@ int main(int /* argc */, char** /* argv */)
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   test(received_unsolicited, 'a');
 
-
   // next, create a request and let the pointer to the response go out of scope. This should clean it up.
   {
-    auto resp_ptr = client0->request("this_endpoint_doesnt_exist", {'a'});
+    auto resp_ptr = client0->request("this_endpoint_doesnt_exist", { 'a' });
     test(client0->pendingRequests(), 1U);
   }
   std::this_thread::sleep_for(std::chrono::milliseconds(200));

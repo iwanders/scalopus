@@ -31,7 +31,6 @@
 
 namespace scalopus
 {
-
 LttngProvider::LttngProvider(std::string path, EndpointManager::Ptr manager) : manager_(manager)
 {
   // Start the tracing tool.
@@ -64,7 +63,8 @@ void LttngProvider::updateMapping()
   for (const auto& transport_endpoints : endpoints)
   {
     // Try to find the scope tracing endpoint and obtain its data.
-    auto endpoint_scope_tracing = EndpointManager::findEndpoint<scalopus::EndpointScopeTracing>(transport_endpoints.second);
+    auto endpoint_scope_tracing =
+        EndpointManager::findEndpoint<scalopus::EndpointScopeTracing>(transport_endpoints.second);
     if (endpoint_scope_tracing != nullptr)
     {
       const auto process_mapping = endpoint_scope_tracing->mapping();

@@ -30,7 +30,6 @@
 
 namespace scalopus
 {
-
 GeneralSource::GeneralSource(GeneralProvider::Ptr provider) : provider_(provider)
 {
 }

@@ -65,5 +65,5 @@ public:
 
   virtual ~TraceEventSource() = default;
 };
-}
+}  // namespace scalopus
 #endif  // SCALOPUS_CATAPULT_TRACE_EVENT_SOURCE_H

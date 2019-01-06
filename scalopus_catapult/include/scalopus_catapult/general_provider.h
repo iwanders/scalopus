@@ -32,10 +32,8 @@
 #include <scalopus_general/endpoint_process_info.h>
 #include "scalopus_catapult/endpoint_manager.h"
 
-
 namespace scalopus
 {
-
 /**
  * @brief This provides the general data such as the process name and thread names.
  */
@@ -63,12 +61,13 @@ public:
 
   // From TraceEventProvider.
   TraceEventSource::Ptr makeSource();
-private:
-  EndpointManager::Ptr manager_;      //!< Manager for connections.
 
-  std::mutex mapping_mutex_;   //!< Mutex for the mapping.
-  ProcessInfoMap mapping_;  //!< The currently known mappings.
+private:
+  EndpointManager::Ptr manager_;  //!< Manager for connections.
+
+  std::mutex mapping_mutex_;  //!< Mutex for the mapping.
+  ProcessInfoMap mapping_;    //!< The currently known mappings.
 };
 
-}
+}  // namespace scalopus
 #endif  // SCALOPUS_CATAPULT_GENERAL_PROVIDER_H

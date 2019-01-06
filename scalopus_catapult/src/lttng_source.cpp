@@ -30,7 +30,6 @@
 
 namespace scalopus
 {
-
 LttngSource::LttngSource(BabeltraceTool::Ptr tool, LttngProvider::Ptr provider) : tool_(tool), provider_(provider)
 {
 }
@@ -44,10 +43,7 @@ void LttngSource::startInterval()
 {
   stopInterval();
   events_.clear();
-  callback_ = tool_->addCallback([this](const CTFEvent& event)
-  {
-    events_.push_back(event);
-  });
+  callback_ = tool_->addCallback([this](const CTFEvent& event) { events_.push_back(event); });
 }
 
 void LttngSource::stopInterval()
@@ -76,7 +72,7 @@ std::vector<json> LttngSource::convertEvents()
   {
     return {};
   }
-  
+
   std::vector<json> result;
   result.reserve(events_.size());
 
