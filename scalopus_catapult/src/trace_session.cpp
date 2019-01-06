@@ -73,13 +73,33 @@ std::string TraceSession::popIncoming()
 
 void TraceSession::loop()
 {
-  // do work.
   while (running_)
   {
-    while(haveIncoming())
+    // Handle any incoming messages from the websocket
+    while (haveIncoming())
     {
       processMessage(popIncoming());
     }
+
+    // Perform work with the sources
+    for (auto& source : sources_)
+    {
+      source->work();
+    }
+
+    // Check any sources for data to be transmitted.
+    std::vector<json> events;
+    for (auto& source : sources_)
+    {
+      auto sendable = source->sendableEvents();
+      events.insert(events.end(), sendable.begin(), sendable.end());
+    }
+    if (!events.empty())
+    {
+      chunkedTransmit(events);
+    }
+
+    // Finally, block a bit just to prevent spinning.
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   };
 }
@@ -128,21 +148,7 @@ void TraceSession::processMessage(const std::string& incoming_msg)
       auto results = source->finishInterval();
       events.insert(events.end(), results.begin(), results.end());
     }
-    
-    // So, now we send the client data in chunks, needs to be in chunks because the webserver buffer is 16 mb.
-    json data_collected;
-    size_t event_count = events.size();
-    const size_t chunk_size = 10000;
-    const size_t chunks_needed = ((event_count / chunk_size) + 1);
-    for (size_t i = 0; i < chunks_needed; i++)
-    {
-      size_t start_position = i * chunk_size;
-      std::vector<json> sliced{
-        std::next(events.begin(), start_position),
-        std::next(events.begin(), start_position + std::min<size_t>(chunk_size, events.size() - start_position))
-      };
-      outgoing(formatEvents(sliced));
-    }
+    chunkedTransmit(events);
 
     res = { { "method", "Tracing.tracingComplete" }, { "params", std::vector<int>{} } };
     outgoing(res.dump());
@@ -150,6 +156,22 @@ void TraceSession::processMessage(const std::string& incoming_msg)
   }
 }
 
+void TraceSession::chunkedTransmit(const std::vector<json>& events)
+{
+  std::cout << "[session " << this <<  "] -> events: " << events.size() << std::endl;
+  // So, now we send the client data in chunks, needs to be in chunks because the webserver buffer is 16 mb.
+  size_t event_count = events.size();
+  const size_t chunks_needed = ((event_count / CHUNK_SIZE) + 1);
+  for (size_t i = 0; i < chunks_needed; i++)
+  {
+    size_t start_position = i * CHUNK_SIZE;
+    std::vector<json> sliced{
+      std::next(events.begin(), start_position),
+      std::next(events.begin(), start_position + std::min<size_t>(CHUNK_SIZE, events.size() - start_position))
+    };
+    outgoing(formatEvents(sliced));
+  }
+}
 
 void TraceSession::outgoing(const std::string& msg)
 {

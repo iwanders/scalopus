@@ -52,6 +52,7 @@ public:
   };
   std::map<unsigned int, ProcessMapping> getMapping();
   void updateMapping();
+  bool getScopeName(unsigned int pid, unsigned int trace_id, std::string& name);
 
 
   LttngProvider(std::string path, EndpointManager::Ptr manager);

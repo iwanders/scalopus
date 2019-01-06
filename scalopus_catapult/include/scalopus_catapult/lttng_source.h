@@ -44,6 +44,7 @@ public:
 
   void startInterval();
   void stopInterval();
+  void work();
   std::vector<json> sendableEvents();
   std::vector<json> finishInterval();
 
@@ -53,7 +54,19 @@ private:
   BabeltraceTool::Ptr tool_;
   LttngProvider::Ptr provider_;
   std::vector<CTFEvent> events_;
+  std::mutex event_mutex_;
   std::shared_ptr<BabeltraceParser::EventCallback> callback_;
+
+  double start_time_ { 0 };
+
+  /**
+   * @brief 
+   * @param halt_on_fail If true, stops conversion if the scope name cannot be resolved. This value is set to true
+   *        if mapping retrieval failed.
+   */
+  std::vector<json> convertEvents(bool& halt_on_fail);
+
+  bool update_mapping_needed_ { false };
 
 };
 }

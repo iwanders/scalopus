@@ -27,6 +27,8 @@
 #include "scalopus_catapult/lttng_provider.h"
 #include "scalopus_catapult/lttng_source.h"
 
+#include <sstream>
+
 namespace scalopus
 {
 
@@ -63,42 +65,40 @@ void LttngProvider::updateMapping()
   {
     ProcessMapping remote_info;
     // try to find the EndpointProcessInfo
+    auto endpoint_ptr = EndpointManager::findEndpoint<scalopus::EndpointProcessInfo>(transport_endpoints.second);
+    if (endpoint_ptr != nullptr)
     {
-      auto it = transport_endpoints.second.find(scalopus::EndpointProcessInfo::name);
-      if (it != transport_endpoints.second.end())
-      {
-        const auto endpoint_instance = std::dynamic_pointer_cast<scalopus::EndpointProcessInfo>(it->second);
-        if (endpoint_instance != nullptr)
-        {
-          remote_info.info = endpoint_instance->processInfo();
-        }
-        else
-        {
-          std::cerr << "[scalopus] Pointer cast did not result in correct pointer, this should not happen."
-                    << std::endl;
-        }
-      }
+      remote_info.info = endpoint_ptr->processInfo();
     }
 
     // Try to find the scope tracing endpoint and obtain its data.
+    auto endpoint_scope_tracing = EndpointManager::findEndpoint<scalopus::EndpointScopeTracing>(transport_endpoints.second);
+    if (endpoint_scope_tracing != nullptr)
     {
-      auto it = transport_endpoints.second.find(scalopus::EndpointScopeTracing::name);
-      if (it != transport_endpoints.second.end())
-      {
-        // found a trace mapping endpoint.
-        const auto endpoint_scope_tracing = std::dynamic_pointer_cast<scalopus::EndpointScopeTracing>(it->second);
-        if (endpoint_scope_tracing != nullptr)
-        {
-          remote_info.trace_ids = endpoint_scope_tracing->mapping();
-        }
-        else
-        {
-          std::cerr << "[scalopus] Pointer cast did not result in correct pointer, this should not happen."
-                    << std::endl;
-        }
-      }
+      remote_info.trace_ids = endpoint_scope_tracing->mapping();
     }
     mapping_[remote_info.info.id] = remote_info;
   }
 }
+
+bool LttngProvider::getScopeName(unsigned int pid, unsigned int trace_id, std::string& name)
+{
+  std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
+  auto pid_info = mapping_.find(pid);
+  if (pid_info != mapping_.end())
+  {
+    auto entry_mapping = pid_info->second.trace_ids.find(trace_id);
+    if (entry_mapping != pid_info->second.trace_ids.end())
+    {
+      // yay! We found the appopriate mapping for this trace id.
+      name = entry_mapping->second;
+      return true;
+    }
+  }
+  std::stringstream z;
+  z << "Unknown 0x" << std::hex << trace_id;
+  name = z.str();
+  return false;
+}
+
 }  // namespace scalopus

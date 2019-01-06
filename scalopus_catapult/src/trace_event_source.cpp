@@ -44,8 +44,11 @@ std::vector<json> TraceEventSource::sendableEvents()
 
 std::vector<json> TraceEventSource::finishInterval()
 {
-  stopInterval();
   return {};
+}
+
+void TraceEventSource::work()
+{
 }
 
 }  // namespace scalopus

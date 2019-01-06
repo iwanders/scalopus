@@ -65,6 +65,23 @@ public:
    */
   void addEndpointFactory(const std::string& name, EndpointFactory&& factory_function);
 
+  template <typename T>
+  static std::shared_ptr<T> findEndpoint(const EndpointMap& transport_endpoints)
+  {
+    auto it = transport_endpoints.find(T::name);
+    if (it != transport_endpoints.end())
+    {
+      const auto endpoint_instance = std::dynamic_pointer_cast<T>(it->second);
+      if (endpoint_instance == nullptr)
+      {
+        // This should never happen, as the pointer by the name of T::name should be of the correct type.
+        throw std::runtime_error("Endpoint's name does not match its real type.");
+      }
+      return endpoint_instance;
+    }
+    return nullptr;
+  }
+
 private:
   mutable std::mutex mutex_;
   std::map<std::string, EndpointFactory> endpoint_factories_;  //!< Map of factory functions to construct endpoints.

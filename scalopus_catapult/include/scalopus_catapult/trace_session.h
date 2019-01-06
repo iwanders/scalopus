@@ -44,6 +44,7 @@ namespace scalopus
  */
 class TraceSession
 {
+  static const size_t CHUNK_SIZE = 10000;
 public:
   using ResponseFunction = std::function<void(std::string)>;
   using Ptr = std::shared_ptr<TraceSession>;
@@ -66,12 +67,10 @@ public:
 
   ~TraceSession();
 
-  static std::string formatEvents(const std::vector<json>& entries);
-
-
 private:
   void loop();
   void processMessage(const std::string& incoming_msg);
+  void chunkedTransmit(const std::vector<json>& events);
 
   ResponseFunction response_;
 
@@ -87,6 +86,7 @@ private:
   std::thread worker_;
   bool running_ { true };
 
+  static std::string formatEvents(const std::vector<json>& entries);
 };
 
 }
