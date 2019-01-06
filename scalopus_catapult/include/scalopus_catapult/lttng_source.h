@@ -54,6 +54,7 @@ private:
   LttngProvider::Ptr provider_;
   std::vector<CTFEvent> events_;
   std::shared_ptr<BabeltraceParser::EventCallback> callback_;
+
 };
 }
 #endif  // SCALOPUS_CATAPULT_LTTNG_SOURCE_H

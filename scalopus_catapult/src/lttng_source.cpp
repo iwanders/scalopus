@@ -64,9 +64,6 @@ std::vector<json> LttngSource::finishInterval()
 {
   stopInterval();
 
-  // process events.
-
-
   std::vector<json> result;
 
   if (events_.empty())
@@ -76,6 +73,31 @@ std::vector<json> LttngSource::finishInterval()
 
   provider_->updateMapping();
   auto mapping = provider_->getMapping();
+
+  // Iterate over all mappings by process ID.
+  for (const auto pid_process_info : mapping)
+  {
+    // make a metadata entry to name a process.
+    json process_entry;
+    process_entry["tid"] = 0;
+    process_entry["ph"] = "M";
+    process_entry["name"] = "process_name";
+    process_entry["args"] = { { "name", pid_process_info.second.info.name } };
+    process_entry["pid"] = pid_process_info.first;
+    result.push_back(process_entry);
+
+    // For all thread mappings, make a metadata entry to name the thread.
+    for (const auto thread_mapping : pid_process_info.second.info.threads)
+    {
+      json tid_entry;
+      tid_entry["tid"] = thread_mapping.first;
+      tid_entry["ph"] = "M";
+      tid_entry["name"] = "thread_name";
+      tid_entry["pid"] = pid_process_info.first;
+      tid_entry["args"] = { { "name", thread_mapping.second } };
+      result.push_back(tid_entry);
+    }
+  }
 
   double start_time = events_.front().time();
   for (const auto& event : events_)
