@@ -25,6 +25,7 @@
 */
 
 #include "scalopus_catapult/trace_session.h"
+#include <sstream>
 #include <iostream>
 
 namespace scalopus
@@ -75,8 +76,6 @@ void TraceSession::loop()
   // do work.
   while (running_)
   {
-    // Process incoming
-    // handle logic.
     while(haveIncoming())
     {
       processMessage(popIncoming());
@@ -93,10 +92,59 @@ void TraceSession::processMessage(const std::string& incoming_msg)
   if (msg["method"] == "Tracing.getCategories")
   {
     // This method is on the first record click, when we can specify the capture profile.
-    // We can specify categories here, but the client does also show the default catapult categories.
-    // So it's of limited use.
+    // We can specify categories here, this requires folding out in the GUI so it's of limited use unfortunately.
     json res = { { "id", msg["id"] },
                  { "result", { { "categories", { "!foo", "!bar", "disabled-by-default-buz" } } } } };
+    outgoing(res.dump());
+    return;
+  }
+
+  if (msg["method"] == "Tracing.start")
+  {
+    // Tracing was started by catapult.
+    json res = { { "id", msg["id"] }, { "result", {} } };
+    for (auto& source : sources_)
+    {
+      source->startInterval();
+    }
+    outgoing(res.dump());
+    return;
+  }
+
+  if (msg["method"] == "Tracing.end")
+  {
+    // Tracing was stopped.
+    for (auto& source : sources_)
+    {
+      source->stopInterval();
+    }
+
+    json res = { { "id", msg["id"] }, { "result", nullptr } };  // nullptr gets converted to NULL, which we need.
+    outgoing(res.dump());
+
+    std::vector<json> events;
+    for (auto& source : sources_)
+    {
+      auto results = source->finishInterval();
+      events.insert(events.end(), results.begin(), results.end());
+    }
+    
+    // So, now we send the client data in chunks, needs to be in chunks because the webserver buffer is 16 mb.
+    json data_collected;
+    size_t event_count = events.size();
+    const size_t chunk_size = 10000;
+    const size_t chunks_needed = ((event_count / chunk_size) + 1);
+    for (size_t i = 0; i < chunks_needed; i++)
+    {
+      size_t start_position = i * chunk_size;
+      std::vector<json> sliced{
+        std::next(events.begin(), start_position),
+        std::next(events.begin(), start_position + std::min<size_t>(chunk_size, events.size() - start_position))
+      };
+      outgoing(formatEvents(sliced));
+    }
+
+    res = { { "method", "Tracing.tracingComplete" }, { "params", std::vector<int>{} } };
     outgoing(res.dump());
     return;
   }
@@ -109,14 +157,22 @@ void TraceSession::outgoing(const std::string& msg)
   response_(msg);
 }
 
-
-void TraceSession::startInterval()
+std::string TraceSession::formatEvents(const std::vector<json>& entries)
 {
+  std::stringstream ss;
+  ss << "{ \"method\": \"Tracing.dataCollected\", \"params\": { \"value\": [\n";
+  bool has_added = false;
+  for (const auto& entry : entries)
+  {
+    if (has_added)
+    {
+      ss << ",\n";
+    }
+    has_added = true;
+    ss << entry.dump();
+  }
+  ss << "]}}";
+  return ss.str();
 }
-
-void TraceSession::stopInterval()
-{
-}
-
 
 }  // namespace scalopus

@@ -28,6 +28,8 @@
 #define SCALOPUS_CATAPULT_LTTNG_SOURCE_H
 
 #include "scalopus_catapult/trace_event_source.h"
+#include "scalopus_catapult/lttng_provider.h"
+#include <scalopus_lttng/babeltrace_tool.h>
 
 
 namespace scalopus
@@ -38,6 +40,8 @@ class LttngSource : public TraceEventSource
 public:
   using Ptr = std::shared_ptr<LttngSource>;
 
+  LttngSource(BabeltraceTool::Ptr tool, LttngProvider::Ptr provider);
+
   void startInterval();
   void stopInterval();
   std::vector<json> sendableEvents();
@@ -45,6 +49,11 @@ public:
 
   virtual ~LttngSource();
 
+private:
+  BabeltraceTool::Ptr tool_;
+  LttngProvider::Ptr provider_;
+  std::vector<CTFEvent> events_;
+  std::shared_ptr<BabeltraceParser::EventCallback> callback_;
 };
 }
 #endif  // SCALOPUS_CATAPULT_LTTNG_SOURCE_H

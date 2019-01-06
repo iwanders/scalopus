@@ -28,6 +28,7 @@
 #include <scalopus_lttng/endpoint_scope_tracing.h>
 #include "scalopus_catapult/catapult_backend.h"
 #include "scalopus_catapult/endpoint_manager.h"
+#include "scalopus_catapult/lttng_provider.h"
 
 #include <seasocks/PrintfLogger.h>
 #include <seasocks/Server.h>
@@ -78,6 +79,7 @@ int main(int /* argc */, char** /* argv */)
 
   // Create the providers.
   std::vector<scalopus::TraceEventProvider::Ptr> providers;
+  providers.push_back(std::make_shared<scalopus::LttngProvider>(path, manager));
   
 
   // Create the catapult backend.

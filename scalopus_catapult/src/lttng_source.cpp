@@ -24,21 +24,35 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scalopus_catapult/lttng_provider.h"
+#include "scalopus_catapult/lttng_source.h"
+
+#include <sstream>
 
 namespace scalopus
 {
 
+LttngSource::LttngSource(BabeltraceTool::Ptr tool, LttngProvider::Ptr provider) : tool_(tool), provider_(provider)
+{
+}
+
 LttngSource::~LttngSource()
 {
+  stopInterval();
 }
 
 void LttngSource::startInterval()
 {
+  stopInterval();
+  callback_ = tool_->addCallback([this](const CTFEvent& event) { events_.push_back(event); });
 }
 
 void LttngSource::stopInterval()
 {
+  if (callback_ != nullptr)
+  {
+    callback_->disable();
+    callback_.reset();
+  }
 }
 
 std::vector<json> LttngSource::sendableEvents()
@@ -49,7 +63,80 @@ std::vector<json> LttngSource::sendableEvents()
 std::vector<json> LttngSource::finishInterval()
 {
   stopInterval();
-  return {};
+
+  // process events.
+
+
+  std::vector<json> result;
+
+  if (events_.empty())
+  {
+    return result;
+  }
+
+  provider_->updateMapping();
+  auto mapping = provider_->getMapping();
+
+  double start_time = events_.front().time();
+  for (const auto& event : events_)
+  {
+    // Time stamp, relative to start.
+    double ts = event.time() - start_time;
+
+    if (event.domain() == "scalopus_scope_id")
+    {
+      // entry scope:
+      // , {"name": "function name", "pid": 5976, "ts": 77033.2, "cat": "PERF", "tid": 140501248366336, "ph": "B"}
+      // exit of scope:
+      // , {"name": "function name", "pid": 5976, "ts": 77118.0, "cat": "PERF", "tid": 140501248366336, "ph": "E"}
+
+      json entry;
+      entry["ts"] = ts * 1e6;  // Time is specified in microseconds in devtools tracing format.
+      entry["cat"] = "PERF";
+      entry["tid"] = event.tid();
+      entry["pid"] = event.pid();
+
+      // try to look up the mapping for this pid
+      std::string name;  // scope name.
+      unsigned long long id = 0;
+      if (event.eventData().find("id") != event.eventData().end())
+      {
+        id = event.eventData().at("id");
+      }
+      // try to retrieve the correct mapping for this trace point id.
+      auto pid_info = mapping.find(event.pid());
+      if (pid_info != mapping.end())
+      {
+        auto entry_mapping = pid_info->second.trace_ids.find(id);
+        if (entry_mapping != pid_info->second.trace_ids.end())
+        {
+          // yay! We found the appopriate mapping for this trace id.
+          name = entry_mapping->second;
+        }
+      }
+      if (name.empty())
+      {
+        std::stringstream z;
+        z << "Unknown trace id." << std::hex << id;
+        name = z.str();
+      }
+      entry["name"] = name;  // assign the name.
+
+      if (event.name() == "entry")
+      {
+        entry["ph"] = "B";
+      }
+      else if (event.name() == "exit")
+      {
+        entry["ph"] = "E";
+      }
+      result.push_back(entry);
+    }
+  }
+  events_.clear();
+
+
+  return result;
 }
 
 }  // namespace scalopus

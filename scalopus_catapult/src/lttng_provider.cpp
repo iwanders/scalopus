@@ -25,11 +25,12 @@
 */
 
 #include "scalopus_catapult/lttng_provider.h"
+#include "scalopus_catapult/lttng_source.h"
 
 namespace scalopus
 {
 
-LttngProvider::LttngProvider(std::string path, EndpointManager::Ptr&& manager) : manager_(manager)
+LttngProvider::LttngProvider(std::string path, EndpointManager::Ptr manager) : manager_(manager)
 {
   // Start the tracing tool.
   tracing_tool_ = std::make_shared<BabeltraceTool>();
@@ -43,7 +44,61 @@ LttngProvider::~LttngProvider()
 
 TraceEventSource::Ptr LttngProvider::makeSource()
 {
-  return nullptr;
+  return std::make_shared<LttngSource>(tracing_tool_, shared_from_this());
 }
 
+std::map<unsigned int, LttngProvider::ProcessMapping> LttngProvider::getMapping()
+{
+  std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
+  return mapping_;
+}
+
+void LttngProvider::updateMapping()
+{
+  std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
+  mapping_.clear();
+
+  auto endpoints = manager_->endpoints();
+  for (const auto& transport_endpoints : endpoints)
+  {
+    ProcessMapping remote_info;
+    // try to find the EndpointProcessInfo
+    {
+      auto it = transport_endpoints.second.find(scalopus::EndpointProcessInfo::name);
+      if (it != transport_endpoints.second.end())
+      {
+        const auto endpoint_instance = std::dynamic_pointer_cast<scalopus::EndpointProcessInfo>(it->second);
+        if (endpoint_instance != nullptr)
+        {
+          remote_info.info = endpoint_instance->processInfo();
+        }
+        else
+        {
+          std::cerr << "[scalopus] Pointer cast did not result in correct pointer, this should not happen."
+                    << std::endl;
+        }
+      }
+    }
+
+    // Try to find the scope tracing endpoint and obtain its data.
+    {
+      auto it = transport_endpoints.second.find(scalopus::EndpointScopeTracing::name);
+      if (it != transport_endpoints.second.end())
+      {
+        // found a trace mapping endpoint.
+        const auto endpoint_scope_tracing = std::dynamic_pointer_cast<scalopus::EndpointScopeTracing>(it->second);
+        if (endpoint_scope_tracing != nullptr)
+        {
+          remote_info.trace_ids = endpoint_scope_tracing->mapping();
+        }
+        else
+        {
+          std::cerr << "[scalopus] Pointer cast did not result in correct pointer, this should not happen."
+                    << std::endl;
+        }
+      }
+    }
+    mapping_[remote_info.info.id] = remote_info;
+  }
+}
 }  // namespace scalopus

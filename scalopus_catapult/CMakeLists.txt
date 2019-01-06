@@ -11,7 +11,9 @@ add_library(scalopus_catapult
   src/endpoint_manager.cpp
 
   src/trace_session.cpp
+  src/trace_event_source.cpp
   src/lttng_provider.cpp
+  src/lttng_source.cpp
 )
 
 target_include_directories(scalopus_catapult

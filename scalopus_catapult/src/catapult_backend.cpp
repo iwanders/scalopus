@@ -28,6 +28,12 @@
 
 namespace scalopus
 {
+
+
+CatapultBackend::CatapultBackend(const std::vector<TraceEventProvider::Ptr>& providers) : providers_(providers)
+{
+}
+
 std::shared_ptr<ss::Response> CatapultBackend::handle(const ss::Request& request)
 {
   if (request.getRequestUri() == "/json/version")
@@ -95,10 +101,6 @@ void CatapultBackend::onDisconnect(ss::WebSocket* ws)
   delSession(ws);
 }
 
-
-CatapultBackend::CatapultBackend(const std::vector<TraceEventProvider::Ptr>& providers) : providers_(providers)
-{
-}
 
 TraceSession::Ptr CatapultBackend::getSession(ss::WebSocket* ws)
 {

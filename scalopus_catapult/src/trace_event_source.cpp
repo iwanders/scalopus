@@ -24,47 +24,28 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_CATAPULT_LTTNG_PROVIDER_H
-#define SCALOPUS_CATAPULT_LTTNG_PROVIDER_H
-
-#include "scalopus_catapult/trace_event_provider.h"
-
-#include <scalopus_general/endpoint_process_info.h>
-#include <scalopus_lttng/endpoint_scope_tracing.h>
-#include <scalopus_lttng/babeltrace_tool.h>
-#include <scalopus_lttng/ctfevent.h>
-
-#include "scalopus_catapult/endpoint_manager.h"
-
+#include "scalopus_catapult/trace_event_source.h"
 
 namespace scalopus
 {
 
-class LttngProvider : public TraceEventProvider, public std::enable_shared_from_this<LttngProvider>
+void TraceEventSource::startInterval()
 {
-public:
-  using Ptr = std::shared_ptr<LttngProvider>;
-
-  struct ProcessMapping
-  {
-    std::map<unsigned int, std::string> trace_ids;
-    EndpointProcessInfo::ProcessInfo info;
-  };
-  std::map<unsigned int, ProcessMapping> getMapping();
-  void updateMapping();
-
-
-  LttngProvider(std::string path, EndpointManager::Ptr manager);
-  TraceEventSource::Ptr makeSource();
-
-  ~LttngProvider();
-private:
-  BabeltraceTool::Ptr tracing_tool_;  //! Babeltrace tool, produces babeltrace sessions.
-  EndpointManager::Ptr manager_;      //!< Manager for connections.
-
-  std::mutex mapping_mutex_;
-  std::map<unsigned int, ProcessMapping> mapping_;
-};
-
 }
-#endif  // SCALOPUS_CATAPULT_LTTNG_PROVIDER_H
+
+void TraceEventSource::stopInterval()
+{
+}
+
+std::vector<json> TraceEventSource::sendableEvents()
+{
+  return {};
+}
+
+std::vector<json> TraceEventSource::finishInterval()
+{
+  stopInterval();
+  return {};
+}
+
+}  // namespace scalopus

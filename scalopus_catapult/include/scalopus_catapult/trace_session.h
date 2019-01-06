@@ -66,10 +66,11 @@ public:
 
   ~TraceSession();
 
+  static std::string formatEvents(const std::vector<json>& entries);
+
+
 private:
   void loop();
-  void startInterval();
-  void stopInterval();
   void processMessage(const std::string& incoming_msg);
 
   ResponseFunction response_;
