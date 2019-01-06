@@ -29,6 +29,7 @@
 #include "scalopus_catapult/catapult_backend.h"
 #include "scalopus_catapult/endpoint_manager.h"
 #include "scalopus_catapult/lttng_provider.h"
+#include "scalopus_catapult/general_provider.h"
 
 #include <seasocks/PrintfLogger.h>
 #include <seasocks/Server.h>
@@ -80,6 +81,7 @@ int main(int /* argc */, char** /* argv */)
   // Create the providers.
   std::vector<scalopus::TraceEventProvider::Ptr> providers;
   providers.push_back(std::make_shared<scalopus::LttngProvider>(path, manager));
+  providers.push_back(std::make_shared<scalopus::GeneralProvider>(manager));
   
 
   // Create the catapult backend.
@@ -90,7 +92,7 @@ int main(int /* argc */, char** /* argv */)
   auto logger = std::make_shared<ss::PrintfLogger>(ss::Logger::Level::WARNING);
   ss::Server server(logger);
 
-
+  // Set the function that's to be used to execute functions on the seasocks thread.
   backend->setExecutor([&server](scalopus::CatapultBackend::Runnable&& runnable)
   {
     server.execute(std::move(runnable));

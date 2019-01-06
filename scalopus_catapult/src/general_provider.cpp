@@ -24,38 +24,30 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scalopus_catapult/lttng_provider.h"
-#include "scalopus_catapult/lttng_source.h"
+#include "scalopus_catapult/general_provider.h"
+#include "scalopus_catapult/general_source.h"
 
 #include <sstream>
 
 namespace scalopus
 {
 
-LttngProvider::LttngProvider(std::string path, EndpointManager::Ptr manager) : manager_(manager)
+GeneralProvider::GeneralProvider(EndpointManager::Ptr manager) : manager_(manager)
 {
-  // Start the tracing tool.
-  tracing_tool_ = std::make_shared<BabeltraceTool>();
-  tracing_tool_->init(path);
 }
 
-LttngProvider::~LttngProvider()
+TraceEventSource::Ptr GeneralProvider::makeSource()
 {
-  tracing_tool_->halt();
+  return std::make_shared<GeneralSource>(shared_from_this());
 }
 
-TraceEventSource::Ptr LttngProvider::makeSource()
-{
-  return std::make_shared<LttngSource>(tracing_tool_, shared_from_this());
-}
-
-EndpointScopeTracing::ProcessTraceMap LttngProvider::getMapping()
+GeneralProvider::ProcessInfoMap GeneralProvider::getMapping()
 {
   std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
   return mapping_;
 }
 
-void LttngProvider::updateMapping()
+void GeneralProvider::updateMapping()
 {
   std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
   mapping_.clear();
@@ -64,31 +56,14 @@ void LttngProvider::updateMapping()
   for (const auto& transport_endpoints : endpoints)
   {
     // Try to find the scope tracing endpoint and obtain its data.
-    auto endpoint_scope_tracing = EndpointManager::findEndpoint<scalopus::EndpointScopeTracing>(transport_endpoints.second);
-    if (endpoint_scope_tracing != nullptr)
+    auto endpoint_general = EndpointManager::findEndpoint<scalopus::EndpointProcessInfo>(transport_endpoints.second);
+    if (endpoint_general != nullptr)
     {
-      const auto process_mapping = endpoint_scope_tracing->mapping();
-      mapping_.insert(process_mapping.begin(), process_mapping.end());
+      const auto process_mapping = endpoint_general->processInfo();
+      mapping_[process_mapping.pid] = process_mapping;
     }
   }
 }
 
-std::string LttngProvider::getScopeName(unsigned int pid, unsigned int trace_id)
-{
-  std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
-  auto pid_info = mapping_.find(pid);
-  if (pid_info != mapping_.end())
-  {
-    auto entry_mapping = pid_info->second.find(trace_id);
-    if (entry_mapping != pid_info->second.end())
-    {
-      // yay! We found the appopriate mapping for this trace id.
-      return entry_mapping->second;
-    }
-  }
-  std::stringstream z;
-  z << "Unknown 0x" << std::hex << trace_id;
-  return z.str();
-}
 
 }  // namespace scalopus

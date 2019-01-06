@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2018, Ivor Wanders
+  Copyright (c) 2019, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -24,37 +24,49 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_ENDPOINT_SCOPE_TRACING_H
-#define SCALOPUS_ENDPOINT_SCOPE_TRACING_H
+#include "scalopus_catapult/general_source.h"
 
-#include <scalopus_transport/interface/endpoint.h>
-#include <scalopus_transport/interface/transport.h>
-#include <map>
-#include <string>
+#include <sstream>
 
 namespace scalopus
 {
-class EndpointScopeTracing : public Endpoint
+
+GeneralSource::GeneralSource(GeneralProvider::Ptr provider) : provider_(provider)
 {
-public:
-  constexpr static const char* name = "scope_tracing";
-  using TraceIdMap = std::map<unsigned int /* trace_id */, std::string /* name */>;
-  using ProcessTraceMap = std::map<unsigned int /* pid */, TraceIdMap /* trace_map */>;
+}
 
-  /**
-   * @brief Return the trace id to name mappings from the endpoint.
-   */
-  ProcessTraceMap mapping();
+std::vector<json> GeneralSource::finishInterval()
+{
+  provider_->updateMapping();
 
-  // From the endpoint
-  std::string getName() const;
-  bool handle(Transport& server, const Data& request, Data& response);
+  std::vector<json> result;
+  auto mapping = provider_->getMapping();
 
-  // Conversion methods used internally.
-  static Data serializeMapping(const ProcessTraceMap& mapping);
-  static ProcessTraceMap deserializeMapping(const Data& data);
-};
+  // Iterate over all mappings by process ID.
+  for (const auto pid_process_info : mapping)
+  {
+    // make a metadata entry to name a process.
+    json process_entry;
+    process_entry["tid"] = 0;
+    process_entry["ph"] = "M";
+    process_entry["name"] = "process_name";
+    process_entry["args"] = { { "name", pid_process_info.second.name } };
+    process_entry["pid"] = pid_process_info.first;
+    result.push_back(process_entry);
 
+    // For all thread mappings, make a metadata entry to name the thread.
+    for (const auto thread_mapping : pid_process_info.second.threads)
+    {
+      json tid_entry;
+      tid_entry["tid"] = thread_mapping.first;
+      tid_entry["ph"] = "M";
+      tid_entry["name"] = "thread_name";
+      tid_entry["pid"] = pid_process_info.first;
+      tid_entry["args"] = { { "name", thread_mapping.second } };
+      result.push_back(tid_entry);
+    }
+  }
+
+  return result;
+}
 }  // namespace scalopus
-
-#endif  // SCALOPUS_ENDPOINT_SCOPE_TRACING_H

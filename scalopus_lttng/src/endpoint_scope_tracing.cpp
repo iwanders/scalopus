@@ -28,6 +28,8 @@
 #include <cstring>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <sys/types.h>
+#include <unistd.h>
 
 namespace scalopus
 {
@@ -40,7 +42,7 @@ std::string EndpointScopeTracing::getName() const
 
 bool EndpointScopeTracing::handle(Transport& /* server */, const Data& request, Data& response)
 {
-  auto mapping = scalopus::ScopeTraceTracker::getInstance().getMap();
+  ProcessTraceMap mapping = {{::getpid(), scalopus::ScopeTraceTracker::getInstance().getMap()}};
   // cool, we have the mappings... now we need to serialize this...
 
   if (request.front() == 'm')
@@ -51,7 +53,7 @@ bool EndpointScopeTracing::handle(Transport& /* server */, const Data& request, 
   return false;
 }
 
-std::map<unsigned int, std::string> EndpointScopeTracing::mapping()
+EndpointScopeTracing::ProcessTraceMap EndpointScopeTracing::mapping()
 {
   // send message...
   auto transport = transport_.lock();
@@ -69,16 +71,16 @@ std::map<unsigned int, std::string> EndpointScopeTracing::mapping()
   return {};
 }
 
-Data EndpointScopeTracing::serializeMapping(const std::map<unsigned int, std::string>& mapping)
+Data EndpointScopeTracing::serializeMapping(const ProcessTraceMap& mapping)
 {
   json jdata = json::object();
   jdata["mapping"] = mapping;  // need to serialize an object, not an array.
   return json::to_bson(jdata);
 }
 
-std::map<unsigned int, std::string> EndpointScopeTracing::deserializeMapping(const Data& data)
+EndpointScopeTracing::ProcessTraceMap EndpointScopeTracing::deserializeMapping(const Data& data)
 {
-  std::map<unsigned int, std::string> res;
+  ProcessTraceMap res;
   json jdata = json::from_bson(data);  // This line may throw
   res = jdata["mapping"].get<decltype(res)>();
   return res;

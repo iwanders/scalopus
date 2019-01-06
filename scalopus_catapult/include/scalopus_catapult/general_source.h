@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2018, Ivor Wanders
+  Copyright (c) 2019, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -24,57 +24,33 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_ENDPOINT_PROCESS_INFO_H
-#define SCALOPUS_ENDPOINT_PROCESS_INFO_H
+#ifndef SCALOPUS_CATAPULT_GENERAL_SOURCE_H
+#define SCALOPUS_CATAPULT_GENERAL_SOURCE_H
 
-#include <scalopus_transport/interface/endpoint.h>
-#include <scalopus_transport/interface/transport.h>
-#include <map>
-#include <string>
+#include "scalopus_catapult/trace_event_source.h"
+#include "scalopus_catapult/general_provider.h"
 
 namespace scalopus
 {
+
 /**
- * @brief This endpoint provides the thread names and process name.
+ * @brief The source that provides the trace event formatted json entries to name the thread and processes.
  */
-class EndpointProcessInfo : public Endpoint
+class GeneralSource : public TraceEventSource
 {
 public:
-  constexpr static const char* name = "process_info";
-
-  //! Struct used to represent the data from the endpoint.
-  struct ProcessInfo
-  {
-    std::string name;                              //!< Name of this process.
-    std::map<unsigned long, std::string> threads;  //!< Names of the threads in this process.
-    unsigned long pid;                              //!< Process id.
-  };
+  using Ptr = std::shared_ptr<GeneralSource>;
 
   /**
-   * @brief Constructor sets the process id.
+   * @brief Constructor for this soure.
+   * @param provider The provider that can be used to resolve the thread and process names.
    */
-  EndpointProcessInfo();
+  GeneralSource(GeneralProvider::Ptr provider);
 
-  //  ------ Server ------
-  /**
-   * @brief Provide a name to use for this process.
-   */
-  void setProcessName(const std::string& name);
-
-  //  ------   Client ------
-  /**
-   * @brief Return the process info from the endpoint.
-   */
-  ProcessInfo processInfo();
-
-  // From the endpoint
-  std::string getName() const;
-  bool handle(Transport& server, const Data& request, Data& response);
-
+  // From TraceEventSource
+  std::vector<json> finishInterval();
 private:
-  ProcessInfo info_;  //!< The process info.
+  GeneralProvider::Ptr provider_;  //!< Pointer to the provider.
 };
-
-}  // namespace scalopus
-
-#endif  // SCALOPUS_ENDPOINT_PROCESS_INFO_H
+}
+#endif  // SCALOPUS_CATAPULT_GENERAL_SOURCE_H

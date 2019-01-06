@@ -43,7 +43,7 @@ std::string EndpointProcessInfo::getName() const
 
 EndpointProcessInfo::EndpointProcessInfo()
 {
-  info_.id = ::getpid();
+  info_.pid = ::getpid();
 }
 
 void EndpointProcessInfo::setProcessName(const std::string& name)
@@ -59,7 +59,7 @@ bool EndpointProcessInfo::handle(Transport& /* server */, const Data& request, D
   if (req["cmd"].get<std::string>() == "info")
   {
     json jdata = json::object();
-    jdata["id"] = info_.id;
+    jdata["pid"] = info_.pid;
     jdata["name"] = info_.name;
     jdata["threads"] = scalopus::ThreadNameTracker::getInstance().getMap();
     response = json::to_bson(jdata);
@@ -87,7 +87,7 @@ EndpointProcessInfo::ProcessInfo EndpointProcessInfo::processInfo()
     json jdata = json::from_bson(future_ptr->get());  // This line may throw
     info.name = jdata["name"].get<decltype(info.name)>();
     info.threads = jdata["threads"].get<decltype(info.threads)>();
-    info.id = jdata["id"].get<decltype(info.id)>();
+    info.pid = jdata["pid"].get<decltype(info.pid)>();
   }
 
   return info;

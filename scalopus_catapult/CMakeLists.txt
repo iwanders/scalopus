@@ -12,8 +12,12 @@ add_library(scalopus_catapult
 
   src/trace_session.cpp
   src/trace_event_source.cpp
+
   src/lttng_provider.cpp
   src/lttng_source.cpp
+
+  src/general_provider.cpp
+  src/general_source.cpp
 )
 
 target_include_directories(scalopus_catapult

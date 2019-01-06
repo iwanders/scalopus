@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2018, Ivor Wanders
+  Copyright (c) 2019, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -24,57 +24,51 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_ENDPOINT_PROCESS_INFO_H
-#define SCALOPUS_ENDPOINT_PROCESS_INFO_H
+#ifndef SCALOPUS_CATAPULT_GENERAL_PROVIDER_H
+#define SCALOPUS_CATAPULT_GENERAL_PROVIDER_H
 
-#include <scalopus_transport/interface/endpoint.h>
-#include <scalopus_transport/interface/transport.h>
-#include <map>
-#include <string>
+#include "scalopus_catapult/trace_event_provider.h"
+
+#include <scalopus_general/endpoint_process_info.h>
+#include "scalopus_catapult/endpoint_manager.h"
+
 
 namespace scalopus
 {
+
 /**
- * @brief This endpoint provides the thread names and process name.
+ * @brief This provides the general data such as the process name and thread names.
  */
-class EndpointProcessInfo : public Endpoint
+class GeneralProvider : public TraceEventProvider, public std::enable_shared_from_this<GeneralProvider>
 {
 public:
-  constexpr static const char* name = "process_info";
-
-  //! Struct used to represent the data from the endpoint.
-  struct ProcessInfo
-  {
-    std::string name;                              //!< Name of this process.
-    std::map<unsigned long, std::string> threads;  //!< Names of the threads in this process.
-    unsigned long pid;                              //!< Process id.
-  };
+  using Ptr = std::shared_ptr<GeneralProvider>;
+  using ProcessInfoMap = std::map<unsigned int, EndpointProcessInfo::ProcessInfo>;
 
   /**
-   * @brief Constructor sets the process id.
+   * @brief Create the general provider.
+   * @param manager The endpoint manager that provides the endpoints to resolve the thread name and process name.
    */
-  EndpointProcessInfo();
+  GeneralProvider(EndpointManager::Ptr manager);
 
-  //  ------ Server ------
   /**
-   * @brief Provide a name to use for this process.
+   * @brief Return all currently known mappings.
    */
-  void setProcessName(const std::string& name);
+  ProcessInfoMap getMapping();
 
-  //  ------   Client ------
   /**
-   * @brief Return the process info from the endpoint.
+   * @brief Update the current mapping by retrieving the currently known maps from the endpoints.
    */
-  ProcessInfo processInfo();
+  void updateMapping();
 
-  // From the endpoint
-  std::string getName() const;
-  bool handle(Transport& server, const Data& request, Data& response);
-
+  // From TraceEventProvider.
+  TraceEventSource::Ptr makeSource();
 private:
-  ProcessInfo info_;  //!< The process info.
+  EndpointManager::Ptr manager_;      //!< Manager for connections.
+
+  std::mutex mapping_mutex_;   //!< Mutex for the mapping.
+  ProcessInfoMap mapping_;  //!< The currently known mappings.
 };
 
-}  // namespace scalopus
-
-#endif  // SCALOPUS_ENDPOINT_PROCESS_INFO_H
+}
+#endif  // SCALOPUS_CATAPULT_GENERAL_PROVIDER_H

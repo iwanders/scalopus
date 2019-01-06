@@ -15,10 +15,15 @@ int main(int /* argc */, char** /* argv */)
     tracing_client->setTransport(transport);
     std::cout << transport << std::endl;
 
-    auto mappings = tracing_client->mapping();
-    for (const auto& id_name : mappings)
+    auto map_from_endpoint = tracing_client->mapping();
+    for (const auto& pid_mappings : map_from_endpoint)
     {
-      std::cout << "" << id_name.first << " -> " << id_name.second << std::endl;
+      std::cout << "  pid: " << pid_mappings.first << std::endl;
+      const auto& mappings = pid_mappings.second;
+      for (const auto& id_name : mappings)
+      {
+        std::cout << "  " << id_name.first << " -> " << id_name.second << std::endl;
+      }
     }
   }
 }

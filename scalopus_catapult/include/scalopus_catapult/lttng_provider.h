@@ -57,18 +57,9 @@ public:
   LttngProvider(std::string path, EndpointManager::Ptr manager);
 
   /**
-   * @brief Convenience struct that holds the process info as well as the trace id map.
-   */
-  struct ProcessMapping
-  {
-    std::map<unsigned int, std::string> trace_ids;
-    EndpointProcessInfo::ProcessInfo info;
-  };
-
-  /**
    * @brief Return all currently known mappings.
    */
-  std::map<unsigned int, ProcessMapping> getMapping();
+  EndpointScopeTracing::ProcessTraceMap getMapping();
 
   /**
    * @brief Update the current mapping by retrieving the currently known maps from the endpoints.
@@ -91,7 +82,7 @@ private:
   EndpointManager::Ptr manager_;      //!< Manager for connections.
 
   std::mutex mapping_mutex_;   //!< Mutex for the mapping.
-  std::map<unsigned int, ProcessMapping> mapping_;  //!< The currently known mappings.
+  EndpointScopeTracing::ProcessTraceMap mapping_;  //!< The currently known mappings.
 };
 
 }

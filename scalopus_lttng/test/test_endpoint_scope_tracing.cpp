@@ -13,15 +13,24 @@ void test(const A& a, const B& b)
 }
 int main(int /* argc */, char** /* argv */)
 {
-  std::map<unsigned int, std::string> test_mapping;
+  scalopus::EndpointScopeTracing::TraceIdMap test_mapping;
   test_mapping[0] = "foo";
   test_mapping[1] = "bar";
   test_mapping[2] = "buz";
 
-  auto serialized = scalopus::EndpointScopeTracing::serializeMapping(test_mapping);
+  scalopus::EndpointScopeTracing::ProcessTraceMap process_mapping;
+  process_mapping[5] = test_mapping;
+  process_mapping[11] = test_mapping;
+  process_mapping[10] = {{3,"foo"}};
+
+  auto serialized = scalopus::EndpointScopeTracing::serializeMapping(process_mapping);
   auto deserialized = scalopus::EndpointScopeTracing::deserializeMapping(serialized);
 
   test(test_mapping, deserialized);
+  for (auto& pid_map : test_mapping)
+  {
+    test(process_mapping[pid_map.first], deserialized[pid_map.first]);
+  }
 
   return 0;
 }
