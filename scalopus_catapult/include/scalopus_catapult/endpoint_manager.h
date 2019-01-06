@@ -65,6 +65,10 @@ public:
    */
   void addEndpointFactory(const std::string& name, EndpointFactory&& factory_function);
 
+  /**
+   * @brief Helper function to find a specific endpoint in a map of functions.
+   * @code auto endpoint_ptr = EndpointManager::findEndpoint<scalopus::EndpointProcessInfo>(endpoint_map);
+   */
   template <typename T>
   static std::shared_ptr<T> findEndpoint(const EndpointMap& transport_endpoints)
   {
@@ -85,7 +89,9 @@ public:
 private:
   mutable std::mutex mutex_;
   std::map<std::string, EndpointFactory> endpoint_factories_;  //!< Map of factory functions to construct endpoints.
-  TransportEndpoints endpoints_;
+  TransportEndpoints endpoints_;   //!< Map of endpoints, each endpoint holds a map of [name] = endpoint
+
+  //! Map to keep track of which transport is already created, this is not transport agnostic.
   std::map<std::size_t, Transport::Ptr> transports_;
 };
 }  // namespace scalopus

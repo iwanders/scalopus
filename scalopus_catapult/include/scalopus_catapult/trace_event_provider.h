@@ -31,10 +31,18 @@
 namespace scalopus
 {
 
+/**
+ * @brief This is the abstract base class for a data provider that's used in the catapult backend.
+ *        It can create Trace Event Sources that are used by a session.
+ */
 class TraceEventProvider
 {
 public:
   using Ptr = std::shared_ptr<TraceEventProvider>;
+
+  /**
+   * @brief Create a trace event source from this provider.
+   */
   virtual TraceEventSource::Ptr makeSource() = 0;
   virtual ~TraceEventProvider() = default;
 };

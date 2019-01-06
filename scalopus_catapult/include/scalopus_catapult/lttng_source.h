@@ -35,29 +35,41 @@
 namespace scalopus
 {
 
+/**
+ * @brief The actual lttng source that provides the trace event format json entries.
+ */
 class LttngSource : public TraceEventSource
 {
 public:
   using Ptr = std::shared_ptr<LttngSource>;
 
+  /**
+   * @brief Constructor for this soure.
+   * @param tool Pointer to the running babeltrace tool, a callback is registered with the tool that's called for each
+   *        event.
+   * @param provider The lttng provider that can be used to resolve the trace point names.
+   */
   LttngSource(BabeltraceTool::Ptr tool, LttngProvider::Ptr provider);
 
+  // from the TraceEventSource
   void startInterval();
   void stopInterval();
   void work();
   std::vector<json> finishInterval();
 
-  virtual ~LttngSource();
-
+  ~LttngSource();
 private:
-  BabeltraceTool::Ptr tool_;
-  LttngProvider::Ptr provider_;
+  BabeltraceTool::Ptr tool_;  //!< Pointer to the babeltrace tool.
+  LttngProvider::Ptr provider_;  //!< Pointer to the provider.
+
+  //! Vector of the events of this interval, between start and stop the BabeltraceTool will freely write into this
+  //! without locks.
   std::vector<CTFEvent> events_;
-  std::mutex event_mutex_;
-  std::shared_ptr<BabeltraceParser::EventCallback> callback_;
+
+  std::shared_ptr<BabeltraceParser::EventCallback> callback_;  //!< Pointer to the registered event callback struct.
 
   /**
-   * @brief Convert events as 
+   * @brief Convert the stored events into the trace event format representation.
    */
   std::vector<json> convertEvents();
 

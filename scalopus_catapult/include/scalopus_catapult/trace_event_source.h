@@ -33,18 +33,37 @@ namespace scalopus
 {
 using json = nlohmann::json;
 
+/**
+ * @brief A trace event source creates json representations of the trace events as used by catapult's trace viewer.
+ * This format is detailed here: https://github.com/catapult-project/catapult/wiki/Trace-Event-Format
+ */
 class TraceEventSource
 {
 public:
   using Ptr = std::shared_ptr<TraceEventSource>;
 
+  /**
+   * @brief This function is called on each source when a recording interval is started.
+   */
   virtual void startInterval();
+
+  /**
+   * @brief This function is called on each source when a recording interval is stopped.
+   */
   virtual void stopInterval();
+
+  /**
+   * @brief This function should stop the interval and yield all events that were recorded during the interval for
+   *        the frontend to consume.
+   */
   virtual std::vector<json> finishInterval();
+
+  /**
+   * @brief This function is called periodically from the session thread.
+   */
   virtual void work();
 
   virtual ~TraceEventSource() = default;
-
 };
 }
 #endif  // SCALOPUS_CATAPULT_TRACE_EVENT_SOURCE_H

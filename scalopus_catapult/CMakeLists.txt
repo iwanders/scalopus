@@ -32,7 +32,7 @@ PUBLIC
   Scalopus::scalopus_babeltrace
 )
 
-add_executable(tracing_target
-  src/tracing_target.cpp)
+add_executable(catapult_server
+  src/catapult_server.cpp)
 
-target_link_libraries(tracing_target PRIVATE Scalopus::scalopus_catapult)
+target_link_libraries(catapult_server PRIVATE Scalopus::scalopus_catapult)

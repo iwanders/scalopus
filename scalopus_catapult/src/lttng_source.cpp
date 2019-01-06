@@ -59,7 +59,6 @@ void LttngSource::stopInterval()
   }
 }
 
-
 void LttngSource::work()
 {
 }
@@ -132,7 +131,6 @@ std::vector<json> LttngSource::convertEvents()
       entry["pid"] = event.pid();
 
       // try to look up the mapping for this pid
-      std::string name;  // scope name.
       unsigned long long id = 0;
       if (event.eventData().find("id") != event.eventData().end())
       {
@@ -140,8 +138,7 @@ std::vector<json> LttngSource::convertEvents()
       }
 
       // Populate the name
-      provider_->getScopeName(event.pid(), id, name);
-      entry["name"] = name;  // assign the name.
+      entry["name"] = provider_->getScopeName(event.pid(), id);
 
       if (event.name() == "entry")
       {

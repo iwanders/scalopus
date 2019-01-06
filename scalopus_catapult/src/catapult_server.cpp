@@ -97,7 +97,6 @@ int main(int /* argc */, char** /* argv */)
   });
 
   // Set the send buffer to 128 mb. At the end of the trace, the json representation needs to fit in this buffer.
-  // This is a workaround for client buffer overflows, proper fix requires a substantial refactor (CORE-11125).
   server.setClientBufferSize(128 * 1024 * 1024u);
 
   server.addWebSocketHandler("/devtools/page/bar", backend);  // needed for chrom(e/ium) 65.0+

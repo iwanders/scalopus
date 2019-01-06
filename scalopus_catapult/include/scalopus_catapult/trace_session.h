@@ -39,12 +39,12 @@ namespace scalopus
 
 /**
  * @brief This class is created for every individual websocket connection. It uses its own thread to perform actions and
- *        accepts (non-blocking) messages from the websocket through the incoming method. It responds at its discretion
- *        or initiates communication from its worker thread using the response_function.
+ *        accepts messages from the websocket. It responds at its discretion or initiates communication from its worker
+ *        thread. All data that is sent through the websocket must be sent through the response_function.
  */
 class TraceSession
 {
-  static const size_t CHUNK_SIZE = 10000;
+  static const size_t CHUNK_SIZE = 1000;
 public:
   using ResponseFunction = std::function<void(std::string)>;
   using Ptr = std::shared_ptr<TraceSession>;
@@ -68,24 +68,56 @@ public:
   ~TraceSession();
 
 private:
-  void loop();
-  void processMessage(const std::string& incoming_msg);
-  void chunkedTransmit(const std::vector<json>& events);
+  ResponseFunction response_;  //!< The function to be used to send data to the client over the websocket.
 
-  ResponseFunction response_;
+  std::vector<TraceEventSource::Ptr> sources_;  //!< The active sources in this session.
 
-  std::vector<TraceEventSource::Ptr> sources_;
-
-  mutable std::mutex incoming_mutex_;
-  std::list<std::string> incoming_msg_;
+  mutable std::mutex incoming_mutex_;  //!< Mutex for list of incoming messages that are pending processing.
+  std::list<std::string> incoming_msg_;  //!< List of incoming messages that will be processed by the worker thread.
+  /**
+   * @brief Function to check whether there are messages pending in incoming.
+   * @return true if there are messages pending in incoming.
+   */
   bool haveIncoming() const;
+
+  /**
+   * @brief Pop one incoming message from the list of pending messages.
+   * @return The message that was received.
+   * @warning This function should only be called if haveIncoming() returned true, otherwise it may cause a crash.
+   */
   std::string popIncoming();
 
+  /**
+   * @brief Function that passes the message to the response function and prints it into the terminal.
+   * @param msg The message to send to the client over the websocket.
+   */
   void outgoing(const std::string& msg);
 
-  std::thread worker_;
-  bool running_ { true };
+  std::thread worker_;  //!< Worker thread for this session.
+  bool running_ { true };  //!< Bool to quit the worker thread gracefully.
 
+  /**
+   * @brief The function executed by the worker thread.
+   */
+  void loop();
+
+  /**
+   * @brief Function used to process invidual messages that came in from the client.
+   * @param incoming_msg The message as it was received from the websocket.
+   */
+  void processMessage(const std::string& incoming_msg);
+
+  /**
+   * @brief This sends the provided events in a chunked manner over in the Tracing.dataCollected wrapping.
+   * @param events The events to transmit to the client.
+   */
+  void chunkedTransmit(const std::vector<json>& events);
+
+  /**
+   * @brief The frontend requires newlines after every trace event in the Tracing.dataCollected return. This function
+   *        converts the vector of entries into the appropriate newline delimited version.
+   * @param entries The entries to format.
+   */
   static std::string formatEvents(const std::vector<json>& entries);
 };
 

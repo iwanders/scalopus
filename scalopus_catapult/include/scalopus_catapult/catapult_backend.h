@@ -53,6 +53,7 @@ namespace ss = seasocks;
 
 /**
  * @brief The actual devtools protocol endpoint, this acts as both the webserver and websocket endpoint.
+ *        It's main purpose is to open and track the active tracing sessions.
  */
 class CatapultBackend : public ss::PageHandler, public ss::WebSocket::Handler
 {
@@ -61,9 +62,18 @@ public:
   using Runnable = std::function<void()>;
   using ExecuteFunction = std::function<void(Runnable&&)>;
 
-
+  /**
+   * @brief Constructor for the catapult backend.
+   * @param providers A vector of trace event providers to be used.
+   */
   CatapultBackend(const std::vector<TraceEventProvider::Ptr>& providers);
 
+  /**
+   * @brief Set the executor function, this function can be passed a callable, this callable will subsequently be called
+   *        by the seasocks server thread.
+   *        This is necessary because the sessions can't interact with the websocket pointers directly, instead they
+   *        have to do so asynchronously via this function to ensure thread safety in seasocks.
+   */
   void setExecutor(ExecuteFunction executor);
 
   // from PageHandler, this serves the http pages.

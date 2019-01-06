@@ -81,7 +81,7 @@ void LttngProvider::updateMapping()
   }
 }
 
-bool LttngProvider::getScopeName(unsigned int pid, unsigned int trace_id, std::string& name)
+std::string LttngProvider::getScopeName(unsigned int pid, unsigned int trace_id)
 {
   std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
   auto pid_info = mapping_.find(pid);
@@ -91,14 +91,12 @@ bool LttngProvider::getScopeName(unsigned int pid, unsigned int trace_id, std::s
     if (entry_mapping != pid_info->second.trace_ids.end())
     {
       // yay! We found the appopriate mapping for this trace id.
-      name = entry_mapping->second;
-      return true;
+      return entry_mapping->second;
     }
   }
   std::stringstream z;
   z << "Unknown 0x" << std::hex << trace_id;
-  name = z.str();
-  return false;
+  return z.str();
 }
 
 }  // namespace scalopus

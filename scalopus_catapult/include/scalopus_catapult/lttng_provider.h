@@ -40,22 +40,49 @@
 namespace scalopus
 {
 
+/**
+ * @brief This is the provider for the lttng data source. It creates the babeltrace process and parses that. It also
+ *        provides functionality to the sessions for resolving trace id's into scope names.
+ */
 class LttngProvider : public TraceEventProvider, public std::enable_shared_from_this<LttngProvider>
 {
 public:
   using Ptr = std::shared_ptr<LttngProvider>;
 
+  /**
+   * @brief Create the lttng provider.
+   * @param path the path on which babeltrace's viewer will be called to obtain the traces.
+   * @param manager The endpoint manager that provides the endpoints to resolve the trace id's.
+   */
+  LttngProvider(std::string path, EndpointManager::Ptr manager);
+
+  /**
+   * @brief Convenience struct that holds the process info as well as the trace id map.
+   */
   struct ProcessMapping
   {
     std::map<unsigned int, std::string> trace_ids;
     EndpointProcessInfo::ProcessInfo info;
   };
+
+  /**
+   * @brief Return all currently known mappings.
+   */
   std::map<unsigned int, ProcessMapping> getMapping();
+
+  /**
+   * @brief Update the current mapping by retrieving the currently known maps from the endpoints.
+   */
   void updateMapping();
-  bool getScopeName(unsigned int pid, unsigned int trace_id, std::string& name);
+
+  /**
+   * @brief Resolve one mapping given the process id and trace id. If the mapping is unknown a pretty string with the
+   *        trace id is returned.
+   */
+  std::string getScopeName(unsigned int pid, unsigned int trace_id);
 
 
-  LttngProvider(std::string path, EndpointManager::Ptr manager);
+  // From TraceEventProvider.
   TraceEventSource::Ptr makeSource();
 
   ~LttngProvider();
@@ -63,8 +90,8 @@ private:
   BabeltraceTool::Ptr tracing_tool_;  //! Babeltrace tool, produces babeltrace sessions.
   EndpointManager::Ptr manager_;      //!< Manager for connections.
 
-  std::mutex mapping_mutex_;
-  std::map<unsigned int, ProcessMapping> mapping_;
+  std::mutex mapping_mutex_;   //!< Mutex for the mapping.
+  std::map<unsigned int, ProcessMapping> mapping_;  //!< The currently known mappings.
 };
 
 }
