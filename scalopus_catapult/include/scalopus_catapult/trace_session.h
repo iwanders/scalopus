@@ -29,6 +29,7 @@
 
 #include "scalopus_catapult/trace_event_source.h"
 #include <functional>
+#include <list>
 #include <string>
 #include <thread>
 #include <mutex>
@@ -36,15 +37,31 @@
 namespace scalopus
 {
 
+/**
+ * @brief This class is created for every individual websocket connection. It uses its own thread to perform actions and
+ *        accepts (non-blocking) messages from the websocket through the incoming method. It responds at its discretion
+ *        or initiates communication from its worker thread using the response_function.
+ */
 class TraceSession
 {
 public:
-  using ResponseFunction = std::function<bool(std::string)>;
+  using ResponseFunction = std::function<void(std::string)>;
   using Ptr = std::shared_ptr<TraceSession>;
 
+  /**
+   * @brief Creates the tracing session.
+   * @param response_function The function that can be used to send text strings over the websocket.
+   */
   TraceSession(ResponseFunction&& response_function);
+
+  /**
+   * @brief Add a data source to this session, in general this is done just after creation before data has come in.
+   */
   void addSource(TraceEventSource::Ptr&& source);
 
+  /**
+   * @brief Method called by the server whenever data is received on the socket.
+   */
   void incoming(const std::string& data);
 
   ~TraceSession();
@@ -53,14 +70,22 @@ private:
   void loop();
   void startInterval();
   void stopInterval();
+  void processMessage(const std::string& incoming_msg);
+
+  ResponseFunction response_;
 
   std::vector<TraceEventSource::Ptr> sources_;
 
-  std::mutex incoming_mutex_;
-  std::vector<std::string> incoming_msg_;
+  mutable std::mutex incoming_mutex_;
+  std::list<std::string> incoming_msg_;
+  bool haveIncoming() const;
+  std::string popIncoming();
+
+  void outgoing(const std::string& msg);
+
   std::thread worker_;
-  ResponseFunction response_;
-  bool running_ { false };
+  bool running_ { true };
+
 };
 
 }

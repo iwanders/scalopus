@@ -25,6 +25,7 @@
 */
 
 #include "scalopus_catapult/trace_session.h"
+#include <iostream>
 
 namespace scalopus
 {
@@ -55,6 +56,20 @@ void TraceSession::incoming(const std::string& data)
   incoming_msg_.push_back(data);
 }
 
+bool TraceSession::haveIncoming() const
+{
+  std::lock_guard<decltype(incoming_mutex_)> lock(incoming_mutex_);
+  return !incoming_msg_.empty();
+}
+
+std::string TraceSession::popIncoming()
+{
+  std::lock_guard<decltype(incoming_mutex_)> lock(incoming_mutex_);
+  auto res = incoming_msg_.front();
+  incoming_msg_.pop_front();
+  return res;
+}
+
 void TraceSession::loop()
 {
   // do work.
@@ -62,10 +77,38 @@ void TraceSession::loop()
   {
     // Process incoming
     // handle logic.
-    using namespace std::chrono_literals;
-    std::this_thread::sleep_for(1s);
+    while(haveIncoming())
+    {
+      processMessage(popIncoming());
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   };
 }
+
+void TraceSession::processMessage(const std::string& incoming_msg)
+{
+  std::cout << "[session " << this <<  "] <- " << incoming_msg << std::endl;
+  auto msg = json::parse(incoming_msg);
+
+  if (msg["method"] == "Tracing.getCategories")
+  {
+    // This method is on the first record click, when we can specify the capture profile.
+    // We can specify categories here, but the client does also show the default catapult categories.
+    // So it's of limited use.
+    json res = { { "id", msg["id"] },
+                 { "result", { { "categories", { "!foo", "!bar", "disabled-by-default-buz" } } } } };
+    outgoing(res.dump());
+    return;
+  }
+}
+
+
+void TraceSession::outgoing(const std::string& msg)
+{
+  std::cout << "[session " << this <<  "] -> " << msg << std::endl;
+  response_(msg);
+}
+
 
 void TraceSession::startInterval()
 {
