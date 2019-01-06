@@ -24,8 +24,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_CATAPULT_CATAPULT_SERVER_H
-#define SCALOPUS_CATAPULT_CATAPULT_SERVER_H
+#ifndef SCALOPUS_CATAPULT_CATAPULT_BACKEND_H
+#define SCALOPUS_CATAPULT_CATAPULT_BACKEND_H
 
 #include <seasocks/PageHandler.h>
 #include <seasocks/WebSocket.h>
@@ -42,11 +42,9 @@
 #include <string>
 #include <thread>
 
-#include <scalopus_catapult/tracing_session.h>
-#include <scalopus_lttng/babeltrace_tool.h>
-#include <scalopus_lttng/ctfevent.h>
-
+#include "scalopus_catapult/trace_session.h"
 #include "scalopus_catapult/endpoint_manager.h"
+#include "scalopus_catapult/trace_event_provider.h"
 
 namespace scalopus
 {
@@ -56,11 +54,17 @@ namespace ss = seasocks;
 /**
  * @brief The actual devtools protocol endpoint, this acts as both the webserver and websocket endpoint.
  */
-class CatapultServer : public ss::PageHandler, public ss::WebSocket::Handler
+class CatapultBackend : public ss::PageHandler, public ss::WebSocket::Handler
 {
 public:
-  using Ptr = std::shared_ptr<CatapultServer>;
-  CatapultServer();
+  using Ptr = std::shared_ptr<CatapultBackend>;
+  using Runnable = std::function<void()>;
+  using ExecuteFunction = std::function<void(Runnable&&)>;
+
+
+  CatapultBackend(const std::vector<TraceEventProvider::Ptr>& providers);
+
+  void setExecutor(ExecuteFunction executor);
 
   // from PageHandler, this serves the http pages.
   std::shared_ptr<ss::Response> handle(const ss::Request& request) override;
@@ -71,18 +75,11 @@ public:
   void onData(ss::WebSocket* connection, const uint8_t* data, size_t length) override;
   void onDisconnect(ss::WebSocket* connection) override;
 
-  /**
-   * @brief Actually construct and initialise the mapping client and babeltrace tool.
-   * @param path The path as passed to the babeltrace tool during init.
-   */
-  void init(const EndpointManager::Ptr& manager, std::string path = "");
-
 private:
-  BabeltraceTool::Ptr tracing_tool_;  //! Babeltrace tool, produces babeltrace sessions.
-  EndpointManager::Ptr manager_;      //!< Manager for connections.
-
   std::mutex session_mutex_;                                //! Mutex for the session map.
-  std::map<ss::WebSocket*, TracingSession::Ptr> sessions_;  //! Map of sessions by websockets.
+  std::map<ss::WebSocket*, TraceSession::Ptr> sessions_;  //! Map of sessions by websockets.
+  std::vector<TraceEventProvider::Ptr> providers_;   //!< List of available data providers.
+  ExecuteFunction executor_;  //!< Function that allows registering functions for execution on the server thread.
 
   /**
    * @brief Make a session for this new websocket.
@@ -95,7 +92,7 @@ private:
    * @param ws The websocket to retrieve the session for.
    * @return The devtools session that is associated to this websocket session.
    */
-  TracingSession::Ptr getSession(ss::WebSocket* ws);
+  TraceSession::Ptr getSession(ss::WebSocket* ws);
 
   /**
    * @brief Removes a session from the session map.
@@ -103,17 +100,7 @@ private:
    */
   void delSession(ss::WebSocket* ws);
 
-  /**
-   * @brief Formats the collected json entries into a correct collectedData return, with newlines.
-   * @note Catapult is pedantic about requiring just one newline in the data per entry.
-   */
-  static std::string formatCollectedData(std::vector<json> entries);
-
-  /**
-   * @brief Make a message that shows the current buffer usage.
-   */
-  static std::string makeBufferUsage(double value);
 };
 
 }  // namespace scalopus
-#endif
+#endif  // SCALOPUS_CATAPULT_CATAPULT_BACKEND_H

@@ -26,7 +26,7 @@
 
 #include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_lttng/endpoint_scope_tracing.h>
-#include "scalopus_catapult/catapult_server.h"
+#include "scalopus_catapult/catapult_backend.h"
 #include "scalopus_catapult/endpoint_manager.h"
 
 #include <seasocks/PrintfLogger.h>
@@ -58,10 +58,8 @@ int main(int /* argc */, char** /* argv */)
   std::string path = "";  // empty path defaults to 'lttng view'
   std::cout << "Using path: \"" << path << "\"  (empty defaults to lttng view scalopus_target_session)" << std::endl;
 
-  // Create the devtools endpoint
-  auto catapult_server = std::make_shared<scalopus::CatapultServer>();
 
-  // Start it on the path provided.
+  // Create the transport & endpoint manager.
   auto manager = std::make_shared<scalopus::EndpointManager>();
 
   // Add scope tracing endpoint factory function.
@@ -71,27 +69,38 @@ int main(int /* argc */, char** /* argv */)
     return tracing_endpoint;
   });
 
+  // Add endpoint factory function for the process information.
   manager->addEndpointFactory(scalopus::EndpointProcessInfo::name, [](const auto& transport) {
     auto endpoint = std::make_shared<scalopus::EndpointProcessInfo>();
     endpoint->setTransport(transport);
     return endpoint;
   });
 
-  catapult_server->init(manager, path);
+  // Create the providers.
+  std::vector<scalopus::TraceEventProvider::Ptr> providers;
+  
+
+  // Create the catapult backend.
+  auto backend = std::make_shared<scalopus::CatapultBackend>(providers);
 
   // Make a webserver and add the endpoints
   namespace ss = seasocks;
   auto logger = std::make_shared<ss::PrintfLogger>(ss::Logger::Level::WARNING);
   ss::Server server(logger);
 
+
+  backend->setExecutor([&server](scalopus::CatapultBackend::Runnable&& runnable)
+  {
+    server.execute(std::move(runnable));
+  });
+
   // Set the send buffer to 128 mb. At the end of the trace, the json representation needs to fit in this buffer.
   // This is a workaround for client buffer overflows, proper fix requires a substantial refactor (CORE-11125).
   server.setClientBufferSize(128 * 1024 * 1024u);
 
-  server.addWebSocketHandler("/devtools/page/bar", catapult_server);  // needed for chrom(e/ium) 65.0+
-  server.addWebSocketHandler("/devtools/browser", catapult_server);   // needed for chrome 60.0
-
-  server.addPageHandler(catapult_server);  // This is retrieved in the overview page.
+  server.addWebSocketHandler("/devtools/page/bar", backend);  // needed for chrom(e/ium) 65.0+
+  server.addWebSocketHandler("/devtools/browser", backend);   // needed for chrome 60.0
+  server.addPageHandler(backend);  // This is retrieved in the overview page.
 
   // Start the server in a separate thread.
   server.startListening(port);

@@ -7,9 +7,11 @@ find_package(Seasocks REQUIRED)
 
 
 add_library(scalopus_catapult
-  src/catapult_server.cpp
-  src/tracing_session.cpp
+  src/catapult_backend.cpp
   src/endpoint_manager.cpp
+
+  src/trace_session.cpp
+  src/lttng_provider.cpp
 )
 
 target_include_directories(scalopus_catapult
