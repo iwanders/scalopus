@@ -7,6 +7,7 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 add_library(scalopus_transport SHARED
   src/transport.cpp
   src/transport_unix.cpp
+  src/transport_mock.cpp
   src/endpoint.cpp
   src/protocol.cpp
   src/endpoint_introspect.cpp

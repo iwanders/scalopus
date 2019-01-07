@@ -370,6 +370,7 @@ void TransportUnix::work()
     }
   }
 }
+
 std::size_t TransportUnix::pendingRequests() const
 {
   std::lock_guard<std::mutex> lock(request_lock_);

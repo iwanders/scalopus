@@ -40,6 +40,7 @@ class Transport
 {
 public:
   using Ptr = std::shared_ptr<Transport>;
+  using WeakPtr = std::weak_ptr<Transport>;
   using PendingResponse = std::shared_ptr<std::future<Data>>;
 
   virtual ~Transport();
@@ -59,7 +60,7 @@ public:
   virtual PendingResponse request(const std::string& remote_endpoint_name, const Data& outgoing) = 0;
 
   /**
-   * @brief Returnt the number of oustanding requests.
+   * @brief Return the number of oustanding requests.
    */
   virtual std::size_t pendingRequests() const = 0;
 

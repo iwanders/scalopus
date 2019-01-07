@@ -24,8 +24,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_PROVIDER_H
-#define SCALOPUS_PROVIDER_H
+#ifndef SCALOPUS_TRANSPORT_UNIX_H
+#define SCALOPUS_TRANSPORT_UNIX_H
 
 #include <scalopus_transport/interface/endpoint.h>
 #include <scalopus_transport/interface/transport.h>
@@ -104,4 +104,4 @@ private:
 };
 
 }  // namespace scalopus
-#endif  // SCALOPUS_PROVIDER_H
+#endif  // SCALOPUS_TRANSPORT_UNIX_H
