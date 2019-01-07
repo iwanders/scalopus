@@ -44,9 +44,5 @@ install(TARGETS scalopus_transport EXPORT ScalopusTransport
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT ScalopusTransport DESTINATION share/scalopus_transport/cmake)
 
-include(CTest)
-if(BUILD_TESTING)
-  enable_testing()
-  add_subdirectory(test)
-endif()
+add_subdirectory(test)
 

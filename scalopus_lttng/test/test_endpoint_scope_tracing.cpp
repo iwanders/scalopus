@@ -26,7 +26,7 @@ int main(int /* argc */, char** /* argv */)
   auto serialized = scalopus::EndpointScopeTracing::serializeMapping(process_mapping);
   auto deserialized = scalopus::EndpointScopeTracing::deserializeMapping(serialized);
 
-  test(test_mapping, deserialized);
+  test(process_mapping, deserialized);
   for (auto& pid_map : test_mapping)
   {
     test(process_mapping[pid_map.first], deserialized[pid_map.first]);

@@ -15,6 +15,12 @@ target_link_libraries(endpoint_scope_tracing
 )
 add_test(test_endpoint_scope_tracing endpoint_scope_tracing)
 
+add_executable(lttng_tracing_macros test_lttng_tracing_macros.cpp)
+target_link_libraries(lttng_tracing_macros
+  PRIVATE
+    scalopus_lttng
+)
+add_test(test_lttng_tracing_macros lttng_tracing_macros)
 
 # https://gitlab.kitware.com/cmake/cmake/issues/8774
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test_ctfevent test_endpoint_scope_tracing)
+add_custom_target(check_lttng COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test_ctfevent test_endpoint_scope_tracing)

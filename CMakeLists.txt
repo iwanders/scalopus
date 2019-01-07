@@ -26,9 +26,13 @@ macro(find_package)
   endif()
 endmacro()
 
+include(CTest)
+if(BUILD_TESTING)
+  enable_testing()
+endif()
+
 add_subdirectory(scalopus_transport)
 add_subdirectory(scalopus_lttng)
 add_subdirectory(scalopus_examples)
 add_subdirectory(scalopus_catapult)
 add_subdirectory(scalopus_general)
-

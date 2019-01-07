@@ -1,0 +1,13 @@
+add_executable(general_thread_naming_macros test_general_thread_naming_macros.cpp)
+target_link_libraries(general_thread_naming_macros
+  PRIVATE
+    scalopus_lttng
+)
+add_test(test_general_thread_naming_macros general_thread_naming_macros)
+
+add_executable(endpoint_process_info test_endpoint_process_info.cpp)
+target_link_libraries(endpoint_process_info
+  PRIVATE
+    scalopus_lttng
+)
+add_test(test_endpoint_process_info endpoint_process_info)

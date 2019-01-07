@@ -74,8 +74,5 @@ install(TARGETS scalopus_lttng scalopus_babeltrace EXPORT ScalopusLttng
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT ScalopusLttng DESTINATION share/scalopus_lttng/cmake)
 
-include(CTest)
-if(BUILD_TESTING)
-  enable_testing()
-  add_subdirectory(test)
-endif()
+add_subdirectory(test)
+
