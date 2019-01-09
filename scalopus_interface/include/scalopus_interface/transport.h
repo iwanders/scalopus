@@ -28,6 +28,7 @@
 #define SCALOPUS_INTERFACE_TRANSPORT_H
 
 #include "scalopus_interface/endpoint.h"
+#include "scalopus_interface/destination.h"
 #include <future>
 #include <map>
 #include <memory>
@@ -84,6 +85,12 @@ public:
    * @return Pointer to the endpoint that has the provided name, or nullptr if not found.
    */
   virtual Endpoint::Ptr getEndpoint(const std::string& name) const;
+
+  /**
+   * @brief Return a destination to connect to this transport.
+   * @note If unsupported return nullptr.
+   */
+  virtual Destination::Ptr getAddress() const;
 
 protected:
   /**

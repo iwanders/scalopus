@@ -24,25 +24,32 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scalopus_catapult/trace_event_source.h"
+#ifndef SCALOPUS_INTERFACE_DESTINATION_H
+#define SCALOPUS_INTERFACE_DESTINATION_H
+#include <memory>
+#include <string>
 
 namespace scalopus
 {
-void TraceEventSource::startInterval()
+/**
+ * @brief This represents a destination for a transport, in general this destination is the server side.
+ */
+class Destination
 {
-}
+public:
+  using Ptr = std::shared_ptr<Destination>;
+  virtual ~Destination() = default;
 
-void TraceEventSource::stopInterval()
-{
-}
+  /**
+   * @brief Return a human readable string that provides some information about the destination.
+   */
+  virtual operator std::string() const;
 
-std::vector<json> TraceEventSource::finishInterval()
-{
-  return {};
-}
-
-void TraceEventSource::work()
-{
-}
+  /**
+   * @brief Provide a hash code, this should be identical for identical destinations.
+   */
+  virtual std::size_t hash_code() const;
+};
 
 }  // namespace scalopus
+#endif  // SCALOPUS_INTERFACE_TRANSPORT_H

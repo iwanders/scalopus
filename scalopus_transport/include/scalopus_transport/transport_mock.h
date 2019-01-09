@@ -27,20 +27,24 @@
 #ifndef SCALOPUS_TRANSPORT_TRANSPORT_MOCK_H
 #define SCALOPUS_TRANSPORT_TRANSPORT_MOCK_H
 
-#include <scalopus_interface/transport.h>
+#include <scalopus_interface/transport_factory.h>
 #include <memory>
 
 namespace scalopus
 {
-/**
- * @brief Create a mock transport server. This is useful for testing endpoints.
- */
-std::shared_ptr<Transport> transportServerMock();
+class TransportMockFactory : public TransportFactory
+{
+public:
+  using Ptr = std::shared_ptr<TransportMockFactory>;
+  std::vector<Destination::Ptr> discover();
+  Transport::Ptr serve();
+  Transport::Ptr connect(const Destination::Ptr& destination);
 
-/**
- * @brief Create a mock transport client connected to the server that's passed in.
- */
-std::shared_ptr<Transport> transportClientMock(std::shared_ptr<Transport> transport_server);
+  /**
+   * @brief This method allows creating a mocked client that's connected to the passed in server.
+   */
+  Transport::Ptr connect(const Transport::Ptr& destination);
+};
 }  // namespace scalopus
 
 #endif  // SCALOPUS_TRANSPORT_TRANSPORT_MOCK_H

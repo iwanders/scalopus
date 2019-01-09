@@ -24,33 +24,53 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_CATAPULT_GENERAL_SOURCE_H
-#define SCALOPUS_CATAPULT_GENERAL_SOURCE_H
+#ifndef SCALOPUS_CATAPULT_LTTNG_SOURCE_H
+#define SCALOPUS_CATAPULT_LTTNG_SOURCE_H
 
-#include "scalopus_catapult/general_provider.h"
-#include "scalopus_catapult/trace_event_source.h"
+#include <scalopus_lttng/babeltrace_tool.h>
+#include "scalopus_lttng/lttng_provider.h"
+#include <scalopus_interface/trace_event_source.h>
 
 namespace scalopus
 {
 /**
- * @brief The source that provides the trace event formatted json entries to name the thread and processes.
+ * @brief The actual lttng source that provides the trace event format json entries.
  */
-class GeneralSource : public TraceEventSource
+class LttngSource : public TraceEventSource
 {
 public:
-  using Ptr = std::shared_ptr<GeneralSource>;
+  using Ptr = std::shared_ptr<LttngSource>;
 
   /**
    * @brief Constructor for this soure.
-   * @param provider The provider that can be used to resolve the thread and process names.
+   * @param tool Pointer to the running babeltrace tool, a callback is registered with the tool that's called for each
+   *        event.
+   * @param provider The lttng provider that can be used to resolve the trace point names.
    */
-  GeneralSource(GeneralProvider::Ptr provider);
+  LttngSource(BabeltraceTool::Ptr tool, LttngProvider::Ptr provider);
 
-  // From TraceEventSource
+  // from the TraceEventSource
+  void startInterval();
+  void stopInterval();
+  void work();
   std::vector<json> finishInterval();
 
+  ~LttngSource();
+
 private:
-  GeneralProvider::Ptr provider_;  //!< Pointer to the provider.
+  BabeltraceTool::Ptr tool_;     //!< Pointer to the babeltrace tool.
+  LttngProvider::Ptr provider_;  //!< Pointer to the provider.
+
+  //! Vector of the events of this interval, between start and stop the BabeltraceTool will freely write into this
+  //! without locks.
+  std::vector<CTFEvent> events_;
+
+  std::shared_ptr<BabeltraceParser::EventCallback> callback_;  //!< Pointer to the registered event callback struct.
+
+  /**
+   * @brief Convert the stored events into the trace event format representation.
+   */
+  std::vector<json> convertEvents();
 };
 }  // namespace scalopus
-#endif  // SCALOPUS_CATAPULT_GENERAL_SOURCE_H
+#endif  // SCALOPUS_CATAPULT_LTTNG_SOURCE_H

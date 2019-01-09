@@ -26,23 +26,24 @@
 #include <unistd.h>
 #include <chrono>
 #include <iostream>
-#include "scalopus_transport/endpoint_introspect.h"
+#include "scalopus_interface/endpoint_introspect.h"
 #include "transport_unix.h"
 #include "test_transport_util.h"
 
 int main(int /* argc */, char** /* argv */)
 {
+  auto factory = std::make_shared<scalopus::TransportUnixFactory>();
   // Create the server
-  auto server = std::make_shared<scalopus::TransportUnix>();
-  test(server->serve(), true);
+  auto server = factory->serve();
 
   // Put the introspection endpoint in the server.
   auto endpoint0_at_server = std::make_shared<scalopus::EndpointIntrospect>();
   server->addEndpoint(endpoint0_at_server);
 
-  // Connect a client to the newly created server using our own process id.
-  auto client0 = std::make_shared<scalopus::TransportUnix>();
-  test(client0->connect(::getpid()), true);
+  // Create a client that's connected to the mock server.
+  auto client0 = factory->connect(server->getAddress());
+
+  test(client0->isConnected(), true);
 
   // Create an endpoint to use the client. This is not YET inside the client.
   auto endpoint0_for_client = std::make_shared<scalopus::EndpointIntrospect>();

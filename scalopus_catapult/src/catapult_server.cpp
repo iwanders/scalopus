@@ -25,11 +25,15 @@
 */
 
 #include <scalopus_general/endpoint_process_info.h>
+#include <scalopus_general/general_provider.h>
+
 #include <scalopus_lttng/endpoint_scope_tracing.h>
+#include <scalopus_lttng/lttng_provider.h>
+
+#include <scalopus_transport/transport_unix.h>
+
 #include "scalopus_catapult/catapult_backend.h"
-#include "scalopus_catapult/endpoint_manager.h"
-#include "scalopus_catapult/general_provider.h"
-#include "scalopus_catapult/lttng_provider.h"
+#include "scalopus_catapult/endpoint_manager_poll.h"
 
 #include <seasocks/PrintfLogger.h>
 #include <seasocks/Server.h>
@@ -61,7 +65,7 @@ int main(int /* argc */, char** /* argv */)
   std::cout << "Using path: \"" << path << "\"  (empty defaults to lttng view scalopus_target_session)" << std::endl;
 
   // Create the transport & endpoint manager.
-  auto manager = std::make_shared<scalopus::EndpointManager>();
+  auto manager = std::make_shared<scalopus::EndpointManagerPoll>(std::make_shared<scalopus::TransportUnixFactory>());
 
   // Add scope tracing endpoint factory function.
   manager->addEndpointFactory(scalopus::EndpointScopeTracing::name, [](const auto& transport) {

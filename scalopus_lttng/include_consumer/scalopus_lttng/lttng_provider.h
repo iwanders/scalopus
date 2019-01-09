@@ -27,14 +27,14 @@
 #ifndef SCALOPUS_CATAPULT_LTTNG_PROVIDER_H
 #define SCALOPUS_CATAPULT_LTTNG_PROVIDER_H
 
-#include "scalopus_catapult/trace_event_provider.h"
+#include <scalopus_interface/trace_event_provider.h>
 
 #include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_lttng/babeltrace_tool.h>
 #include <scalopus_lttng/ctfevent.h>
 #include <scalopus_lttng/endpoint_scope_tracing.h>
 
-#include "scalopus_catapult/endpoint_manager.h"
+#include <scalopus_interface/endpoint_manager.h>
 
 namespace scalopus
 {

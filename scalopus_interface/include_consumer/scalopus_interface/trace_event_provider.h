@@ -24,44 +24,27 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scalopus_catapult/general_provider.h"
-#include "scalopus_catapult/general_source.h"
+#ifndef SCALOPUS_INTERFACE_TRACE_EVENT_PROVIDER_H
+#define SCALOPUS_INTERFACE_TRACE_EVENT_PROVIDER_H
 
-#include <sstream>
-
+#include "scalopus_interface/trace_event_source.h"
 namespace scalopus
 {
-GeneralProvider::GeneralProvider(EndpointManager::Ptr manager) : manager_(manager)
+/**
+ * @brief This is the abstract base class for a data provider that's used in the catapult backend.
+ *        It can create Trace Event Sources that are used by a session.
+ */
+class TraceEventProvider
 {
-}
+public:
+  using Ptr = std::shared_ptr<TraceEventProvider>;
 
-TraceEventSource::Ptr GeneralProvider::makeSource()
-{
-  return std::make_shared<GeneralSource>(shared_from_this());
-}
-
-GeneralProvider::ProcessInfoMap GeneralProvider::getMapping()
-{
-  std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
-  return mapping_;
-}
-
-void GeneralProvider::updateMapping()
-{
-  std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
-  mapping_.clear();
-
-  auto endpoints = manager_->endpoints();
-  for (const auto& transport_endpoints : endpoints)
-  {
-    // Try to find the scope tracing endpoint and obtain its data.
-    auto endpoint_general = EndpointManager::findEndpoint<scalopus::EndpointProcessInfo>(transport_endpoints.second);
-    if (endpoint_general != nullptr)
-    {
-      const auto process_mapping = endpoint_general->processInfo();
-      mapping_[process_mapping.pid] = process_mapping;
-    }
-  }
-}
+  /**
+   * @brief Create a trace event source from this provider.
+   */
+  virtual TraceEventSource::Ptr makeSource() = 0;
+  virtual ~TraceEventProvider() = default;
+};
 
 }  // namespace scalopus
+#endif  // SCALOPUS_INTERFACE_TRACE_EVENT_PROVIDER_H

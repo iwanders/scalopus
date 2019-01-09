@@ -24,8 +24,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scalopus_catapult/endpoint_manager.h"
-#include <scalopus_transport/endpoint_introspect.h>
+#include "scalopus_interface/endpoint_manager.h"
+#include <scalopus_interface/endpoint_introspect.h>
 #include <scalopus_transport/transport_unix.h>
 #include <algorithm>
 #include <iostream>

@@ -392,7 +392,39 @@ bool TransportUnix::processMsg(const protocol::Msg& request, protocol::Msg& resp
   return false;
 }
 
-std::shared_ptr<Transport> transportServerUnix()
+Destination::Ptr TransportUnix::getAddress() const
+{
+  return std::make_shared<TransportUnixDestination>(::getpid());
+}
+
+
+// Methods for the factory
+TransportUnixDestination::TransportUnixDestination(unsigned int pid) : pid_(pid)
+{
+}
+
+TransportUnixDestination::operator std::string() const
+{
+  std::stringstream ss;
+  ss << "<unix:" << pid_ << ">";
+  return ss.str();
+}
+std::size_t TransportUnixDestination::hash_code() const
+{
+  return pid_;
+}
+
+std::vector<Destination::Ptr> TransportUnixFactory::discover()
+{
+  std::vector<Destination::Ptr> res;
+  for (const auto& pid : TransportUnix::getTransportServers())
+  {
+    res.push_back(std::make_shared<TransportUnixDestination>(pid));
+  }
+  return res;
+}
+
+Transport::Ptr TransportUnixFactory::serve()
 {
   auto t = std::make_unique<TransportUnix>();
   if (t->serve())
@@ -402,19 +434,21 @@ std::shared_ptr<Transport> transportServerUnix()
   return nullptr;
 }
 
-std::shared_ptr<Transport> transportClientUnix(std::size_t pid)
+Transport::Ptr TransportUnixFactory::connect(const Destination::Ptr& destination)
 {
+  auto dest = std::dynamic_pointer_cast<TransportUnixDestination>(destination);
+  if (dest == nullptr)
+  {
+    return nullptr;
+  }
   auto t = std::make_unique<TransportUnix>();
-  if (t->connect(pid))
+  if (t->connect(dest->pid_))
   {
     return t;
   }
   return nullptr;
 }
 
-std::vector<size_t> getTransportServersUnix()
-{
-  return TransportUnix::getTransportServers();
-}
+
 
 }  // namespace scalopus

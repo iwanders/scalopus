@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2018, Ivor Wanders
+  Copyright (c) 2019, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -24,10 +24,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_CATAPULT_ENDPOINT_MANANGER_H
-#define SCALOPUS_CATAPULT_ENDPOINT_MANANGER_H
+#ifndef SCALOPUS_CATAPULT_ENDPOINT_MANANGER_POLL_H
+#define SCALOPUS_CATAPULT_ENDPOINT_MANANGER_POLL_H
 
-#include <scalopus_interface/transport.h>
+#include <scalopus_interface/transport_factory.h>
+#include <scalopus_interface/endpoint_manager.h>
 #include <functional>
 #include <map>
 #include <memory>
@@ -37,10 +38,9 @@
 namespace scalopus
 {
 /**
- * @brief Something that discovers transport servers and manages enpoints over these transports.
- * @TODO Refactor such that it is transport agnostic.
+ * @brief Something that discovers transport servers and manages endpoints over these transports.
  */
-class EndpointManager
+class EndpointManagerPoll : public EndpointManager
 {
 public:
   using Ptr = std::shared_ptr<EndpointManager>;
@@ -48,7 +48,8 @@ public:
   using EndpointMap = std::map<std::string, Endpoint::Ptr>;
   using TransportEndpoints = std::map<Transport::Ptr, EndpointMap>;
 
-  EndpointManager();
+  EndpointManagerPoll(TransportFactory::Ptr factory);
+
   /**
    * @brief This function should be called periodically to discover transports and connect.
    */
@@ -57,34 +58,12 @@ public:
   /**
    * @brief Return the map of the currently known endpoints.
    */
-  TransportEndpoints endpoints() const;
+  virtual TransportEndpoints endpoints() const;
 
   /**
    * @brief Add an endpoint factory function to the manager.
    */
   void addEndpointFactory(const std::string& name, EndpointFactory&& factory_function);
-
-  /**
-   * @brief Helper function to find a specific endpoint in a map of functions.
-   * @code auto endpoint_ptr = EndpointManager::findEndpoint<scalopus::EndpointProcessInfo>(endpoint_map);
-   */
-  template <typename T>
-  static std::shared_ptr<T> findEndpoint(const EndpointMap& transport_endpoints)
-  {
-    auto it = transport_endpoints.find(T::name);
-    if (it != transport_endpoints.end())
-    {
-      const auto endpoint_instance = std::dynamic_pointer_cast<T>(it->second);
-      if (endpoint_instance == nullptr)
-      {
-        // This should never happen, as the pointer by the name of T::name should be of the correct type.
-        throw std::runtime_error("Endpoint's name does not match its real type.");
-      }
-      return endpoint_instance;
-    }
-    return nullptr;
-  }
-
 private:
   mutable std::mutex mutex_;
   std::map<std::string, EndpointFactory> endpoint_factories_;  //!< Map of factory functions to construct endpoints.
@@ -92,6 +71,8 @@ private:
 
   //! Map to keep track of which transport is already created, this is not transport agnostic.
   std::map<std::size_t, Transport::Ptr> transports_;
+
+  TransportFactory::Ptr factory_;
 };
 }  // namespace scalopus
-#endif  // SCALOPUS_CATAPULT_ENDPOINT_MANANGER_H
+#endif  // SCALOPUS_CATAPULT_ENDPOINT_MANANGER_POLL_H

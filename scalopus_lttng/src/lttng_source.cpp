@@ -24,7 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scalopus_catapult/lttng_source.h"
+#include "scalopus_lttng/lttng_source.h"
 
 #include <sstream>
 

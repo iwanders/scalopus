@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2018, Ivor Wanders
+  Copyright (c) 2019, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -24,22 +24,48 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_TRANSPORT_UNIX_H
-#define SCALOPUS_TRANSPORT_UNIX_H
+#include "scalopus_general/general_source.h"
 
-#include <scalopus_interface/transport_factory.h>
-#include <memory>
+#include <sstream>
 
 namespace scalopus
 {
-class TransportUnixFactory : public TransportFactory
+GeneralSource::GeneralSource(GeneralProvider::Ptr provider) : provider_(provider)
 {
-public:
-  using Ptr = std::shared_ptr<TransportUnixFactory>;
-  std::vector<Destination::Ptr> discover();
-  Transport::Ptr serve();
-  Transport::Ptr connect(const Destination::Ptr& destination);
-};
-}  // namespace scalopus
+}
 
-#endif  // SCALOPUS_TRANSPORT_UNIX_H
+std::vector<json> GeneralSource::finishInterval()
+{
+  provider_->updateMapping();
+
+  std::vector<json> result;
+  auto mapping = provider_->getMapping();
+
+  // Iterate over all mappings by process ID.
+  for (const auto pid_process_info : mapping)
+  {
+    // make a metadata entry to name a process.
+    json process_entry;
+    process_entry["tid"] = 0;
+    process_entry["ph"] = "M";
+    process_entry["name"] = "process_name";
+    process_entry["args"] = { { "name", pid_process_info.second.name } };
+    process_entry["pid"] = pid_process_info.first;
+    result.push_back(process_entry);
+
+    // For all thread mappings, make a metadata entry to name the thread.
+    for (const auto thread_mapping : pid_process_info.second.threads)
+    {
+      json tid_entry;
+      tid_entry["tid"] = thread_mapping.first;
+      tid_entry["ph"] = "M";
+      tid_entry["name"] = "thread_name";
+      tid_entry["pid"] = pid_process_info.first;
+      tid_entry["args"] = { { "name", thread_mapping.second } };
+      result.push_back(tid_entry);
+    }
+  }
+
+  return result;
+}
+}  // namespace scalopus

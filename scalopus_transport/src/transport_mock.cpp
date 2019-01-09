@@ -91,25 +91,39 @@ void TransportMock::broadcast(const std::string& remote_endpoint_name, const Dat
   }
 }
 
+
 std::size_t TransportMock::pendingRequests() const
 {
   return 0;
 }
 
-std::shared_ptr<Transport> transportServerMock()
+// Methods for the mock factory
+std::vector<Destination::Ptr> TransportMockFactory::discover()
+{
+  return {};
+}
+
+Transport::Ptr TransportMockFactory::serve()
 {
   return std::make_shared<TransportMock>();
 }
 
-/**
- * @brief Create a mock transport client.
- */
-std::shared_ptr<Transport> transportClientMock(std::shared_ptr<Transport> transport_server)
+Transport::Ptr TransportMockFactory::connect(const Destination::Ptr& destination)
 {
-  auto mock_server = std::dynamic_pointer_cast<TransportMock>(transport_server);
+  auto mock_server = std::dynamic_pointer_cast<TransportMock>(destination);
   auto client = std::make_shared<TransportMock>(mock_server);
   mock_server->addClient(client);
   return client;
 }
+
+Transport::Ptr TransportMockFactory::connect(const Transport::Ptr& destination)
+{
+  auto mock_server = std::dynamic_pointer_cast<TransportMock>(destination);
+  auto client = std::make_shared<TransportMock>(mock_server);
+  mock_server->addClient(client);
+  return client;
+}
+
+
 
 }  // namespace scalopus

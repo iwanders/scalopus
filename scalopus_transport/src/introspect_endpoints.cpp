@@ -1,16 +1,17 @@
 #include <cstring>
 #include <iostream>
-#include "scalopus_transport/endpoint_introspect.h"
+#include <scalopus_interface/endpoint_introspect.h>
 #include "scalopus_transport/transport_unix.h"
 
 int main(int /* argc */, char** /* argv */)
 {
-  const auto providers = scalopus::getTransportServersUnix();
-  for (const auto& pid : providers)
+  auto factory = std::make_shared<scalopus::TransportUnixFactory>();
+  const auto providers = factory->discover();
+  for (const auto& destination : providers)
   {
-    std::cout << pid << std::endl;
+    std::cout << destination << std::endl;
 
-    auto transport = scalopus::transportClientUnix(pid);
+    auto transport = factory->connect(destination);
     auto introspect_client = std::make_shared<scalopus::EndpointIntrospect>();
 
     introspect_client->setTransport(transport);

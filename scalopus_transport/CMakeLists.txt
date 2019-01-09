@@ -10,7 +10,6 @@ add_library(scalopus_transport SHARED
   src/transport_unix.cpp
   src/transport_mock.cpp
   src/protocol.cpp
-  src/endpoint_introspect.cpp
 )
 add_library(Scalopus::scalopus_transport ALIAS scalopus_transport)
 
@@ -33,7 +32,7 @@ target_link_libraries(scalopus_transport
 add_executable(introspect_endpoints
   src/introspect_endpoints.cpp
 )
-target_link_libraries(introspect_endpoints Scalopus::scalopus_transport)
+target_link_libraries(introspect_endpoints Scalopus::scalopus_transport Scalopus::scalopus_consumer)
 
 export(
   TARGETS scalopus_transport

@@ -27,7 +27,7 @@
 #include <iostream>
 #include "scalopus_lttng/endpoint_scope_tracing.h"
 #include "scalopus_lttng/scope_tracing.h"
-#include "scalopus_transport/transport_mock.h"
+#include <scalopus_transport/transport_mock.h>
 
 template <typename A, typename B>
 void test_map(const A& a, const B& b)
@@ -64,11 +64,11 @@ int main(int /* argc */, char** /* argv */)
   // Create the endpoint.
   auto server_endpoint = std::make_shared<scalopus::EndpointScopeTracing>();
 
-  // Create mock server and client.
-  auto server = scalopus::transportServerMock();
+  auto factory = std::make_shared<scalopus::TransportMockFactory>();
+  auto server = factory->serve();
   server->addEndpoint(server_endpoint);
+  auto client = factory->connect(server);
 
-  auto client = scalopus::transportClientMock(server);
   // Add the endpoint to the client.
   auto client_endpoint = std::make_shared<scalopus::EndpointScopeTracing>();
   client_endpoint->setTransport(client);

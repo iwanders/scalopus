@@ -24,10 +24,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_TRANSPORT_MOCK_H
-#define SCALOPUS_TRANSPORT_MOCK_H
+#ifndef SCALOPUS_TRANSPORT_TRANSPORT_MOCK_INTERNAL_H
+#define SCALOPUS_TRANSPORT_TRANSPORT_MOCK_INTERNAL_H
 
-#include <scalopus_interface/transport.h>
+#include <scalopus_interface/transport_factory.h>
+#include <scalopus_transport/transport_mock.h>
 #include <future>
 #include <map>
 #include <set>
@@ -61,8 +62,5 @@ private:
   std::vector<Transport::WeakPtr> clients_;
 };
 
-// From public header:
-std::shared_ptr<Transport> transportServerMock();
-std::shared_ptr<Transport> transportClientMock(std::shared_ptr<Transport> transport_server);
 }  // namespace scalopus
-#endif  // SCALOPUS_TRANSPORT_MOCK_H
+#endif  // SCALOPUS_TRANSPORT_TRANSPORT_MOCK_INTERNAL_H

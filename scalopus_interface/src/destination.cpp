@@ -23,49 +23,21 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#include "scalopus_catapult/general_source.h"
-
+#include "scalopus_interface/destination.h"
 #include <sstream>
 
 namespace scalopus
 {
-GeneralSource::GeneralSource(GeneralProvider::Ptr provider) : provider_(provider)
+Destination::operator std::string() const
 {
+  std::stringstream ss;
+  ss << this;
+  return ss.str();
 }
 
-std::vector<json> GeneralSource::finishInterval()
+size_t Destination::hash_code() const
 {
-  provider_->updateMapping();
-
-  std::vector<json> result;
-  auto mapping = provider_->getMapping();
-
-  // Iterate over all mappings by process ID.
-  for (const auto pid_process_info : mapping)
-  {
-    // make a metadata entry to name a process.
-    json process_entry;
-    process_entry["tid"] = 0;
-    process_entry["ph"] = "M";
-    process_entry["name"] = "process_name";
-    process_entry["args"] = { { "name", pid_process_info.second.name } };
-    process_entry["pid"] = pid_process_info.first;
-    result.push_back(process_entry);
-
-    // For all thread mappings, make a metadata entry to name the thread.
-    for (const auto thread_mapping : pid_process_info.second.threads)
-    {
-      json tid_entry;
-      tid_entry["tid"] = thread_mapping.first;
-      tid_entry["ph"] = "M";
-      tid_entry["name"] = "thread_name";
-      tid_entry["pid"] = pid_process_info.first;
-      tid_entry["args"] = { { "name", thread_mapping.second } };
-      result.push_back(tid_entry);
-    }
-  }
-
-  return result;
+  return reinterpret_cast<size_t>(this);
 }
+
 }  // namespace scalopus

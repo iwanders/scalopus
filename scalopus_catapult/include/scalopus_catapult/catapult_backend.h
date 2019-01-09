@@ -31,8 +31,6 @@
 #include <seasocks/WebSocket.h>
 #include <seasocks/util/PathHandler.h>
 
-#include <nlohmann/json.hpp>
-
 #include <cstring>
 #include <iostream>
 #include <memory>
@@ -42,13 +40,11 @@
 #include <string>
 #include <thread>
 
-#include "scalopus_catapult/endpoint_manager.h"
-#include "scalopus_catapult/trace_event_provider.h"
+#include <scalopus_interface/trace_event_provider.h>
 #include "scalopus_catapult/trace_session.h"
 
 namespace scalopus
 {
-using json = nlohmann::json;
 namespace ss = seasocks;
 
 /**

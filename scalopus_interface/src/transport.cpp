@@ -83,4 +83,10 @@ Endpoint::Ptr Transport::getEndpoint(const std::string& name) const
   }
   return nullptr;
 }
+
+Destination::Ptr Transport::getAddress() const
+{
+  return nullptr;
+}
+
 }  // namespace scalopus

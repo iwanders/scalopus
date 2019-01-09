@@ -24,50 +24,25 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_CATAPULT_GENERAL_PROVIDER_H
-#define SCALOPUS_CATAPULT_GENERAL_PROVIDER_H
-
-#include "scalopus_catapult/trace_event_provider.h"
-
-#include <scalopus_general/endpoint_process_info.h>
-#include "scalopus_catapult/endpoint_manager.h"
+#include "scalopus_interface/trace_event_source.h"
 
 namespace scalopus
 {
-/**
- * @brief This provides the general data such as the process name and thread names.
- */
-class GeneralProvider : public TraceEventProvider, public std::enable_shared_from_this<GeneralProvider>
+void TraceEventSource::startInterval()
 {
-public:
-  using Ptr = std::shared_ptr<GeneralProvider>;
-  using ProcessInfoMap = std::map<unsigned int, EndpointProcessInfo::ProcessInfo>;
+}
 
-  /**
-   * @brief Create the general provider.
-   * @param manager The endpoint manager that provides the endpoints to resolve the thread name and process name.
-   */
-  GeneralProvider(EndpointManager::Ptr manager);
+void TraceEventSource::stopInterval()
+{
+}
 
-  /**
-   * @brief Return all currently known mappings.
-   */
-  ProcessInfoMap getMapping();
+std::vector<json> TraceEventSource::finishInterval()
+{
+  return {};
+}
 
-  /**
-   * @brief Update the current mapping by retrieving the currently known maps from the endpoints.
-   */
-  void updateMapping();
-
-  // From TraceEventProvider.
-  TraceEventSource::Ptr makeSource();
-
-private:
-  EndpointManager::Ptr manager_;  //!< Manager for connections.
-
-  std::mutex mapping_mutex_;  //!< Mutex for the mapping.
-  ProcessInfoMap mapping_;    //!< The currently known mappings.
-};
+void TraceEventSource::work()
+{
+}
 
 }  // namespace scalopus
-#endif  // SCALOPUS_CATAPULT_GENERAL_PROVIDER_H

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5.0)
 
-find_package(ScalopusGeneral REQUIRED)
+find_package(ScalopusInterface REQUIRED)
 
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
@@ -28,13 +28,30 @@ target_link_libraries(scalopus_general
     nlohmann_json::nlohmann_json
 )
 
+add_library(scalopus_general_consumer SHARED
+  src/general_source.cpp
+  src/general_provider.cpp
+)
+target_include_directories(scalopus_general_consumer
+  PUBLIC 
+    $<INSTALL_INTERFACE:include_consumer>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include_consumer>
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+add_library(Scalopus::scalopus_general_consumer ALIAS scalopus_general_consumer)
+target_link_libraries(scalopus_general_consumer
+  PUBLIC
+    scalopus_general
+    Scalopus::scalopus_consumer
+)
 
 export(
-  TARGETS scalopus_general
+  TARGETS scalopus_general scalopus_general_consumer
   NAMESPACE Scalopus::
   FILE ScalopusGeneralConfig.cmake
 )
-install(TARGETS scalopus_general EXPORT ScalopusGeneral
+install(TARGETS scalopus_general scalopus_general_consumer EXPORT ScalopusGeneral
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

@@ -24,7 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <iostream>
-#include "scalopus_transport/transport_mock.h"
+#include <scalopus_transport/transport_mock.h>
 #include "scalopus_general/endpoint_process_info.h"
 #include "scalopus_general/thread_naming.h"
 
@@ -50,11 +50,11 @@ int main(int /* argc */, char** /* argv */)
   // Assign a process name.
   server_info->setProcessName("Fooo");
 
-  // Create mock server and client.
-  auto server = scalopus::transportServerMock();
+  auto factory = std::make_shared<scalopus::TransportMockFactory>();
+  auto server = factory->serve();
   server->addEndpoint(server_info);
+  auto client = factory->connect(server);
 
-  auto client = scalopus::transportClientMock(server);
   // Add the endpoint to the client.
   auto client_info = std::make_shared<scalopus::EndpointProcessInfo>();
   client_info->setTransport(client);

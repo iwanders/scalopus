@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019, Ivor Wanders
+  Copyright (c) 2018, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -23,47 +23,48 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#ifndef SCALOPUS_CATAPULT_TRACE_EVENT_SOURCE_H
-#define SCALOPUS_CATAPULT_TRACE_EVENT_SOURCE_H
-
+#include "scalopus_interface/endpoint_introspect.h"
+#include <iostream>
 #include <nlohmann/json.hpp>
+#include "scalopus_interface/transport.h"
 
 namespace scalopus
 {
 using json = nlohmann::json;
 
-/**
- * @brief A trace event source creates json representations of the trace events as used by catapult's trace viewer.
- * This format is detailed here: https://github.com/catapult-project/catapult/wiki/Trace-Event-Format
- */
-class TraceEventSource
+std::string EndpointIntrospect::getName() const
 {
-public:
-  using Ptr = std::shared_ptr<TraceEventSource>;
+  return name;
+}
 
-  /**
-   * @brief This function is called on each source when a recording interval is started.
-   */
-  virtual void startInterval();
+bool EndpointIntrospect::handle(Transport& server, const Data& /* request */, Data& response)
+{
+  const auto endpoints = server.endpoints();
 
-  /**
-   * @brief This function is called on each source when a recording interval is stopped.
-   */
-  virtual void stopInterval();
+  json jdata = json::object();
+  jdata["endpoints"] = endpoints;
+  response = json::to_bson(jdata);
+  return true;
+}
 
-  /**
-   * @brief This function should stop the interval and yield all events that were recorded during the interval for
-   *        the frontend to consume.
-   */
-  virtual std::vector<json> finishInterval();
+std::vector<std::string> EndpointIntrospect::supported()
+{
+  // send message...
+  auto transport = transport_.lock();
+  if (transport == nullptr)
+  {
+    throw communication_error("No transport provided to endpoint, cannot communicate.");
+  }
 
-  /**
-   * @brief This function is called periodically from the session thread.
-   */
-  virtual void work();
+  // Obtain the response data
+  auto future_ptr = transport->request(name, {});
+  if (future_ptr->wait_for(std::chrono::milliseconds(200)) == std::future_status::ready)
+  {
+    json jdata = json::from_bson(future_ptr->get());  // This line may throw
+    return jdata["endpoints"].get<std::vector<std::string>>();
+  }
 
-  virtual ~TraceEventSource() = default;
-};
+  return {};
+}
+
 }  // namespace scalopus
-#endif  // SCALOPUS_CATAPULT_TRACE_EVENT_SOURCE_H

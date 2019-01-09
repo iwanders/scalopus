@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2018, Ivor Wanders
+  Copyright (c) 2019, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -24,22 +24,44 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_TRANSPORT_UNIX_H
-#define SCALOPUS_TRANSPORT_UNIX_H
+#include "scalopus_general/general_provider.h"
+#include "scalopus_general/general_source.h"
 
-#include <scalopus_interface/transport_factory.h>
-#include <memory>
+#include <sstream>
 
 namespace scalopus
 {
-class TransportUnixFactory : public TransportFactory
+GeneralProvider::GeneralProvider(EndpointManager::Ptr manager) : manager_(manager)
 {
-public:
-  using Ptr = std::shared_ptr<TransportUnixFactory>;
-  std::vector<Destination::Ptr> discover();
-  Transport::Ptr serve();
-  Transport::Ptr connect(const Destination::Ptr& destination);
-};
-}  // namespace scalopus
+}
 
-#endif  // SCALOPUS_TRANSPORT_UNIX_H
+TraceEventSource::Ptr GeneralProvider::makeSource()
+{
+  return std::make_shared<GeneralSource>(shared_from_this());
+}
+
+GeneralProvider::ProcessInfoMap GeneralProvider::getMapping()
+{
+  std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
+  return mapping_;
+}
+
+void GeneralProvider::updateMapping()
+{
+  std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
+  mapping_.clear();
+
+  auto endpoints = manager_->endpoints();
+  for (const auto& transport_endpoints : endpoints)
+  {
+    // Try to find the scope tracing endpoint and obtain its data.
+    auto endpoint_general = EndpointManager::findEndpoint<scalopus::EndpointProcessInfo>(transport_endpoints.second);
+    if (endpoint_general != nullptr)
+    {
+      const auto process_mapping = endpoint_general->processInfo();
+      mapping_[process_mapping.pid] = process_mapping;
+    }
+  }
+}
+
+}  // namespace scalopus

@@ -34,7 +34,7 @@
 #include <scalopus_general/thread_naming.h>
 #include <scalopus_lttng/endpoint_scope_tracing.h>
 #include <scalopus_lttng/scope_tracing.h>
-#include <scalopus_transport/endpoint_introspect.h>
+#include <scalopus_interface/endpoint_introspect.h>
 #include <scalopus_transport/transport_unix.h>
 
 void test_two_raiis_in_same_scope()
@@ -77,12 +77,13 @@ void a()
 
 int main(int /* argc */, char** argv)
 {
-  const auto provider = scalopus::transportServerUnix();
-  provider->addEndpoint(std::make_unique<scalopus::EndpointScopeTracing>());
-  provider->addEndpoint(std::make_unique<scalopus::EndpointIntrospect>());
+  auto factory = std::make_shared<scalopus::TransportUnixFactory>();
+  const auto server = factory->serve();
+  server->addEndpoint(std::make_unique<scalopus::EndpointScopeTracing>());
+  server->addEndpoint(std::make_unique<scalopus::EndpointIntrospect>());
   auto endpoint_process_info = std::make_shared<scalopus::EndpointProcessInfo>();
   endpoint_process_info->setProcessName(argv[0]);
-  provider->addEndpoint(endpoint_process_info);
+  server->addEndpoint(endpoint_process_info);
 
   TRACE_THREAD_NAME("main");
 

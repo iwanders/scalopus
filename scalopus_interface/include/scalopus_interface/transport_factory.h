@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2018, Ivor Wanders
+  Copyright (c) 2019, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -24,22 +24,41 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_TRANSPORT_UNIX_H
-#define SCALOPUS_TRANSPORT_UNIX_H
+#ifndef SCALOPUS_INTERFACE_TRANSPORT_FACTORY_H
+#define SCALOPUS_INTERFACE_TRANSPORT_FACTORY_H
 
-#include <scalopus_interface/transport_factory.h>
+#include "scalopus_interface/transport.h"
+#include "scalopus_interface/destination.h"
+#include <vector>
 #include <memory>
 
 namespace scalopus
 {
-class TransportUnixFactory : public TransportFactory
+/**
+ * @brief The transport factory provides a standardized way to start transport servers, discover and connect to them.
+ */
+class TransportFactory
 {
 public:
-  using Ptr = std::shared_ptr<TransportUnixFactory>;
-  std::vector<Destination::Ptr> discover();
-  Transport::Ptr serve();
-  Transport::Ptr connect(const Destination::Ptr& destination);
-};
-}  // namespace scalopus
+  using Ptr = std::shared_ptr<TransportFactory>;
 
-#endif  // SCALOPUS_TRANSPORT_UNIX_H
+  /**
+   * @brief Provide a list of discovered servers.
+   */
+  virtual std::vector<Destination::Ptr> discover() = 0;
+
+  /**
+   * @brief Start a server.
+   */
+  virtual Transport::Ptr serve() = 0;
+
+  /**
+   * @brief Connect to a specified destination, connectable destinations are provided by the discover method.
+   */
+  virtual Transport::Ptr connect(const Destination::Ptr& destination) = 0;
+
+  virtual ~TransportFactory() = default;
+};
+
+}  // namespace scalopus
+#endif  // SCALOPUS_INTERFACE_TRANSPORT_FACTORY_H

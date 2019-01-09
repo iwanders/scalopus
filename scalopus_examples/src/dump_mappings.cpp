@@ -5,12 +5,13 @@
 
 int main(int /* argc */, char** /* argv */)
 {
-  const auto providers = scalopus::getTransportServersUnix();
-  for (const auto& pid : providers)
+  auto factory = std::make_shared<scalopus::TransportUnixFactory>();
+  const auto providers = factory->discover();
+  for (const auto& destination : providers)
   {
-    std::cout << pid << std::endl;
+    std::cout << std::string(*destination) << std::endl;
 
-    auto transport = scalopus::transportClientUnix(pid);
+    auto transport = factory->connect(destination);
     auto tracing_client = std::make_shared<scalopus::EndpointScopeTracing>();
     tracing_client->setTransport(transport);
     std::cout << transport << std::endl;

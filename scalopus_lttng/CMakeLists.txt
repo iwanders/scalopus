@@ -36,6 +36,7 @@ add_library(Scalopus::scalopus_lttng ALIAS scalopus_lttng)
 target_link_libraries(scalopus_lttng
   PUBLIC
     Scalopus::scalopus_transport
+    Scalopus::scalopus_interface
     Scalopus::scalopus_general
   PRIVATE
     nlohmann_json::nlohmann_json
@@ -43,7 +44,7 @@ target_link_libraries(scalopus_lttng
 )
 
 
-add_library(scalopus_babeltrace
+add_library(scalopus_babeltrace SHARED
   src/ctfevent.cpp
   src/babeltrace_tool.cpp
   src/babeltrace_parser.cpp)
@@ -63,12 +64,31 @@ target_link_libraries(babeltrace_test
     scalopus_babeltrace
 )
 
+add_library(scalopus_lttng_consumer SHARED
+  src/lttng_source.cpp
+  src/lttng_provider.cpp
+)
+target_include_directories(scalopus_lttng_consumer
+  PUBLIC 
+    $<INSTALL_INTERFACE:include_consumer>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include_consumer>
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+add_library(Scalopus::scalopus_lttng_consumer ALIAS scalopus_lttng_consumer)
+target_link_libraries(scalopus_lttng_consumer
+  PUBLIC
+    scalopus_lttng
+    scalopus_babeltrace
+    Scalopus::scalopus_consumer
+)
+
 export(
-  TARGETS scalopus_lttng scalopus_babeltrace
+  TARGETS scalopus_lttng scalopus_babeltrace scalopus_lttng_consumer
   NAMESPACE Scalopus::
   FILE ScalopusLttngConfig.cmake
 )
-install(TARGETS scalopus_lttng scalopus_babeltrace EXPORT ScalopusLttng
+install(TARGETS scalopus_lttng scalopus_babeltrace scalopus_lttng_consumer EXPORT ScalopusLttng
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

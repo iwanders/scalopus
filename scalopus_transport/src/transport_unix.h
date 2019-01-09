@@ -24,10 +24,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_TRANSPORT_TRANSPORT_UNIX_H
-#define SCALOPUS_TRANSPORT_TRANSPORT_UNIX_H
+#ifndef SCALOPUS_TRANSPORT_TRANSPORT_UNIX_INTERNAL_H
+#define SCALOPUS_TRANSPORT_TRANSPORT_UNIX_INTERNAL_H
 
-#include "scalopus_interface/transport.h"
+#include <scalopus_interface/transport_factory.h>
+#include "scalopus_transport/transport_unix.h"
 #include <future>
 #include <map>
 #include <set>
@@ -74,6 +75,7 @@ public:
 
   bool isConnected() const;
 
+  Destination::Ptr getAddress() const;
 private:
   using PendingRequest = std::pair<std::promise<Data>, std::weak_ptr<std::future<Data>>>;
 
@@ -102,5 +104,14 @@ private:
   std::map<std::pair<std::string, size_t>, PendingRequest> ongoing_requests_;
 };
 
+class TransportUnixDestination : public Destination
+{
+public:
+  TransportUnixDestination(unsigned int pid);
+  unsigned int pid_;
+  operator std::string() const;
+  std::size_t hash_code() const;
+};
+
 }  // namespace scalopus
-#endif  // SCALOPUS_TRANSPORT_TRANSPORT_UNIX_H
+#endif  // SCALOPUS_TRANSPORT_TRANSPORT_UNIX_INTERNAL_H

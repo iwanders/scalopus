@@ -24,27 +24,49 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_CATAPULT_TRACE_EVENT_PROVIDER_H
-#define SCALOPUS_CATAPULT_TRACE_EVENT_PROVIDER_H
+#ifndef SCALOPUS_CATAPULT_GENERAL_PROVIDER_H
+#define SCALOPUS_CATAPULT_GENERAL_PROVIDER_H
 
-#include "scalopus_catapult/trace_event_source.h"
+#include <scalopus_interface/trace_event_provider.h>
+#include <scalopus_interface/endpoint_manager.h>
+#include "scalopus_general/endpoint_process_info.h"
+
 namespace scalopus
 {
 /**
- * @brief This is the abstract base class for a data provider that's used in the catapult backend.
- *        It can create Trace Event Sources that are used by a session.
+ * @brief This provides the general data such as the process name and thread names.
  */
-class TraceEventProvider
+class GeneralProvider : public TraceEventProvider, public std::enable_shared_from_this<GeneralProvider>
 {
 public:
-  using Ptr = std::shared_ptr<TraceEventProvider>;
+  using Ptr = std::shared_ptr<GeneralProvider>;
+  using ProcessInfoMap = std::map<unsigned int, EndpointProcessInfo::ProcessInfo>;
 
   /**
-   * @brief Create a trace event source from this provider.
+   * @brief Create the general provider.
+   * @param manager The endpoint manager that provides the endpoints to resolve the thread name and process name.
    */
-  virtual TraceEventSource::Ptr makeSource() = 0;
-  virtual ~TraceEventProvider() = default;
+  GeneralProvider(EndpointManager::Ptr manager);
+
+  /**
+   * @brief Return all currently known mappings.
+   */
+  ProcessInfoMap getMapping();
+
+  /**
+   * @brief Update the current mapping by retrieving the currently known maps from the endpoints.
+   */
+  void updateMapping();
+
+  // From TraceEventProvider.
+  TraceEventSource::Ptr makeSource();
+
+private:
+  EndpointManager::Ptr manager_;  //!< Manager for connections.
+
+  std::mutex mapping_mutex_;  //!< Mutex for the mapping.
+  ProcessInfoMap mapping_;    //!< The currently known mappings.
 };
 
 }  // namespace scalopus
-#endif  // SCALOPUS_CATAPULT_TRACE_EVENT_PROVIDER_H
+#endif  // SCALOPUS_CATAPULT_GENERAL_PROVIDER_H
