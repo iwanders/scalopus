@@ -27,8 +27,7 @@
 #ifndef SCALOPUS_TRANSPORT_MOCK_H
 #define SCALOPUS_TRANSPORT_MOCK_H
 
-#include <scalopus_transport/interface/endpoint.h>
-#include <scalopus_transport/interface/transport.h>
+#include <scalopus_interface/transport.h>
 #include <future>
 #include <map>
 #include <set>

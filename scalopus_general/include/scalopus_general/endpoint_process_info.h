@@ -24,11 +24,10 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_ENDPOINT_PROCESS_INFO_H
-#define SCALOPUS_ENDPOINT_PROCESS_INFO_H
+#ifndef SCALOPUS_GENERAL_ENDPOINT_PROCESS_INFO_H
+#define SCALOPUS_GENERAL_ENDPOINT_PROCESS_INFO_H
 
-#include <scalopus_transport/interface/endpoint.h>
-#include <scalopus_transport/interface/transport.h>
+#include <scalopus_interface/transport.h>
 #include <map>
 #include <string>
 
@@ -77,4 +76,4 @@ private:
 
 }  // namespace scalopus
 
-#endif  // SCALOPUS_ENDPOINT_PROCESS_INFO_H
+#endif  // SCALOPUS_GENERAL_ENDPOINT_PROCESS_INFO_H

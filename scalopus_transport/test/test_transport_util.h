@@ -24,7 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scalopus_transport/interface/endpoint.h"
+#include <scalopus_interface/endpoint.h>
 
 template <typename A, typename B>
 void test(const A& a, const B& b)

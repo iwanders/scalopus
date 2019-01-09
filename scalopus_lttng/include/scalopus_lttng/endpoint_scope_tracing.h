@@ -24,11 +24,10 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_ENDPOINT_SCOPE_TRACING_H
-#define SCALOPUS_ENDPOINT_SCOPE_TRACING_H
+#ifndef SCALOPUS_LTTNG_ENDPOINT_SCOPE_TRACING_H
+#define SCALOPUS_LTTNG_ENDPOINT_SCOPE_TRACING_H
 
-#include <scalopus_transport/interface/endpoint.h>
-#include <scalopus_transport/interface/transport.h>
+#include <scalopus_interface/transport.h>
 #include <map>
 #include <string>
 
@@ -57,4 +56,4 @@ public:
 
 }  // namespace scalopus
 
-#endif  // SCALOPUS_ENDPOINT_SCOPE_TRACING_H
+#endif  // SCALOPUS_LTTNG_ENDPOINT_SCOPE_TRACING_H

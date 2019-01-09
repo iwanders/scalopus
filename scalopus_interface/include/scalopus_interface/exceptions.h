@@ -23,47 +23,30 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef SCALOPUS_INTERFACE_ENDPOINT_H
-#define SCALOPUS_INTERFACE_ENDPOINT_H
 
-#include <scalopus_transport/interface/types.h>
-#include <memory>
-#include <string>
-#include <vector>
+#ifndef SCALOPUS_INTERFACE_EXCEPTIONS_H
+#define SCALOPUS_INTERFACE_EXCEPTIONS_H
+
+#include <stdexcept>
 
 namespace scalopus
 {
-class Transport;
-
-class Endpoint
+class error : public std::runtime_error
 {
 public:
-  using Ptr = std::shared_ptr<Endpoint>;
-  Endpoint();
-  virtual std::string getName() const = 0;
+  error(const std::string& what_arg) : std::runtime_error(what_arg)
+  {
+  }
+};
 
-  /**
-   * @brief Handle data in the endpoint.
-   * @return True if outgoing should be returned over the transport. False if no outgoing message.
-   */
-  virtual bool handle(Transport& transport, const Data& incoming, Data& outgoing);
-
-  /**
-   * @brief Handle unsolicited data incoming over a client connection from the endpoint
-   * In general this is to accept proactive / broadcast / publish style data.
-   */
-  virtual bool unsolicited(Transport& transport, const Data& incoming, Data& outgoing);
-
-  virtual ~Endpoint();
-
-  /**
-   * @brief Set the transport to be used by this endpoint.
-   */
-  void setTransport(const std::shared_ptr<Transport>& transport);
-
-protected:
-  std::weak_ptr<Transport> transport_;
+class communication_error : public error
+{
+public:
+  communication_error(const std::string& what_arg) : error(what_arg)
+  {
+  }
 };
 
 }  // namespace scalopus
-#endif  // SCALOPUS_INTERFACE_ENDPOINT_H
+
+#endif  // SCALOPUS_INTERFACE_EXCEPTIONS_H

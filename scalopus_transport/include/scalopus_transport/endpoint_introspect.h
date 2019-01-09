@@ -24,10 +24,10 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_ENDPOINT_INTROSPECT_H
-#define SCALOPUS_ENDPOINT_INTROSPECT_H
+#ifndef SCALOPUS_TRANSPORT_ENDPOINT_INTROSPECT_H
+#define SCALOPUS_TRANSPORT_ENDPOINT_INTROSPECT_H
 
-#include <scalopus_transport/interface/endpoint.h>
+#include <scalopus_interface/endpoint.h>
 
 namespace scalopus
 {
@@ -47,4 +47,4 @@ public:
 
 }  // namespace scalopus
 
-#endif  // SCALOPUS_ENDPOINT_INTROSPECT_H
+#endif  // SCALOPUS_TRANSPORT_ENDPOINT_INTROSPECT_H

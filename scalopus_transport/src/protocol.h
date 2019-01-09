@@ -27,7 +27,7 @@
 #define SCALOPUS_PROTOCOL_H
 #include <string>
 #include <vector>
-#include "scalopus_transport/interface/types.h"
+#include "scalopus_interface/types.h"
 
 namespace scalopus
 {

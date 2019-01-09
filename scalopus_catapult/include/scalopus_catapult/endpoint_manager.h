@@ -27,8 +27,7 @@
 #ifndef SCALOPUS_CATAPULT_ENDPOINT_MANANGER_H
 #define SCALOPUS_CATAPULT_ENDPOINT_MANANGER_H
 
-#include <scalopus_transport/interface/endpoint.h>
-#include <scalopus_transport/interface/transport.h>
+#include <scalopus_interface/transport.h>
 #include <functional>
 #include <map>
 #include <memory>
@@ -95,4 +94,4 @@ private:
   std::map<std::size_t, Transport::Ptr> transports_;
 };
 }  // namespace scalopus
-#endif
+#endif  // SCALOPUS_CATAPULT_ENDPOINT_MANANGER_H

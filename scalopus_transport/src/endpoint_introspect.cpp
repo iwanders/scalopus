@@ -26,7 +26,7 @@
 #include "scalopus_transport/endpoint_introspect.h"
 #include <iostream>
 #include <nlohmann/json.hpp>
-#include "scalopus_transport/interface/transport.h"
+#include <scalopus_interface/transport.h>
 
 namespace scalopus
 {

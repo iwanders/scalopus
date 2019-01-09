@@ -27,7 +27,7 @@
 #ifndef SCALOPUS_TRANSPORT_UNIX_H
 #define SCALOPUS_TRANSPORT_UNIX_H
 
-#include <scalopus_transport/interface/transport.h>
+#include <scalopus_interface/transport.h>
 #include <memory>
 
 namespace scalopus

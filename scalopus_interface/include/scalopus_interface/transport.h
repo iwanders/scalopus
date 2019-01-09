@@ -27,7 +27,7 @@
 #ifndef SCALOPUS_INTERFACE_TRANSPORT_H
 #define SCALOPUS_INTERFACE_TRANSPORT_H
 
-#include <scalopus_transport/interface/endpoint.h>
+#include "scalopus_interface/endpoint.h"
 #include <future>
 #include <map>
 #include <memory>
@@ -77,20 +77,20 @@ public:
   /**
    * @brief The list of endpoints that are stored by this transport.
    */
-  std::vector<std::string> endpoints() const;
+  virtual std::vector<std::string> endpoints() const;
 
   /**
    * @brief Retrieve an endpoint by a name.
    * @return Pointer to the endpoint that has the provided name, or nullptr if not found.
    */
-  Endpoint::Ptr getEndpoint(const std::string& name) const;
+  virtual Endpoint::Ptr getEndpoint(const std::string& name) const;
 
 protected:
   /**
    * @brief Returns whether or not there are any broadcasts in the queue to be sent out.
    * @return True if there are pending broadcasts in the queue and calling popBroadcast() would be valid.
    */
-  bool haveBroadcast() const;
+  virtual bool haveBroadcast() const;
 
   /**
    * @brief Return an entry from the broadcast queue.
@@ -106,4 +106,4 @@ protected:
 };
 
 }  // namespace scalopus
-#endif  // SCALOPUS_INTERFACE_TRANSPORT_SERVER_H
+#endif  // SCALOPUS_INTERFACE_TRANSPORT_H

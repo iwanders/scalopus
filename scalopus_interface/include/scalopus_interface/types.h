@@ -24,29 +24,15 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_INTERFACE_EXCEPTIONS_H
-#define SCALOPUS_INTERFACE_EXCEPTIONS_H
+#ifndef SCALOPUS_INTERFACE_TYPES_H
+#define SCALOPUS_INTERFACE_TYPES_H
 
-#include <stdexcept>
+#include <vector>
+#include "scalopus_interface/exceptions.h"
 
 namespace scalopus
 {
-class error : public std::runtime_error
-{
-public:
-  error(const std::string& what_arg) : std::runtime_error(what_arg)
-  {
-  }
-};
-
-class communication_error : public error
-{
-public:
-  communication_error(const std::string& what_arg) : error(what_arg)
-  {
-  }
-};
-
+using Data = std::vector<std::uint8_t>;
 }  // namespace scalopus
 
-#endif
+#endif  // SCALOPUS_INTERFACE_TYPES_H

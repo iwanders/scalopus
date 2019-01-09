@@ -23,16 +23,47 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef SCALOPUS_INTERFACE_ENDPOINT_H
+#define SCALOPUS_INTERFACE_ENDPOINT_H
 
-#ifndef SCALOPUS_INTERFACE_TYPES_H
-#define SCALOPUS_INTERFACE_TYPES_H
-
+#include <scalopus_interface/types.h>
+#include <memory>
+#include <string>
 #include <vector>
-#include "scalopus_transport/interface/exceptions.h"
 
 namespace scalopus
 {
-using Data = std::vector<std::uint8_t>;
-}  // namespace scalopus
+class Transport;
 
-#endif
+class Endpoint
+{
+public:
+  using Ptr = std::shared_ptr<Endpoint>;
+  Endpoint();
+  virtual std::string getName() const = 0;
+
+  /**
+   * @brief Handle data in the endpoint.
+   * @return True if outgoing should be returned over the transport. False if no outgoing message.
+   */
+  virtual bool handle(Transport& transport, const Data& incoming, Data& outgoing);
+
+  /**
+   * @brief Handle unsolicited data incoming over a client connection from the endpoint
+   * In general this is to accept proactive / broadcast / publish style data.
+   */
+  virtual bool unsolicited(Transport& transport, const Data& incoming, Data& outgoing);
+
+  virtual ~Endpoint();
+
+  /**
+   * @brief Set the transport to be used by this endpoint.
+   */
+  void setTransport(const std::shared_ptr<Transport>& transport);
+
+protected:
+  std::weak_ptr<Transport> transport_;
+};
+
+}  // namespace scalopus
+#endif  // SCALOPUS_INTERFACE_ENDPOINT_H
