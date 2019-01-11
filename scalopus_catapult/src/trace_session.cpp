@@ -71,7 +71,7 @@ void TraceSession::loop()
   while (running_)
   {
     // Handle any incoming messages from the websocket
-    while (haveIncoming())
+    while (haveIncoming() && running_)
     {
       processMessage(popIncoming());
     }
@@ -83,6 +83,7 @@ void TraceSession::loop()
     }
 
     // Finally, block a bit just to prevent spinning.
+    // @TODO Think of a way to allow it to block here until there are messages or work needs to be done.
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   };
 }

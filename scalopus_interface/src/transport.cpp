@@ -27,9 +27,6 @@
 
 namespace scalopus
 {
-Transport::~Transport()
-{
-}
 
 bool Transport::isConnected() const
 {
@@ -62,15 +59,10 @@ void Transport::addEndpoint(const std::shared_ptr<Endpoint>& endpoint)
   endpoints_[endpoint->getName()] = endpoint;
 }
 
-std::vector<std::string> Transport::endpoints() const
+std::map<std::string, Endpoint::Ptr> Transport::endpoints() const
 {
   std::lock_guard<std::mutex> lock(endpoint_mutex_);
-  std::vector<std::string> keys;
-  for (const auto& name_endpoint : endpoints_)
-  {
-    keys.emplace_back(name_endpoint.first);
-  }
-  return keys;
+  return endpoints_;
 }
 
 Endpoint::Ptr Transport::getEndpoint(const std::string& name) const

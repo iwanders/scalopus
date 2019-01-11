@@ -35,15 +35,19 @@ namespace scalopus
 {
 class Transport;
 
+/**
+ * @brief The endpoint specifies the interface for by which the transport interacts with the endpoints.
+ *        This specifies the interface for both the server side and the client side.
+ */
 class Endpoint
 {
 public:
   using Ptr = std::shared_ptr<Endpoint>;
-  Endpoint();
+
   virtual std::string getName() const = 0;
 
   /**
-   * @brief Handle data in the endpoint.
+   * @brief Let the endpoint handline incoming data.
    * @return True if outgoing should be returned over the transport. False if no outgoing message.
    */
   virtual bool handle(Transport& transport, const Data& incoming, Data& outgoing);
@@ -54,13 +58,12 @@ public:
    */
   virtual bool unsolicited(Transport& transport, const Data& incoming, Data& outgoing);
 
-  virtual ~Endpoint();
-
   /**
-   * @brief Set the transport to be used by this endpoint.
+   * @brief Set the transport to be used by this endpoint. This is in general used by the client endpoint.
    */
-  void setTransport(const std::shared_ptr<Transport>& transport);
+  virtual void setTransport(const std::shared_ptr<Transport>& transport);
 
+  virtual ~Endpoint() = default;
 protected:
   std::weak_ptr<Transport> transport_;
 };

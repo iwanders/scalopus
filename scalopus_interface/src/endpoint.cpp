@@ -28,13 +28,7 @@
 
 namespace scalopus
 {
-Endpoint::Endpoint()
-{
-}
 
-Endpoint::~Endpoint()
-{
-}
 
 bool Endpoint::handle(Transport& /* transport */, const Data& /* incoming */, Data& /* outgoing */)
 {

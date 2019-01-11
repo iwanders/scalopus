@@ -40,9 +40,14 @@ std::string EndpointIntrospect::getName() const
 bool EndpointIntrospect::handle(Transport& server, const Data& /* request */, Data& response)
 {
   const auto endpoints = server.endpoints();
+  std::vector<std::string> names{endpoints.size()};
+  std::transform(endpoints.begin(), endpoints.end(), names.begin(), [](const auto& name_ptr)
+    {
+      return name_ptr.first;
+    });
 
   json jdata = json::object();
-  jdata["endpoints"] = endpoints;
+  jdata["endpoints"] = names;
   response = json::to_bson(jdata);
   return true;
 }

@@ -44,7 +44,7 @@ public:
   using WeakPtr = std::weak_ptr<Transport>;
   using PendingResponse = std::shared_ptr<std::future<Data>>;
 
-  virtual ~Transport();
+  virtual ~Transport() = default;
 
   /**
    * @brief Add an endpoitn to this transport, this allows endpoints to receive broadcast messages.
@@ -78,7 +78,7 @@ public:
   /**
    * @brief The list of endpoints that are stored by this transport.
    */
-  virtual std::vector<std::string> endpoints() const;
+  virtual std::map<std::string, Endpoint::Ptr> endpoints() const;
 
   /**
    * @brief Retrieve an endpoint by a name.
