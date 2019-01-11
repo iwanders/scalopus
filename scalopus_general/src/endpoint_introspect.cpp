@@ -24,8 +24,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_general/endpoint_introspect.h"
-#include <nlohmann/json.hpp>
 #include <scalopus_interface/transport.h>
+#include <nlohmann/json.hpp>
 
 namespace scalopus
 {
@@ -39,11 +39,9 @@ std::string EndpointIntrospect::getName() const
 bool EndpointIntrospect::handle(Transport& server, const Data& /* request */, Data& response)
 {
   const auto endpoints = server.endpoints();
-  std::vector<std::string> names{endpoints.size()};
-  std::transform(endpoints.begin(), endpoints.end(), names.begin(), [](const auto& name_ptr)
-    {
-      return name_ptr.first;
-    });
+  std::vector<std::string> names{ endpoints.size() };
+  std::transform(endpoints.begin(), endpoints.end(), names.begin(),
+                 [](const auto& name_ptr) { return name_ptr.first; });
 
   json jdata = json::object();
   jdata["endpoints"] = names;

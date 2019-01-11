@@ -27,10 +27,10 @@
 #ifndef SCALOPUS_INTERFACE_TRANSPORT_FACTORY_H
 #define SCALOPUS_INTERFACE_TRANSPORT_FACTORY_H
 
-#include "scalopus_interface/transport.h"
-#include "scalopus_interface/destination.h"
-#include <vector>
 #include <memory>
+#include <vector>
+#include "scalopus_interface/destination.h"
+#include "scalopus_interface/transport.h"
 
 namespace scalopus
 {

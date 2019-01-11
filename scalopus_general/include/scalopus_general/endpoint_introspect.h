@@ -24,8 +24,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_TRANSPORT_ENDPOINT_INTROSPECT_H
-#define SCALOPUS_TRANSPORT_ENDPOINT_INTROSPECT_H
+#ifndef SCALOPUS_GENERAL_ENDPOINT_INTROSPECT_H
+#define SCALOPUS_GENERAL_ENDPOINT_INTROSPECT_H
 
 #include <scalopus_interface/endpoint.h>
 
@@ -41,10 +41,11 @@ public:
    */
   std::vector<std::string> supported();
 
+  // Methods from the superclass
   std::string getName() const;
   bool handle(Transport& transport, const Data& incoming, Data& outgoing);
 };
 
 }  // namespace scalopus
 
-#endif  // SCALOPUS_TRANSPORT_ENDPOINT_INTROSPECT_H
+#endif  // SCALOPUS_GENERAL_ENDPOINT_INTROSPECT_H

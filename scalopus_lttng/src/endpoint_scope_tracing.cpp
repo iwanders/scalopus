@@ -47,7 +47,9 @@ bool EndpointScopeTracing::handle(Transport& /* server */, const Data& request, 
 
   if (request.front() == 'm')
   {
-    response = serializeMapping(mapping);
+    json jdata = json::object();
+    jdata["mapping"] = mapping;  // need to serialize an object, not an array.
+    response = json::to_bson(jdata);
     return true;
   }
   return false;
@@ -65,25 +67,12 @@ EndpointScopeTracing::ProcessTraceMap EndpointScopeTracing::mapping()
   auto future_ptr = transport->request(getName(), { 'm' });
   if (future_ptr->wait_for(std::chrono::milliseconds(200)) == std::future_status::ready)
   {
-    return deserializeMapping(future_ptr->get());
+    ProcessTraceMap res;
+    json jdata = json::from_bson(future_ptr->get());
+    jdata["mapping"].get_to(res);
+    return res;
   }
 
   return {};
 }
-
-Data EndpointScopeTracing::serializeMapping(const ProcessTraceMap& mapping)
-{
-  json jdata = json::object();
-  jdata["mapping"] = mapping;  // need to serialize an object, not an array.
-  return json::to_bson(jdata);
-}
-
-EndpointScopeTracing::ProcessTraceMap EndpointScopeTracing::deserializeMapping(const Data& data)
-{
-  ProcessTraceMap res;
-  json jdata = json::from_bson(data);  // This line may throw
-  res = jdata["mapping"].get<decltype(res)>();
-  return res;
-}
-
 }  // namespace scalopus

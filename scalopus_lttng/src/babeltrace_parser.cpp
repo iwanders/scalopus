@@ -65,7 +65,7 @@ void BabeltraceParser::process(FILE* stdout)
           if ((*it)->active == false)
           {
             // session went inactive, remove it.
-            std::cout << "callback inactive: " << (*it).get() << std::endl;
+            std::cout << "[BabeltraceParser] callback inactive: " << (*it).get() << std::endl;
             it = sessions_recording_.erase(it);
             continue;
           }
@@ -79,7 +79,7 @@ void BabeltraceParser::process(FILE* stdout)
     }
     if (std::feof(stdout))
     {
-      std::cout << "Reached end of file, quiting parser function." << std::endl;
+      std::cout << "[BabeltraceParser] Reached end of file, quiting parser function." << std::endl;
       processing_.store(false);
     }
   };
@@ -100,7 +100,7 @@ void BabeltraceParser::halt()
 void BabeltraceParser::setCallback(const std::shared_ptr<EventCallback>& callback)
 {
   std::lock_guard<std::mutex> lock(mutex_);
-  std::cout << "Adding callback: " << callback.get() << std::endl;
+  std::cout << "[BabeltraceParser] Adding callback: " << callback.get() << std::endl;
   sessions_recording_.insert(callback);
 }
 

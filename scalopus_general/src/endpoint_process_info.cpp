@@ -85,9 +85,9 @@ EndpointProcessInfo::ProcessInfo EndpointProcessInfo::processInfo()
   if (future_ptr->wait_for(std::chrono::milliseconds(200)) == std::future_status::ready)
   {
     json jdata = json::from_bson(future_ptr->get());  // This line may throw
-    info.name = jdata["name"].get<decltype(info.name)>();
-    info.threads = jdata["threads"].get<decltype(info.threads)>();
-    info.pid = jdata["pid"].get<decltype(info.pid)>();
+    jdata["name"].get_to(info.name);
+    jdata["threads"].get_to(info.threads);
+    jdata["pid"].get_to(info.pid);
   }
 
   return info;

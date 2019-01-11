@@ -23,8 +23,8 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <iostream>
 #include <scalopus_transport/transport_mock.h>
+#include <iostream>
 #include "scalopus_general/endpoint_process_info.h"
 #include "scalopus_general/thread_naming.h"
 

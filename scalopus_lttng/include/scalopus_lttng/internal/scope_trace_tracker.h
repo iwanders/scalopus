@@ -24,8 +24,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_SCOPE_TRACE_TRACKER_H
-#define SCALOPUS_SCOPE_TRACE_TRACKER_H
+#ifndef SCALOPUS_LTTNG_SCOPE_TRACE_TRACKER_H
+#define SCALOPUS_LTTNG_SCOPE_TRACE_TRACKER_H
 
 #include <scalopus_general/map_tracker.h>
 #include <map>
@@ -41,6 +41,9 @@ namespace scalopus
  */
 class ScopeTraceTracker : public MapTracker<unsigned int, std::string>
 {
+private:
+  ScopeTraceTracker() = default;
+
 public:
   /**
    * @brief Static method through which the singleton instance can be retrieved.
@@ -50,4 +53,4 @@ public:
 };
 }  // namespace scalopus
 
-#endif  // SCALOPUS_SCOPE_TRACE_TRACKER_H
+#endif  // SCALOPUS_LTTNG_SCOPE_TRACE_TRACKER_H

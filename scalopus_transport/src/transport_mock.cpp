@@ -59,8 +59,7 @@ TransportMock::PendingResponse TransportMock::request(const std::string& remote_
   {
     throw std::runtime_error("The TransportMock does not sending data to non-existant endpoints on the server.");
   }
-  auto handle = std::async(std::launch::async, [&]()
-  {
+  auto handle = std::async(std::launch::async, [&]() {
     Data resp;
     auto res = endpoint->handle(*server_, outgoing, resp);
     if (res)
@@ -79,8 +78,7 @@ void TransportMock::broadcast(const std::string& remote_endpoint_name, const Dat
     if (client != nullptr)
     {
       auto endpoint = client->getEndpoint(remote_endpoint_name);
-      std::async(std::launch::async, [&]()
-      {
+      std::async(std::launch::async, [&]() {
         Data resp;
         if (endpoint->unsolicited(*client, outgoing, resp))
         {
@@ -95,7 +93,6 @@ void TransportMock::broadcast(const std::string& remote_endpoint_name, const Dat
     }
   }
 }
-
 
 std::size_t TransportMock::pendingRequests() const
 {
@@ -128,7 +125,5 @@ Transport::Ptr TransportMockFactory::connect(const Transport::Ptr& destination)
   mock_server->addClient(client);
   return client;
 }
-
-
 
 }  // namespace scalopus

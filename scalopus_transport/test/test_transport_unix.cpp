@@ -26,8 +26,8 @@
 #include <unistd.h>
 #include <chrono>
 #include <iostream>
-#include "transport_unix.h"
 #include "test_transport_util.h"
+#include "transport_unix.h"
 
 int main(int /* argc */, char** /* argv */)
 {
@@ -37,8 +37,8 @@ int main(int /* argc */, char** /* argv */)
 
   // Put an echo endpoint in the server.
   auto endpoint0_at_server = std::make_shared<scalopus::EndpointTest>();
-  endpoint0_at_server->handle_ = [](scalopus::Transport& /* transport */, const auto& incoming, auto& outgoing) -> bool
-  {
+  endpoint0_at_server->handle_ = [](scalopus::Transport& /* transport */, const auto& incoming,
+                                    auto& outgoing) -> bool {
     outgoing = incoming;
     return true;
   };
@@ -49,7 +49,7 @@ int main(int /* argc */, char** /* argv */)
   test(client0->isConnected(), true);
 
   // Check if we can retrieve the introspect endpoint from the server over the transport.
-  const scalopus::Data request{'t', 'e', 's', 't'};
+  const scalopus::Data request{ 't', 'e', 's', 't' };
   const auto pending_response = client0->request("endpoint_test", request);
   const auto status = pending_response->wait_for(std::chrono::seconds(1));
   if (status != std::future_status::ready)

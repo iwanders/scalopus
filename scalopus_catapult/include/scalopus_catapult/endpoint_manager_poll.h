@@ -27,8 +27,8 @@
 #ifndef SCALOPUS_CATAPULT_ENDPOINT_MANANGER_POLL_H
 #define SCALOPUS_CATAPULT_ENDPOINT_MANANGER_POLL_H
 
-#include <scalopus_interface/transport_factory.h>
 #include <scalopus_interface/endpoint_manager.h>
+#include <scalopus_interface/transport_factory.h>
 #include <functional>
 #include <map>
 #include <memory>
@@ -64,6 +64,7 @@ public:
    * @brief Add an endpoint factory function to the manager.
    */
   void addEndpointFactory(const std::string& name, EndpointFactory&& factory_function);
+
 private:
   mutable std::mutex mutex_;
   std::map<std::string, EndpointFactory> endpoint_factories_;  //!< Map of factory functions to construct endpoints.

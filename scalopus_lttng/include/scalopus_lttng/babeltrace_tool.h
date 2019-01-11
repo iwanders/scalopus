@@ -39,7 +39,7 @@
 namespace scalopus
 {
 /**
- * @brief Class that runs the babeltrace tool and runs the parser on it.
+ * @brief Class that runs the babeltrace tool and runs the parser on its text output to obtain CTFEvents
  */
 class BabeltraceTool
 {

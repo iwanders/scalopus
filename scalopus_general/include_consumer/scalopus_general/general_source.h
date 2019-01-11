@@ -27,8 +27,8 @@
 #ifndef SCALOPUS_CATAPULT_GENERAL_SOURCE_H
 #define SCALOPUS_CATAPULT_GENERAL_SOURCE_H
 
-#include "scalopus_general/general_provider.h"
 #include <scalopus_interface/trace_event_source.h>
+#include "scalopus_general/general_provider.h"
 
 namespace scalopus
 {

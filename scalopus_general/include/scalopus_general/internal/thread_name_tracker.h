@@ -36,6 +36,9 @@ namespace scalopus
  */
 class ThreadNameTracker : public MapTracker<unsigned long, std::string>
 {
+private:
+  ThreadNameTracker() = default;
+
 public:
   static ThreadNameTracker& getInstance();
 

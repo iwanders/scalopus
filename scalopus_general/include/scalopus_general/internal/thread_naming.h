@@ -32,10 +32,10 @@
 
 // Macro to register the thread name once.
 #define TRACE_THREAD_NAME_ONCE(name, have_done_once_varname)                                                           \
-  static thread_local bool have_done_once_varname = false;                                                            \
-  if (!have_done_once_varname)                                                                                        \
+  static thread_local bool have_done_once_varname = false;                                                             \
+  if (!have_done_once_varname)                                                                                         \
   {                                                                                                                    \
-    have_done_once_varname = true;                                                                                    \
+    have_done_once_varname = true;                                                                                     \
     scalopus::ThreadNameTracker::getInstance().setCurrentName(name);                                                   \
   }
 

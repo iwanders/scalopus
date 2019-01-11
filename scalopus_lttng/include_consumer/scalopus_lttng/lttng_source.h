@@ -27,9 +27,9 @@
 #ifndef SCALOPUS_CATAPULT_LTTNG_SOURCE_H
 #define SCALOPUS_CATAPULT_LTTNG_SOURCE_H
 
+#include <scalopus_interface/trace_event_source.h>
 #include <scalopus_lttng/babeltrace_tool.h>
 #include "scalopus_lttng/lttng_provider.h"
-#include <scalopus_interface/trace_event_source.h>
 
 namespace scalopus
 {

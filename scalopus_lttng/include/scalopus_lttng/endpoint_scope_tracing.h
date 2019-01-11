@@ -48,10 +48,6 @@ public:
   // From the endpoint
   std::string getName() const;
   bool handle(Transport& server, const Data& request, Data& response);
-
-  // Conversion methods used internally.
-  static Data serializeMapping(const ProcessTraceMap& mapping);
-  static ProcessTraceMap deserializeMapping(const Data& data);
 };
 
 }  // namespace scalopus

@@ -27,13 +27,13 @@
 #ifndef SCALOPUS_INTERFACE_TRANSPORT_H
 #define SCALOPUS_INTERFACE_TRANSPORT_H
 
-#include "scalopus_interface/endpoint.h"
-#include "scalopus_interface/destination.h"
 #include <future>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <vector>
+#include "scalopus_interface/destination.h"
+#include "scalopus_interface/endpoint.h"
 
 namespace scalopus
 {

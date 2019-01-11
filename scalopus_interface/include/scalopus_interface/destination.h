@@ -27,6 +27,7 @@
 #ifndef SCALOPUS_INTERFACE_DESTINATION_H
 #define SCALOPUS_INTERFACE_DESTINATION_H
 #include <memory>
+#include <ostream>
 #include <string>
 
 namespace scalopus
@@ -50,6 +51,8 @@ public:
    */
   virtual std::size_t hash_code() const;
 };
+
+std::ostream& operator<<(std::ostream& out, const Destination::Ptr& a);
 
 }  // namespace scalopus
 #endif  // SCALOPUS_INTERFACE_TRANSPORT_H

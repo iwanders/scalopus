@@ -40,4 +40,9 @@ size_t Destination::hash_code() const
   return reinterpret_cast<size_t>(this);
 }
 
+std::ostream& operator<<(std::ostream& out, const Destination::Ptr& a)
+{
+  return out << std::string(*a);
+}
+
 }  // namespace scalopus

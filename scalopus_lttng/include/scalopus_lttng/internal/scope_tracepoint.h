@@ -24,8 +24,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_SCOPE_TRACEPOINT_H
-#define SCALOPUS_SCOPE_TRACEPOINT_H
+#ifndef SCALOPUS_LTTNG_TRACEPOINT_H
+#define SCALOPUS_LTTNG_TRACEPOINT_H
 
 namespace scalopus
 {
@@ -43,4 +43,4 @@ void scope_exit(const unsigned int id);
 
 }  // namespace scalopus
 
-#endif  // SCALOPUS_SCOPE_TRACEPOINT_H
+#endif  // SCALOPUS_LTTNG_TRACEPOINT_H

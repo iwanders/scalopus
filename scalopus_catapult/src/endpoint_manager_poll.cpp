@@ -66,12 +66,12 @@ void EndpointManagerPoll::manage()
     {
       continue;  // already have a connection to this transport, ignore it.
     }
-    std::cerr << "[scalopus] Creating transport to: " << std::string(*destination) << std::endl;
+    std::cerr << "[scalopus] Creating transport to: " << destination << std::endl;
     // Attempt to make a transport to this server.
     auto transport = factory_->connect(destination);
     if (!transport->isConnected())
     {
-      std::cerr << "[scalopus] Client failed to connect." << std::endl;
+      std::cerr << "[scalopus] Client failed to connect to " << destination << std::endl;
       continue;
     }
     transports_[destination->hash_code()] = transport;

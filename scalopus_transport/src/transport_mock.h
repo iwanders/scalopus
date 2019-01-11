@@ -31,9 +31,9 @@
 #include <scalopus_transport/transport_mock.h>
 #include <future>
 #include <map>
+#include <memory>
 #include <set>
 #include <thread>
-#include <memory>
 #include <utility>
 #include <vector>
 #include "protocol.h"
@@ -58,6 +58,7 @@ public:
 
   void addClient(Transport::WeakPtr client);
   bool isConnected() const;
+
 private:
   Ptr server_;
   std::vector<Transport::WeakPtr> clients_;

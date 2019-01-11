@@ -28,8 +28,6 @@
 
 namespace scalopus
 {
-
-
 bool Endpoint::handle(Transport& /* transport */, const Data& /* incoming */, Data& /* outgoing */)
 {
   return false;

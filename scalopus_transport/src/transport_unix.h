@@ -28,7 +28,6 @@
 #define SCALOPUS_TRANSPORT_TRANSPORT_UNIX_INTERNAL_H
 
 #include <scalopus_interface/transport_factory.h>
-#include "scalopus_transport/transport_unix.h"
 #include <future>
 #include <map>
 #include <set>
@@ -36,6 +35,7 @@
 #include <utility>
 #include <vector>
 #include "protocol.h"
+#include "scalopus_transport/transport_unix.h"
 
 namespace scalopus
 {
@@ -76,6 +76,7 @@ public:
   bool isConnected() const;
 
   Destination::Ptr getAddress() const;
+
 private:
   using PendingRequest = std::pair<std::promise<Data>, std::weak_ptr<std::future<Data>>>;
 
@@ -104,10 +105,10 @@ private:
   std::map<std::pair<std::string, size_t>, PendingRequest> ongoing_requests_;
 };
 
-class TransportUnixDestination : public Destination
+class DestinationUnix : public Destination
 {
 public:
-  TransportUnixDestination(unsigned int pid);
+  DestinationUnix(unsigned int pid);
   unsigned int pid_;
   operator std::string() const;
   std::size_t hash_code() const;

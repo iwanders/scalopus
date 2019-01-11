@@ -24,8 +24,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_SCOPE_TRACE_RAII_H
-#define SCALOPUS_SCOPE_TRACE_RAII_H
+#ifndef SCALOPUS_LTTNG_TRACE_RAII_H
+#define SCALOPUS_LTTNG_TRACE_RAII_H
 
 #include <scalopus_lttng/internal/scope_tracepoint.h>
 
@@ -52,4 +52,4 @@ public:
 
 }  // namespace scalopus
 
-#endif  // SCALOPUS_SCOPE_TRACE_RAII_H
+#endif  // SCALOPUS_LTTNG_TRACE_RAII_H

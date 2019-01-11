@@ -58,11 +58,12 @@ int main(int /* argc */, char** /* argv */)
 
   // retrieve the port number to bind the webserver on
   int port = 9222;  // 9222 is default chrom(e/ium) remote debugging port.
-  std::cout << "Using port: " << port << ", 9222 is default, it is default remote debugging port" << std::endl;
+  std::cout << "[main] Using port: " << port << ", 9222 is default, it is default remote debugging port" << std::endl;
 
   // Retrieve the path to run babeltrace on.
   std::string path = "";  // empty path defaults to 'lttng view'
-  std::cout << "Using path: \"" << path << "\"  (empty defaults to lttng view scalopus_target_session)" << std::endl;
+  std::cout << "[main] Using path: \"" << path << "\"  (empty defaults to lttng view scalopus_target_session)"
+            << std::endl;
 
   // Create the transport & endpoint manager.
   auto manager = std::make_shared<scalopus::EndpointManagerPoll>(std::make_shared<scalopus::TransportUnixFactory>());
@@ -109,7 +110,7 @@ int main(int /* argc */, char** /* argv */)
   server.startListening(port);
   std::thread seasocksThread([&] { server.loop(); });
 
-  std::cout << "Everything started, falling into idle loop. Use ctrl+c to quit." << std::endl;
+  std::cout << "[main] Everything started, falling into loop to detect transports. Use ctrl + c to quit." << std::endl;
 
   // block while we serve requests.
   while (running)
@@ -119,7 +120,7 @@ int main(int /* argc */, char** /* argv */)
     manager->manage();
   }
 
-  std::cout << "Shutting down." << std::endl;
+  std::cout << "[main] Shutting down." << std::endl;
   server.terminate();  // send terminate signal to the server
 
   // Wait for the webserver thread to join.

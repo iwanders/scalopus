@@ -82,7 +82,7 @@ void BabeltraceTool::halt()
     process_->close();
 
     // Nuke the process, just to be sure we clean up correctly.
-    kill(process_->getPid(), SIGINT);
+    ::kill(process_->getPid(), SIGINT);
 
     process_ = nullptr;
   }

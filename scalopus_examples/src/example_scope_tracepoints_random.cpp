@@ -31,22 +31,22 @@
  * Default thread count is 1.
  */
 
-#include <cstdlib>
+#include <atomic>
 #include <chrono>
+#include <cstdlib>
 #include <iostream>
+#include <random>
 #include <sstream>
 #include <string>
 #include <thread>
-#include <random>
-#include <atomic>
 
 #include <signal.h>
 
+#include <scalopus_general/endpoint_introspect.h>
 #include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_general/thread_naming.h>
 #include <scalopus_lttng/endpoint_scope_tracing.h>
 #include <scalopus_lttng/scope_tracing.h>
-#include <scalopus_general/endpoint_introspect.h>
 #include <scalopus_transport/transport_unix.h>
 
 int randint(int min, int max)
@@ -60,7 +60,7 @@ void random_callstack(unsigned int level, size_t time_base)
 {
   std::this_thread::sleep_for(std::chrono::microseconds(2 * time_base));
   {
-    scalopus::TraceRAII tracepoint{level};
+    scalopus::TraceRAII tracepoint{ level };
     std::this_thread::sleep_for(std::chrono::microseconds(1 * time_base));
     if (randint(0, 2) && (level <= 10))
     {
@@ -78,7 +78,6 @@ void random_callstack(unsigned int level, size_t time_base)
   std::this_thread::sleep_for(std::chrono::microseconds(2 * time_base));
 }
 
-
 // Signal handling.
 bool running{ true };
 void sigint_handler(int /* s */)
@@ -94,7 +93,7 @@ int main(int argc, char** argv)
   size_t time_base = 10000;
   size_t thread_count = 1;
   if (argc >= 2)  // got a time base.
-  {    
+  {
     time_base = std::atoi(argv[1]);
   }
   if (argc >= 3)  // got a thread count as well
@@ -123,10 +122,10 @@ int main(int argc, char** argv)
 
   // Create the threads
   std::vector<std::thread> active_threads;
-  std::atomic_bool threads_running { true };
+  std::atomic_bool threads_running{ true };
   for (size_t i = 0; i < thread_count; i++)
   {
-    active_threads.emplace_back([&](){
+    active_threads.emplace_back([&]() {
       std::stringstream thread_name;
       thread_name << "Thread 0x" << std::hex << i;
       TRACE_THREAD_NAME(thread_name.str());

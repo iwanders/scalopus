@@ -27,8 +27,8 @@
 #ifndef SCALOPUS_CATAPULT_GENERAL_PROVIDER_H
 #define SCALOPUS_CATAPULT_GENERAL_PROVIDER_H
 
-#include <scalopus_interface/trace_event_provider.h>
 #include <scalopus_interface/endpoint_manager.h>
+#include <scalopus_interface/trace_event_provider.h>
 #include "scalopus_general/endpoint_process_info.h"
 
 namespace scalopus

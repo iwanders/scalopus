@@ -64,6 +64,7 @@ public:
   virtual void setTransport(const std::shared_ptr<Transport>& transport);
 
   virtual ~Endpoint() = default;
+
 protected:
   std::weak_ptr<Transport> transport_;
 };

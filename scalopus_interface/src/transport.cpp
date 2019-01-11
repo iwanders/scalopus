@@ -27,7 +27,6 @@
 
 namespace scalopus
 {
-
 bool Transport::isConnected() const
 {
   return false;

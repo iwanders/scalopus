@@ -24,10 +24,10 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <scalopus_transport/transport_mock.h>
 #include <iostream>
 #include "scalopus_lttng/endpoint_scope_tracing.h"
 #include "scalopus_lttng/scope_tracing.h"
-#include <scalopus_transport/transport_mock.h>
 
 template <typename A, typename B>
 void test_map(const A& a, const B& b)
