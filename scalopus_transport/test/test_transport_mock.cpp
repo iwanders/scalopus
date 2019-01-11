@@ -26,31 +26,40 @@
 #include <unistd.h>
 #include <chrono>
 #include <iostream>
-#include "scalopus_interface/endpoint_introspect.h"
 #include "transport_mock.h"
 #include "test_transport_util.h"
 
 int main(int /* argc */, char** /* argv */)
 {
   auto factory = std::make_shared<scalopus::TransportMockFactory>();
+
   // Create the server
   auto server = factory->serve();
 
-  // Put the introspection endpoint in the server.
-  auto endpoint0_at_server = std::make_shared<scalopus::EndpointIntrospect>();
+  // Put an echo endpoint in the server.
+  auto endpoint0_at_server = std::make_shared<scalopus::EndpointTest>();
+  endpoint0_at_server->handle_ = [](scalopus::Transport& /* transport */, const auto& incoming, auto& outgoing) -> bool
+  {
+    outgoing = incoming;
+    return true;
+  };
   server->addEndpoint(endpoint0_at_server);
 
   // Create a client that's connected to the mock server.
   auto client0 = factory->connect(server);
-
-  // Create an endpoint to use the client. This is not YET inside the client.
-  auto endpoint0_for_client = std::make_shared<scalopus::EndpointIntrospect>();
-  endpoint0_for_client->setTransport(client0);
+  test(client0->isConnected(), true);
 
   // Check if we can retrieve the introspect endpoint from the server over the transport.
-  const auto remote_supported = endpoint0_for_client->supported();
-  test(remote_supported.size(), 1U);
-  test(remote_supported.front(), "introspect");
+  const scalopus::Data request{'t', 'e', 's', 't'};
+  const auto pending_response = client0->request("endpoint_test", request);
+  const auto status = pending_response->wait_for(std::chrono::seconds(1));
+  if (status != std::future_status::ready)
+  {
+    test("future status was not ", " ready");
+  }
+  const auto value = pending_response->get();
+  test(value.size(), request.size());
+  test(std::equal(request.begin(), request.end(), value.begin()), true);
 
   // Add an endpoint to the client that allows us to detect broadcasts.
   const auto test_endpoint = std::make_shared<scalopus::EndpointTest>();

@@ -1,6 +1,6 @@
 #include <cstring>
 #include <iostream>
-#include <scalopus_interface/endpoint_introspect.h>
+#include <scalopus_general/endpoint_introspect.h>
 #include "scalopus_transport/transport_unix.h"
 
 int main(int /* argc */, char** /* argv */)

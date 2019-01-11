@@ -41,6 +41,11 @@ void TransportMock::addClient(Transport::WeakPtr client)
   clients_.push_back(client);
 }
 
+bool TransportMock::isConnected() const
+{
+  return server_ != nullptr;
+}
+
 TransportMock::PendingResponse TransportMock::request(const std::string& remote_endpoint_name, const Data& outgoing)
 {
   // This is from the client.

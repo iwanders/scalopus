@@ -8,6 +8,7 @@ include(FindThreads)
 
 add_library(scalopus_general SHARED
   src/endpoint_process_info.cpp
+  src/endpoint_introspect.cpp
   src/thread_name_tracker.cpp
 )
 

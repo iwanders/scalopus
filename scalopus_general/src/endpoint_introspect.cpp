@@ -23,10 +23,9 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "scalopus_interface/endpoint_introspect.h"
-#include <iostream>
+#include "scalopus_general/endpoint_introspect.h"
 #include <nlohmann/json.hpp>
-#include "scalopus_interface/transport.h"
+#include <scalopus_interface/transport.h>
 
 namespace scalopus
 {

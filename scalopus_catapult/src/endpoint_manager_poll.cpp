@@ -25,7 +25,7 @@
 */
 
 #include "scalopus_catapult/endpoint_manager_poll.h"
-#include <scalopus_interface/endpoint_introspect.h>
+#include <scalopus_general/endpoint_introspect.h>
 #include <algorithm>
 #include <iostream>
 

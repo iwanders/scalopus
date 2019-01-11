@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.5.0)
 
 find_package(ScalopusTransport REQUIRED)
 find_package(ScalopusLttng REQUIRED)
+find_package(ScalopusGeneral REQUIRED)
 
 add_executable(example_scope_tracepoints
   src/example_scope_tracepoints.cpp
@@ -15,3 +16,7 @@ add_executable(example_scope_tracepoints_random
   src/example_scope_tracepoints_random.cpp
 )
 target_link_libraries(example_scope_tracepoints_random Scalopus::scalopus_lttng)
+
+
+add_executable(introspect_endpoints src/introspect_endpoints.cpp)
+target_link_libraries(introspect_endpoints Scalopus::scalopus_transport Scalopus::scalopus_consumer Scalopus::scalopus_general)

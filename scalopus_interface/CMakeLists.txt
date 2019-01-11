@@ -6,7 +6,6 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 add_library(scalopus_interface SHARED
   src/endpoint.cpp
   src/destination.cpp
-  src/endpoint_introspect.cpp
   src/transport.cpp
 )
 

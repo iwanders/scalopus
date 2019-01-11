@@ -29,11 +29,6 @@ target_link_libraries(scalopus_transport
     nlohmann_json::nlohmann_json
 )
 
-add_executable(introspect_endpoints
-  src/introspect_endpoints.cpp
-)
-target_link_libraries(introspect_endpoints Scalopus::scalopus_transport Scalopus::scalopus_consumer)
-
 export(
   TARGETS scalopus_transport
   NAMESPACE Scalopus::

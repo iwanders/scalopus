@@ -44,6 +44,7 @@ public:
   std::function<bool(Transport& transport, const Data& incoming, Data& outgoing)> handle_;
   std::function<bool(Transport& transport, const Data& incoming, Data& outgoing)> unsolicited_;
   std::string name_{ "endpoint_test" };
+
   std::string getName() const
   {
     return name_;

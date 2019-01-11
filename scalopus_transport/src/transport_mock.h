@@ -57,6 +57,7 @@ public:
   std::size_t pendingRequests() const;
 
   void addClient(Transport::WeakPtr client);
+  bool isConnected() const;
 private:
   Ptr server_;
   std::vector<Transport::WeakPtr> clients_;

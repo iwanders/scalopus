@@ -1,7 +1,7 @@
 #include <scalopus_transport/transport_unix.h>
 #include <cstring>
 #include <iostream>
-#include "scalopus_lttng/endpoint_scope_tracing.h"
+#include <scalopus_lttng/endpoint_scope_tracing.h>
 
 int main(int /* argc */, char** /* argv */)
 {
