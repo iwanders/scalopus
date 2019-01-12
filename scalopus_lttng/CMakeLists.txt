@@ -9,33 +9,78 @@ endif()
 
 include(FindThreads)
 
-# Create the library that provides the scope tracepoints 
-add_library(scalopus_lttng SHARED
-  src/scope_tracepoint_lttng.cpp
+add_library(scalopus_scope_tracing
   src/scope_trace_raii.cpp
   src/scope_trace_tracker.cpp
   src/endpoint_scope_tracing.cpp
 )
-
-target_include_directories(scalopus_lttng
+target_include_directories(scalopus_scope_tracing
   PUBLIC 
     $<INSTALL_INTERFACE:include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-add_library(Scalopus::scalopus_lttng ALIAS scalopus_lttng)
+add_library(Scalopus::scalopus_scope_tracing ALIAS scalopus_scope_tracing)
 
-target_link_libraries(scalopus_lttng
+target_link_libraries(scalopus_scope_tracing
   PUBLIC
     Scalopus::scalopus_transport
-    Scalopus::scalopus_interface
     Scalopus::scalopus_general
   PRIVATE
     nlohmann_json::nlohmann_json
+)
+
+
+# Create the library that provides the scope tracepoints 
+add_library(scalopus_tracepoint_lttng SHARED
+  src/scope_tracepoint_lttng.cpp
+)
+target_include_directories(scalopus_tracepoint_lttng
+  PUBLIC 
+    $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+add_library(Scalopus::scalopus_tracepoint_lttng ALIAS scalopus_tracepoint_lttng)
+
+target_link_libraries(scalopus_tracepoint_lttng
+  PRIVATE
     ${LTTngUST_LIBRARIES}
 )
 
+add_library(scalopus_lttng INTERFACE)
+add_library(Scalopus::scalopus_lttng ALIAS scalopus_lttng)
+
+target_link_libraries(scalopus_lttng
+  INTERFACE
+    Scalopus::scalopus_scope_tracing
+    Scalopus::scalopus_tracepoint_lttng
+)
+
+# Create the library that provides the scope tracepoints 
+add_library(scalopus_scope_tracing_native
+  src/scope_tracepoint_native.cpp
+  src/tracepoint_collector_native.cpp
+  src/endpoint_native_tracepoint_collector.cpp
+)
+
+target_include_directories(scalopus_scope_tracing_native
+  PUBLIC 
+    $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+add_library(Scalopus::scalopus_scope_tracing_native ALIAS scalopus_scope_tracing_native)
+
+target_link_libraries(scalopus_scope_tracing_native
+  PUBLIC
+    Scalopus::scalopus_scope_tracing
+  PRIVATE
+    nlohmann_json::nlohmann_json
+)
 
 add_library(scalopus_babeltrace SHARED
   src/ctfevent.cpp
@@ -57,7 +102,7 @@ target_link_libraries(babeltrace_test
     scalopus_babeltrace
 )
 
-add_library(scalopus_lttng_consumer SHARED
+add_library(scalopus_lttng_consumer
   src/lttng_source.cpp
   src/lttng_provider.cpp
 )
@@ -77,11 +122,11 @@ target_link_libraries(scalopus_lttng_consumer
 )
 
 export(
-  TARGETS scalopus_lttng scalopus_babeltrace scalopus_lttng_consumer
+  TARGETS scalopus_lttng scalopus_babeltrace scalopus_lttng_consumer scalopus_scope_tracing scalopus_tracepoint_lttng scalopus_scope_tracing_native
   NAMESPACE Scalopus::
   FILE ScalopusLttngConfig.cmake
 )
-install(TARGETS scalopus_lttng scalopus_babeltrace scalopus_lttng_consumer EXPORT ScalopusLttng
+install(TARGETS scalopus_lttng scalopus_babeltrace scalopus_lttng_consumer scalopus_scope_tracing scalopus_tracepoint_lttng scalopus_scope_tracing_native EXPORT ScalopusLttng
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
