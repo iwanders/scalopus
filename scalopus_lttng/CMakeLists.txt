@@ -11,7 +11,7 @@ include(FindThreads)
 
 # Create the library that provides the scope tracepoints 
 add_library(scalopus_lttng SHARED
-  src/scope_tracepoint.cpp
+  src/scope_tracepoint_lttng.cpp
   src/scope_trace_raii.cpp
   src/scope_trace_tracker.cpp
   src/endpoint_scope_tracing.cpp

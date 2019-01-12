@@ -24,29 +24,21 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#undef TRACEPOINT_PROVIDER
-#define TRACEPOINT_PROVIDER scalopus_scope_id
+#define TRACEPOINT_DEFINE
+#define TRACEPOINT_CREATE_PROBES
+#include "scope_tracepoint_lttng_definition.h"
+#include <scalopus_lttng/internal/scope_tracepoint.h>
 
-#if !defined(_TRACEPOINT_scalopus_scope_id_H) || defined(TRACEPOINT_HEADER_MULTI_READ)
-#define _TRACEPOINT_scalopus_scope_id_H
+namespace scalopus
+{
+void scope_entry(const unsigned int id)
+{
+  tracepoint(scalopus_scope_id, entry, id);
+}
 
-#include <lttng/tracepoint.h>
+void scope_exit(const unsigned int id)
+{
+  tracepoint(scalopus_scope_id, exit, id);
+}
 
-TRACEPOINT_EVENT_CLASS(scalopus_scope_id, scope_id_class, TP_ARGS(unsigned int, id_),
-                       TP_FIELDS(ctf_integer(unsigned int, id, id_)))
-
-TRACEPOINT_EVENT_INSTANCE(scalopus_scope_id, scope_id_class, entry, TP_ARGS(unsigned int, id_))
-
-TRACEPOINT_LOGLEVEL(scalopus_scope_id, entry, TRACE_DEBUG_FUNCTION)
-
-TRACEPOINT_EVENT_INSTANCE(scalopus_scope_id, scope_id_class, exit, TP_ARGS(unsigned int, id_))
-
-TRACEPOINT_LOGLEVEL(scalopus_scope_id, exit, TRACE_DEBUG_FUNCTION)
-
-#endif /* _TRACEPOINT_scalopus_scope_id_H */
-
-#undef TRACEPOINT_INCLUDE
-#define TRACEPOINT_INCLUDE "scope_tracepoint.h"
-
-/* This part must be outside ifdef protection */
-#include <lttng/tracepoint-event.h>
+}  // namespace scalopus
