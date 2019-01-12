@@ -1,11 +1,3 @@
-cmake_minimum_required(VERSION 3.5.0)
-
-find_package(ScalopusTransport REQUIRED)
-find_package(ScalopusLttng REQUIRED)
-find_package(ScalopusInterface REQUIRED)
-find_package(nlohmann_json 3.2.0 REQUIRED)
-find_package(Seasocks REQUIRED)
-
 
 add_library(scalopus_catapult
   src/catapult_backend.cpp

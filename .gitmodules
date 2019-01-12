@@ -1,0 +1,6 @@
+[submodule "thirdparty/nlohmann_json"]
+	path = thirdparty/nlohmann_json
+	url = https://github.com/nlohmann/json
+[submodule "thirdparty/seasocks"]
+	path = thirdparty/seasocks
+	url = https://github.com/mattgodbolt/seasocks/

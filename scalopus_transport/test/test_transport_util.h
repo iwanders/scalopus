@@ -25,6 +25,7 @@
 */
 
 #include <scalopus_interface/endpoint.h>
+#include <functional>
 
 template <typename A, typename B>
 void test(const A& a, const B& b)

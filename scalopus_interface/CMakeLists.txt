@@ -1,7 +1,3 @@
-cmake_minimum_required(VERSION 3.5.0)
-
-find_package(nlohmann_json 3.2.0 REQUIRED)
-
 # The interface for endpoint and transport, this is all a process under test should need.
 add_library(scalopus_interface SHARED
   src/endpoint.cpp

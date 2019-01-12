@@ -1,14 +1,7 @@
-cmake_minimum_required(VERSION 3.5.0)
-
-find_package(ScalopusTransport REQUIRED)
-find_package(ScalopusGeneral REQUIRED)
-
 include (FindPkgConfig)
 if (PKG_CONFIG_FOUND)
   pkg_check_modules(LTTngUST lttng-ust)
 endif()
-
-find_package(nlohmann_json 3.2.0 REQUIRED)
 
 if (!LTTngUST_FOUND)
   error("LTTNG could not be found")

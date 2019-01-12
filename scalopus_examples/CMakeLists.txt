@@ -1,8 +1,3 @@
-cmake_minimum_required(VERSION 3.5.0)
-
-find_package(ScalopusTransport REQUIRED)
-find_package(ScalopusLttng REQUIRED)
-find_package(ScalopusGeneral REQUIRED)
 
 add_executable(example_scope_tracepoints
   src/example_scope_tracepoints.cpp
