@@ -43,10 +43,11 @@ namespace tracepoint_collector_types
 // This is quite a few template parameters that need to be stacked into each other...
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
-using ScopeTraceEvent = std::tuple<TimePoint, unsigned int, bool>;
+using ScopeTraceEvent = std::tuple<TimePoint, unsigned int, uint8_t>;
 using EventContainer = std::vector<ScopeTraceEvent>;
 using ScopeBuffer = SPSCRingBuffer<EventContainer>;
 using ScopeBufferPtr = std::shared_ptr<ScopeBuffer>;
+using ThreadedEvents = std::map<unsigned long, std::vector<std::tuple<uint64_t, unsigned int, uint8_t>>>;
 }
 
 class TracePointCollectorNative : public MapTracker<unsigned long, tracepoint_collector_types::ScopeBufferPtr>
@@ -55,8 +56,8 @@ private:
   TracePointCollectorNative() = default;
 
 public:
-  constexpr static const bool ENTRY = true;
-  constexpr static const bool EXIT = false;
+  constexpr static const uint8_t ENTRY = 1;
+  constexpr static const uint8_t EXIT = 2;
   /**
    * @brief Static method through which the singleton instance can be retrieved.
    * @return Returns the singleton instance of the object.

@@ -37,16 +37,13 @@ TracePointCollectorNative& TracePointCollectorNative::getInstance()
 tracepoint_collector_types::ScopeBufferPtr TracePointCollectorNative::getBuffer()
 {
   auto tid = static_cast<unsigned long>(pthread_self());
-  std::cout << "getBuffer called by : " << tid<< std::endl;
   if (exists(tid))
   {
-    std::cout << "Returning already existing" << std::endl;
     return getMap()[tid];
   }
   else
   {
     // make the map.
-    std::cout << "Making the map" << std::endl;
     auto buffer = std::make_shared<tracepoint_collector_types::ScopeBuffer>(tracepoint_collector_types::EventContainer{10000});
     insert(tid, buffer);
     return buffer;

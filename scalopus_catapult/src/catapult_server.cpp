@@ -30,6 +30,7 @@
 #include <scalopus_lttng/endpoint_scope_tracing.h>
 #include <scalopus_lttng/endpoint_native_tracepoint_collector.h>
 #include <scalopus_lttng/lttng_provider.h>
+#include <scalopus_lttng/native_trace_provider.h>
 
 #include <scalopus_transport/transport_unix.h>
 
@@ -82,15 +83,26 @@ int main(int /* argc */, char** /* argv */)
     endpoint->setTransport(transport);
     return endpoint;
   });
-  manager->addEndpointFactory(scalopus::EndpointNativeTracepointCollector::name, [](const auto& transport) {
-    auto endpoint = std::make_shared<scalopus::EndpointNativeTracepointCollector>();
-    endpoint->setTransport(transport);
-    return endpoint;
+
+  auto native_trace_provider = std::make_shared<scalopus::NativeTraceProvider>(manager);
+  manager->addEndpointFactory(scalopus::EndpointNativeTracepointCollector::name,
+    [provider = std::weak_ptr<scalopus::NativeTraceProvider>(native_trace_provider)](const auto& transport) {
+    auto ptr = provider.lock();
+    if (ptr)
+    {
+      auto endpoint = ptr->receiveEndpoint();
+      endpoint->setTransport(transport);
+      return endpoint;
+    }
+    return scalopus::Endpoint::Ptr{nullptr};
   });
 
   // Create the providers.
   std::vector<scalopus::TraceEventProvider::Ptr> providers;
   providers.push_back(std::make_shared<scalopus::LttngProvider>(path, manager));
+  providers.push_back(native_trace_provider);
+
+
   providers.push_back(std::make_shared<scalopus::GeneralProvider>(manager));
 
   // Create the catapult backend.

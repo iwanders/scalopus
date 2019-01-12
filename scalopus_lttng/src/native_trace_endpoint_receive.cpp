@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019, Ivor Wanders
+  Copyright (c) 2018, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -23,29 +23,23 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#include "scalopus_lttng/lttng_provider.h"
-#include "scalopus_lttng/lttng_source.h"
-
-#include <sstream>
-
+#include "native_trace_endpoint_receive.h"
+#include <iostream>
 namespace scalopus
 {
-LttngProvider::LttngProvider(std::string path, EndpointManager::Ptr manager) : ScopeTracingProvider{manager}
+
+NativeTraceEndpointReceive::NativeTraceEndpointReceive(ReceiveFunction&& receiver) : receiver_{receiver}
 {
-  // Start the tracing tool.
-  tracing_tool_ = std::make_shared<BabeltraceTool>();
-  tracing_tool_->init(path);
 }
 
-LttngProvider::~LttngProvider()
+std::string NativeTraceEndpointReceive::getName() const
 {
-  tracing_tool_->halt();
+  return name;
 }
 
-TraceEventSource::Ptr LttngProvider::makeSource()
+bool NativeTraceEndpointReceive::unsolicited(Transport& /* transport */, const Data& incoming, Data&  /* outgoing */)
 {
-  return std::make_shared<LttngSource>(tracing_tool_, shared_from_this());
+  receiver_(incoming);
+  return false;
 }
-
 }  // namespace scalopus

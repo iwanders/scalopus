@@ -24,45 +24,53 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_CATAPULT_LTTNG_PROVIDER_H
-#define SCALOPUS_CATAPULT_LTTNG_PROVIDER_H
+#ifndef SCALOPUS_CATAPULT_SCOPE_TRACING_PROVIDER_H
+#define SCALOPUS_CATAPULT_SCOPE_TRACING_PROVIDER_H
 
 #include <scalopus_interface/trace_event_provider.h>
 
 #include <scalopus_general/endpoint_process_info.h>
-#include <scalopus_lttng/babeltrace_tool.h>
-#include <scalopus_lttng/ctfevent.h>
 #include <scalopus_lttng/endpoint_scope_tracing.h>
-#include <scalopus_lttng/scope_tracing_provider.h>
-
 #include <scalopus_interface/endpoint_manager.h>
 
 namespace scalopus
 {
 /**
- * @brief This is the provider for the lttng data source. It creates the babeltrace process and parses that. It also
- *        provides functionality to the sessions for resolving trace id's into scope names.
+ * @brief This provider provides the generic aspects of a scope tracing provider.
  */
-class LttngProvider : public ScopeTracingProvider, public std::enable_shared_from_this<LttngProvider>
+class ScopeTracingProvider : public TraceEventProvider
 {
 public:
-  using Ptr = std::shared_ptr<LttngProvider>;
+  using Ptr = std::shared_ptr<ScopeTracingProvider>;
 
   /**
-   * @brief Create the lttng provider.
-   * @param path the path on which babeltrace's viewer will be called to obtain the traces.
+   * @brief Create the scope tracing provider.
    * @param manager The endpoint manager that provides the endpoints to resolve the trace id's.
    */
-  LttngProvider(std::string path, EndpointManager::Ptr manager);
+  ScopeTracingProvider(EndpointManager::Ptr manager);
 
-  // From TraceEventProvider.
-  TraceEventSource::Ptr makeSource();
+  /**
+   * @brief Return all currently known mappings.
+   */
+  EndpointScopeTracing::ProcessTraceMap getMapping();
 
-  ~LttngProvider();
+  /**
+   * @brief Update the current mapping by retrieving the currently known maps from the endpoints.
+   */
+  void updateMapping();
+
+  /**
+   * @brief Resolve one mapping given the process id and trace id. If the mapping is unknown a pretty string with the
+   *        trace id is returned.
+   */
+  std::string getScopeName(unsigned int pid, unsigned int trace_id);
 
 private:
-  BabeltraceTool::Ptr tracing_tool_;  //! Babeltrace tool, produces babeltrace sessions.
+  EndpointManager::Ptr manager_;      //!< Manager for connections.
+
+  std::mutex mapping_mutex_;                       //!< Mutex for the mapping.
+  EndpointScopeTracing::ProcessTraceMap mapping_;  //!< The currently known mappings.
 };
 
 }  // namespace scalopus
-#endif  // SCALOPUS_CATAPULT_LTTNG_PROVIDER_H
+#endif  // SCALOPUS_CATAPULT_SCOPE_TRACING_PROVIDER_H

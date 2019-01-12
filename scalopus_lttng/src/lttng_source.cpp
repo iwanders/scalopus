@@ -76,12 +76,12 @@ std::vector<json> LttngSource::convertEvents()
   std::vector<json> result;
   result.reserve(events_.size());
 
-  double start_time = events_.front().time();
+  //  double start_time = events_.front().time();
 
   for (auto& event : events_)
   {
     // Time stamp, relative to start.
-    double ts = event.time() - start_time;
+    double ts = event.time();
 
     if (event.domain() == "scalopus_scope_id")
     {

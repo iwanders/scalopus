@@ -44,7 +44,6 @@ public:
   // From the endpoint
   std::string getName() const;
   bool handle(Transport& server, const Data& request, Data& response);
-  bool unsolicited(Transport& server, const Data& request, Data& response);
 private:
   void work();
   bool running_ { true };

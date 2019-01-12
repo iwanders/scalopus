@@ -65,7 +65,6 @@ add_library(scalopus_scope_tracing_native
   src/tracepoint_collector_native.cpp
   src/endpoint_native_tracepoint_collector.cpp
 )
-
 target_include_directories(scalopus_scope_tracing_native
   PUBLIC 
     $<INSTALL_INTERFACE:include>
@@ -81,6 +80,7 @@ target_link_libraries(scalopus_scope_tracing_native
   PRIVATE
     nlohmann_json::nlohmann_json
 )
+
 
 add_library(scalopus_babeltrace SHARED
   src/ctfevent.cpp
@@ -105,6 +105,10 @@ target_link_libraries(babeltrace_test
 add_library(scalopus_lttng_consumer
   src/lttng_source.cpp
   src/lttng_provider.cpp
+  src/scope_tracing_provider.cpp
+  src/native_trace_provider.cpp
+  src/native_trace_source.cpp
+  src/native_trace_endpoint_receive.cpp
 )
 target_include_directories(scalopus_lttng_consumer
   PUBLIC 
@@ -122,11 +126,25 @@ target_link_libraries(scalopus_lttng_consumer
 )
 
 export(
-  TARGETS scalopus_lttng scalopus_babeltrace scalopus_lttng_consumer scalopus_scope_tracing scalopus_tracepoint_lttng scalopus_scope_tracing_native
+  TARGETS
+    scalopus_lttng
+    scalopus_babeltrace
+    scalopus_lttng_consumer
+    scalopus_scope_tracing
+    scalopus_tracepoint_lttng
+    scalopus_scope_tracing_native
   NAMESPACE Scalopus::
   FILE ScalopusLttngConfig.cmake
 )
-install(TARGETS scalopus_lttng scalopus_babeltrace scalopus_lttng_consumer scalopus_scope_tracing scalopus_tracepoint_lttng scalopus_scope_tracing_native EXPORT ScalopusLttng
+install(TARGETS
+  scalopus_lttng
+  scalopus_babeltrace
+  scalopus_lttng_consumer
+  scalopus_scope_tracing
+  scalopus_tracepoint_lttng
+  scalopus_scope_tracing_native 
+
+  EXPORT ScalopusLttng
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

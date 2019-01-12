@@ -24,28 +24,32 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scalopus_lttng/lttng_provider.h"
-#include "scalopus_lttng/lttng_source.h"
+#ifndef SCALOPUS_LTTNG_NATIVE_TRACE_ENDPOINT_RECEIVE_H
+#define SCALOPUS_LTTNG_NATIVE_TRACE_ENDPOINT_RECEIVE_H
 
-#include <sstream>
+#include <scalopus_interface/transport.h>
+#include "scalopus_lttng/native_trace_provider.h"
+#include <map>
+#include <string>
 
 namespace scalopus
 {
-LttngProvider::LttngProvider(std::string path, EndpointManager::Ptr manager) : ScopeTracingProvider{manager}
+class NativeTraceEndpointReceive : public Endpoint
 {
-  // Start the tracing tool.
-  tracing_tool_ = std::make_shared<BabeltraceTool>();
-  tracing_tool_->init(path);
-}
+public:
+  using Ptr = std::shared_ptr<NativeTraceEndpointReceive>;
+  using ReceiveFunction = std::function<void(const Data&)>;
+  constexpr static const char* name = "native_tracepoint_collector";
 
-LttngProvider::~LttngProvider()
-{
-  tracing_tool_->halt();
-}
+  NativeTraceEndpointReceive(ReceiveFunction&& receiver);
 
-TraceEventSource::Ptr LttngProvider::makeSource()
-{
-  return std::make_shared<LttngSource>(tracing_tool_, shared_from_this());
-}
+  // From the endpoint
+  std::string getName() const;
+  bool unsolicited(Transport& server, const Data& request, Data& response);
+private:
+  ReceiveFunction receiver_;
+};
 
 }  // namespace scalopus
+
+#endif  // SCALOPUS_LTTNG_NATIVE_TRACE_ENDPOINT_RECEIVE_H

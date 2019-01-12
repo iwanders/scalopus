@@ -53,7 +53,8 @@ EndpointNativeTracepointCollector::~EndpointNativeTracepointCollector()
 static Data process_events(const EventMap& tid_event_map)
 {
   json events = json({});
-  std::map<unsigned long, std::vector<std::tuple<uint64_t, unsigned int, bool>>> event_list;
+  events["pid"] = static_cast<unsigned long>(::getpid());
+  tracepoint_collector_types::ThreadedEvents event_list;
   for (const auto& tid_event : tid_event_map)
   {
     const auto& tid = tid_event.first;
@@ -115,11 +116,4 @@ bool EndpointNativeTracepointCollector::handle(Transport& /* server */, const Da
 {
   return false;
 }
-bool EndpointNativeTracepointCollector::unsolicited(Transport& /* server */, const Data& incoming, Data&  /* outgoing */)
-{
-  json req = json::from_bson(incoming);
-  std::cout << "Got: " << req.dump() << std::endl;
-  return false;
-}
-
 }  // namespace scalopus

@@ -26,6 +26,7 @@
 
 #include <scalopus_lttng/internal/scope_tracepoint.h>
 #include "tracepoint_collector_native.h"
+#include <iostream>
 
 namespace scalopus
 {
@@ -33,7 +34,10 @@ void scope_entry(const unsigned int id)
 {
   thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
   // @TODO Do something with overrun, count lost events?
-  buffer.push({tracepoint_collector_types::Clock::now(), id, TracePointCollectorNative::ENTRY});
+  if (!buffer.push({tracepoint_collector_types::Clock::now(), id, TracePointCollectorNative::ENTRY}))
+  {
+    std::cout<<"." << std::endl;
+  }
 }
 
 void scope_exit(const unsigned int id)

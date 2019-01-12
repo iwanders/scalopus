@@ -24,28 +24,48 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scalopus_lttng/lttng_provider.h"
-#include "scalopus_lttng/lttng_source.h"
+#ifndef SCALOPUS_CATAPULT_NATIVE_TRACE_PROVIDER_H
+#define SCALOPUS_CATAPULT_NATIVE_TRACE_PROVIDER_H
 
-#include <sstream>
+#include <scalopus_lttng/scope_tracing_provider.h>
+#include <scalopus_interface/endpoint.h>
+#include <set>
 
 namespace scalopus
 {
-LttngProvider::LttngProvider(std::string path, EndpointManager::Ptr manager) : ScopeTracingProvider{manager}
+/**
+ * @brief This provider creates trace events from the native tracepoint collector endpoint.
+ */
+class NativeTraceSource;
+class NativeTraceProvider : public ScopeTracingProvider, public std::enable_shared_from_this<NativeTraceProvider>
 {
-  // Start the tracing tool.
-  tracing_tool_ = std::make_shared<BabeltraceTool>();
-  tracing_tool_->init(path);
-}
+public:
+  using Ptr = std::shared_ptr<NativeTraceProvider>;
+  using WeakPtr = std::weak_ptr<NativeTraceProvider>;
 
-LttngProvider::~LttngProvider()
-{
-  tracing_tool_->halt();
-}
+  /**
+   * @brief Create the lttng provider.
+   * @param manager The endpoint manager that provides the endpoints to resolve the trace id's.
+   */
+  NativeTraceProvider(EndpointManager::Ptr manager);
 
-TraceEventSource::Ptr LttngProvider::makeSource()
-{
-  return std::make_shared<LttngSource>(tracing_tool_, shared_from_this());
-}
+  /**
+   * @brief This function acts as the endpoint factory for the receiving end.
+   */
+  Endpoint::Ptr receiveEndpoint();
+
+  // From TraceEventProvider.
+  TraceEventSource::Ptr makeSource();
+
+private:
+  /**
+   * @brief The receiving endpoint calls this method whenever it received unsolicited data.
+   */
+  void incoming(const Data& incoming);
+
+  std::mutex source_mutex_;
+  std::set<std::shared_ptr<NativeTraceSource>> sources_;
+};
 
 }  // namespace scalopus
+#endif  // SCALOPUS_CATAPULT_NATIVE_TRACE_PROVIDER_H

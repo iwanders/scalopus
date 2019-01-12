@@ -24,28 +24,54 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "scalopus_lttng/lttng_provider.h"
-#include "scalopus_lttng/lttng_source.h"
+#ifndef SCALOPUS_LTTNG_NATIVE_TRACE_SOURCE_H
+#define SCALOPUS_LTTNG_NATIVE_TRACE_SOURCE_H
 
-#include <sstream>
+#include <scalopus_interface/trace_event_source.h>
+#include <scalopus_lttng/babeltrace_tool.h>
+#include "scalopus_lttng/native_trace_provider.h"
 
 namespace scalopus
 {
-LttngProvider::LttngProvider(std::string path, EndpointManager::Ptr manager) : ScopeTracingProvider{manager}
+/**
+ * @brief The actual source that provides the trace event format json entries.
+ */
+class NativeTraceSource : public TraceEventSource
 {
-  // Start the tracing tool.
-  tracing_tool_ = std::make_shared<BabeltraceTool>();
-  tracing_tool_->init(path);
-}
+public:
+  using Ptr = std::shared_ptr<NativeTraceSource>;
+  using DataPtr = std::shared_ptr<Data>;
 
-LttngProvider::~LttngProvider()
-{
-  tracing_tool_->halt();
-}
+  /**
+   * @brief Constructor for this soure.
+   * @param provider The native trace provider that can be used to resolve the trace point names.
+   */
+  NativeTraceSource(NativeTraceProvider::WeakPtr provider);
 
-TraceEventSource::Ptr LttngProvider::makeSource()
-{
-  return std::make_shared<LttngSource>(tracing_tool_, shared_from_this());
-}
+  // from the TraceEventSource
+  void startInterval();
+  void stopInterval();
+  void work();
+  std::vector<json> finishInterval();
 
+  ~NativeTraceSource();
+
+  /**
+   * @brief Return whether or not this 
+   */
+  bool isRecording() const;
+
+  /**
+   * @brief This is called by the server's receiving thread and contains chunks of incoming data.
+   */
+  void addData(const DataPtr& incoming_data);
+private:
+  NativeTraceProvider::WeakPtr provider_;  //!< Pointer to the provider.
+
+  std::atomic_bool in_interval_ { false };
+
+  std::mutex data_mutex_;
+  std::vector<DataPtr> recorded_data_;
+};
 }  // namespace scalopus
+#endif  // SCALOPUS_LTTNG_NATIVE_TRACE_SOURCE_H
