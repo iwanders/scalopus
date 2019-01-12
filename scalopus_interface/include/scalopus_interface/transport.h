@@ -67,6 +67,7 @@ public:
 
   /**
    * @brief Broadcast is a non-blocking call, this is queued for broadcast, the worker than sends it at it's discretion
+   *        This function allows endpoints on the server side to send to all connected clients.
    */
   virtual void broadcast(const std::string& remote_endpoint_name, const Data& outgoing);
 

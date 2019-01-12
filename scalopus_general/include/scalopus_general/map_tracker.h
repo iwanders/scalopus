@@ -64,6 +64,15 @@ public:
     return mapping_;
   }
 
+  /**
+   * @brief Return true if a key already exists, return false if the key doesn't exist.
+   */
+  bool exists(const Key& k) const
+  {
+    std::shared_lock<decltype(mutex_)> lock(mutex_);
+    return mapping_.find(k) != mapping_.end();
+  }
+
 private:
   std::map<Key, Value> mapping_;
   mutable std::shared_timed_mutex mutex_;  //! Mutex for the mapping container.

@@ -23,6 +23,7 @@ PUBLIC
   Scalopus::scalopus_consumer
   Scalopus::scalopus_general_consumer
   Scalopus::scalopus_lttng_consumer
+  Scalopus::scalopus_scope_tracing_native
 )
 
 add_executable(catapult_server

@@ -28,6 +28,7 @@
 #include <scalopus_general/general_provider.h>
 
 #include <scalopus_lttng/endpoint_scope_tracing.h>
+#include <scalopus_lttng/endpoint_native_tracepoint_collector.h>
 #include <scalopus_lttng/lttng_provider.h>
 
 #include <scalopus_transport/transport_unix.h>
@@ -78,6 +79,11 @@ int main(int /* argc */, char** /* argv */)
   // Add endpoint factory function for the process information.
   manager->addEndpointFactory(scalopus::EndpointProcessInfo::name, [](const auto& transport) {
     auto endpoint = std::make_shared<scalopus::EndpointProcessInfo>();
+    endpoint->setTransport(transport);
+    return endpoint;
+  });
+  manager->addEndpointFactory(scalopus::EndpointNativeTracepointCollector::name, [](const auto& transport) {
+    auto endpoint = std::make_shared<scalopus::EndpointNativeTracepointCollector>();
     endpoint->setTransport(transport);
     return endpoint;
   });
