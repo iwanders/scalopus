@@ -102,7 +102,7 @@ std::vector<json> NativeTraceSource::finishInterval()
 
         // Finally, we can create a trace type that can be used by devtools.
         json entry;
-        entry["ts"] = static_cast<double>(timestamp_ns_since_epoch) / 1000.0;
+        entry["ts"] = static_cast<double>(timestamp_ns_since_epoch) / 1e3;
         entry["cat"] = "PERF";
         entry["tid"] = tid;
         entry["pid"] = pid;

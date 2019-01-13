@@ -60,29 +60,8 @@ static Data process_events(const EventMap& tid_event_map)
   json events = json({});
   // Need to know the PID when we consume these traces.
   events["pid"] = static_cast<unsigned long>(::getpid());
-
-  // Then, we construct a list of native types that we can serialize.
-  tracepoint_collector_types::ThreadedEvents event_list;
-
-  for (const auto& tid_event : tid_event_map)
-  {
-    const auto& thread_id = tid_event.first;
-    event_list[thread_id].reserve(tid_event.second.size());
-    for (const auto& event : tid_event.second)
-    {
-      const auto& time = std::get<0>(event);
-      const auto& trace_id = std::get<1>(event);
-      const auto& trace_type = std::get<2>(event);
-
-      // Calculate the timestamp since the unix epoch in nanoseconds.
-      auto now_ns = std::chrono::time_point_cast<std::chrono::nanoseconds>(time);
-      auto epoch = std::chrono::duration_cast<std::chrono::nanoseconds>(now_ns.time_since_epoch());
-
-      event_list[thread_id].emplace_back(epoch.count(), trace_id, trace_type);
-    }
-  }
-  // Finally, add the now consumable events to the json object
-  events["events"] = event_list;
+  // The event map is composed of default serializable types, so conversion is trivial:
+  events["events"] = tid_event_map;
   return json::to_bson(events);
 }
 

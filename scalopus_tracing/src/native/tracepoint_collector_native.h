@@ -35,11 +35,8 @@ namespace scalopus
 {
 namespace tracepoint_collector_types
 {
-
-//! Clock to use for trace timestamps.
-using Clock = std::chrono::high_resolution_clock;
 //! Timepoint of that clock.
-using TimePoint = std::chrono::time_point<Clock>;
+using TimePoint = uint64_t;
 //! Trace event as it is stored in the ringbuffer.
 using ScopeTraceEvent = std::tuple<TimePoint, unsigned int, uint8_t>;
 //! The container that backs the ringbuffer.
@@ -49,7 +46,7 @@ using ScopeBuffer = SPSCRingBuffer<EventContainer>;
 //! Pointer type to the ringbuffer.
 using ScopeBufferPtr = std::shared_ptr<ScopeBuffer>;
 //! The (grouped by thread) events composed of native types that we can serialize to binary for transfer.
-using ThreadedEvents = std::map<unsigned long, std::vector<std::tuple<uint64_t, unsigned int, uint8_t>>>;
+using ThreadedEvents = std::map<unsigned long, std::vector<std::tuple<TimePoint, unsigned int, uint8_t>>>;
 }
 
 /**
