@@ -42,6 +42,10 @@ NativeTraceSource::~NativeTraceSource()
 void NativeTraceSource::startInterval()
 {
   stopInterval();
+  {
+    std::lock_guard<decltype(data_mutex_)> lock(data_mutex_);
+    recorded_data_.clear();
+  }
   in_interval_.store(true);
 }
 

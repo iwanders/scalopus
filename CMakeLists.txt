@@ -5,6 +5,7 @@ project(Scalopus VERSION 0.0.1)
 # Include libraries first.
 option(SCALOPUS_USE_EXTERNAL_JSON "Obtain nlohmann_json through find_package." OFF)
 option(SCALOPUS_USE_EXTERNAL_SEASOCKS "Obtain Seasocks through find_package." OFF)
+option(SCALOPUS_BUILD_TRACING_LTTNG "Try to build the LTTNG tracing target." ON)
 set(SCALOPUS_CMAKE_CONFIG_DIR          "${CMAKE_CURRENT_BINARY_DIR}")
 set(SCALOPUS_COMPONENT_CMAKE_CONFIG_DIR          "${CMAKE_CURRENT_BINARY_DIR}/cmake/")
 set(SCALOPUS_CMAKE_PROJECT_CONFIG_FILE "${SCALOPUS_CMAKE_CONFIG_DIR}/${PROJECT_NAME}Config.cmake")
