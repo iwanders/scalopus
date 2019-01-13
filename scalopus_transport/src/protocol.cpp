@@ -48,6 +48,10 @@ bool readData(int fd, size_t length, Data& incoming)
   while (true)
   {
     ssize_t chunk_received = ::read(fd, buf.data(), std::min(length - received, chunk_size));
+    if (chunk_received == -1)
+    {
+      return false;  // this should not happen as it indicates a broken transmission or broken file descriptor.
+    }
 
     // Add the data to incoming.
     incoming.resize(received + static_cast<size_t>(chunk_received));
