@@ -48,14 +48,33 @@ A picture is worth a thousand words, so here goes:
 ![Overview of Scalopus](/doc/overview.png "Overview of Scalopus")
 
 The subcomponents of scalopus are clearly separated:
-- `scalopus_interface` Specifies the interfaces how the various components interact with each other.
-- `scalopus_transport` Provides two implementations of the `Transport` interface.
-- `scalopus_general` This provides the process information endpoint, which allows naming the process and its threads.
-- `scalopus_tracing` This provides means of tracing scopes and the `Provider` and `Source` to visualise them.
-- `scalopus_catapult` Provides the chrome devtools protocol endpoint webserver that allows consuming the traces.
-- `scalopus_examples` This provides some examples on how to write instrumented source code.
+- [scalopus_interface](/scalopus_interface) Specifies the interfaces how the various components interact with each other.
+- [scalopus_transport](/scalopus_transport) Provides two implementations of the `Transport` interface.
+- [scalopus_general](/scalopus_general) This provides the process information endpoint, which allows naming the process and its threads.
+- [scalopus_tracing](/scalopus_tracing) This provides means of tracing scopes and the `Provider` and `Source` to visualise them.
+- [scalopus_catapult](/scalopus_catapult) Provides the chrome devtools protocol endpoint webserver that allows consuming the traces.
+- [scalopus_examples](/scalopus_examples) This provides some examples on how to write instrumented source code.
 
+### Interface
+The interface specifies how the interaction between the components happens.
 
+#### Endpoint
+The Endpoint is a class instantiated at the server and client sides of the transport. An endpoint can interact with the transport and thus with the endpoints at the other end of a transport. Endpoints are stored by name and their name must be unique. The Endpoint interface is the same at both sides of the transport. If data comes in for an endpoint the transport will call the appropriate method, if part of a request (client initiated) this will be `handle`, sent by the server side it will call `unsolicited`. When an Endpoint's `handle` method is called it can immediately respond from the server' thread with a response.
+
+#### TransportFactory
+The TransportFactory provides an abstracted way of creating a server of a specific type, discovering other servers and returning a list of Destinations and creating a Transport that's connected to a certain Destination.
+
+#### Transport
+A Transport provides a means of storing a list of Endpoints and allowing those to communicate with the Transport and receive data from the Transport. On the server side the Endpoints can send data through the `broadcast` method, which sends the data to all connected clients. At the client side of the Transport the main way of interacting is with the `request` method, that sends a request and returns a `std::Future` that will be populated with the response.
+
+#### Endpoint Manager
+This interface is part of the `scalopus_consumer` target, it provides a way to query the available Endpoints from something that manages endpoints. This is necessary because the Providers need to be able to obtain the Endpoint in the catapult server.
+
+#### TraceEventProvider
+This interface is part of the `scalopus_consumer` target. The provider is a class that persists for the lifetime of the catapult server and has one method called `makeSource`, this method returns a TraceEventSource for tracing sessions to use.
+
+#### TraceEventSource
+This interface is part of the `scalopus_consumer` target. A source is created from its associated Provider, it is responsible for producing json representations of [traces][trace_event_format] that will be sent to the browser. The browser must start an interval, during which the source should collect traces. At the end of the interval the source must provide valid trace events ready for consumption by catapult's trace viewer. 
 
 ## Building
 
@@ -65,6 +84,7 @@ the traces from lttng the `babeltrace` package is required:
 apt-get install liblttng-ust-dev babeltrace
 ```
 
+Then, building should be as simple as:
 ```bash
 # Clone repo, recursively to ensure Seasocks and Nlohmann_json are cloned as well.
 git clone --recurse-submodules Scalopus
