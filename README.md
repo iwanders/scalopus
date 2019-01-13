@@ -42,18 +42,12 @@ Scalopus aims to solve these problems by:
 To get the tracepoints out of the program LTTng is a good fit because it is performant and provides very little overhead
 if tracepoints are not being recorded. Additionally it allows toggling tracepoints by process id and other niceties.
 
-### How does it look code wise?
+## Architecture
 
-```cpp
-void fooBarBuz()
-{
-  TRACE_PRETTY_FUNCTION();
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-}
-```
 
-Building
---------
+
+## Building
+
 In order to use LTTng to get the traces out of the program under test one must install `liblttng-ust-dev` to consume
 the traces from lttng the `babeltrace` package is required:
 ```bash
@@ -70,7 +64,6 @@ make -j8
 # Run tests with:
 make test
 ```
-
 
 [catapult_trace_viewer]: https://github.com/catapult-project/catapult/blob/master/tracing/README.md
 [catapult]: https://github.com/catapult-project/catapult

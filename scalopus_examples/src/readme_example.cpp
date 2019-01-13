@@ -33,11 +33,18 @@
 #include <scalopus_tracing/tracing.h>
 #include <scalopus_transport/transport_unix.h>
 
+void fooBarBuz()
+{
+  TRACE_PRETTY_FUNCTION();
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+}
+
 void c()
 {
   TRACE_PRETTY_FUNCTION();
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   std::cout << "  c" << std::endl;
+  fooBarBuz();
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
