@@ -43,6 +43,17 @@ To get the tracepoints out of the program LTTng is a good fit because it is perf
 if tracepoints are not being recorded. Additionally it allows toggling tracepoints by process id and other niceties.
 
 ## Architecture
+A picture is worth a thousand words, so here goes:
+
+![Overview of Scalopus](/doc/overview.png "Overview of Scalopus")
+
+The subcomponents of scalopus are clearly separated:
+- `scalopus_interface` Specifies the interfaces how the various components interact with each other.
+- `scalopus_transport` Provides two implementations of the `Transport` interface.
+- `scalopus_general` This provides the process information endpoint, which allows naming the process and its threads.
+- `scalopus_tracing` This provides means of tracing scopes and the `Provider` and `Source` to visualise them.
+- `scalopus_catapult` Provides the chrome devtools protocol endpoint webserver that allows consuming the traces.
+- `scalopus_examples` This provides some examples on how to write instrumented source code.
 
 
 
