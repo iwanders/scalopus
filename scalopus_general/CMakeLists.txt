@@ -42,7 +42,7 @@ target_link_libraries(scalopus_general_consumer
 export(
   TARGETS scalopus_general scalopus_general_consumer
   NAMESPACE Scalopus::
-  FILE ScalopusGeneralConfig.cmake
+  FILE ${SCALOPUS_COMPONENT_CMAKE_CONFIG_DIR}/ScalopusGeneralConfig.cmake
 )
 install(TARGETS scalopus_general scalopus_general_consumer EXPORT ScalopusGeneral
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

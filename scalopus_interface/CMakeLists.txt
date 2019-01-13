@@ -10,10 +10,6 @@ target_include_directories(scalopus_interface
     $<INSTALL_INTERFACE:include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
-target_link_libraries(scalopus_interface
-  PRIVATE
-    nlohmann_json::nlohmann_json
-)
 add_library(Scalopus::scalopus_interface ALIAS scalopus_interface)
 
 
@@ -29,7 +25,7 @@ target_include_directories(scalopus_consumer
 target_link_libraries(scalopus_consumer
   PUBLIC
     nlohmann_json::nlohmann_json
-    scalopus_interface
+    Scalopus::scalopus_interface
 )
 add_library(Scalopus::scalopus_consumer ALIAS scalopus_consumer)
 
@@ -37,7 +33,7 @@ add_library(Scalopus::scalopus_consumer ALIAS scalopus_consumer)
 export(
   TARGETS scalopus_interface scalopus_consumer
   NAMESPACE Scalopus::
-  FILE ScalopusInterfaceConfig.cmake
+  FILE ${SCALOPUS_COMPONENT_CMAKE_CONFIG_DIR}/ScalopusInterfaceConfig.cmake
 )
 install(TARGETS scalopus_interface scalopus_consumer EXPORT ScalopusInterface
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

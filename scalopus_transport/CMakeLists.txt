@@ -25,7 +25,7 @@ target_link_libraries(scalopus_transport
 export(
   TARGETS scalopus_transport
   NAMESPACE Scalopus::
-  FILE ScalopusTransportConfig.cmake
+  FILE ${SCALOPUS_COMPONENT_CMAKE_CONFIG_DIR}/ScalopusTransportConfig.cmake
 )
 install(TARGETS scalopus_transport EXPORT ScalopusTransport
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

@@ -25,7 +25,6 @@ add_library(Scalopus::scalopus_scope_tracing ALIAS scalopus_scope_tracing)
 
 target_link_libraries(scalopus_scope_tracing
   PUBLIC
-    Scalopus::scalopus_transport
     Scalopus::scalopus_general
   PRIVATE
     nlohmann_json::nlohmann_json
@@ -79,7 +78,7 @@ target_link_libraries(scalopus_tracepoint_native
     nlohmann_json::nlohmann_json
 )
 
-add_library(scalopus_scope_tracing_native SHARED
+add_library(scalopus_scope_tracing_native
   src/native_trace_endpoint_sender.cpp
 )
 add_library(Scalopus::scalopus_scope_tracing_native ALIAS scalopus_scope_tracing_native)
@@ -95,6 +94,7 @@ target_link_libraries(scalopus_scope_tracing_native
   PUBLIC
     Scalopus::scalopus_scope_tracing
     Scalopus::scalopus_tracepoint_native
+  PRIVATE
     nlohmann_json::nlohmann_json
 )
 
@@ -143,15 +143,15 @@ target_link_libraries(scalopus_lttng_consumer
 
 export(
   TARGETS
-    scalopus_lttng
-    scalopus_babeltrace
-    scalopus_lttng_consumer
     scalopus_scope_tracing
+    scalopus_babeltrace
+    scalopus_lttng
+    scalopus_lttng_consumer
     scalopus_tracepoint_lttng
     scalopus_tracepoint_native
     scalopus_scope_tracing_native
   NAMESPACE Scalopus::
-  FILE ScalopusLttngConfig.cmake
+  FILE ${SCALOPUS_COMPONENT_CMAKE_CONFIG_DIR}/ScalopusLttngConfig.cmake
 )
 install(TARGETS
   scalopus_lttng

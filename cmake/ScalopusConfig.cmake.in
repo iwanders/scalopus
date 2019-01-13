@@ -1,0 +1,41 @@
+cmake_minimum_required(VERSION 3.5.0)
+
+include(FindPackageHandleStandardArgs)
+set(${CMAKE_FIND_PACKAGE_NAME}_CONFIG ${CMAKE_CURRENT_LIST_FILE})
+find_package_handle_standard_args(@PROJECT_NAME@ CONFIG_MODE)
+
+set(SCALOPUS_USED_EXTERNAL_JSON "" @SCALOPUS_USE_EXTERNAL_JSON@)
+set(SCALOPUS_USED_EXTERNAL_SEASOCKS "" @SCALOPUS_USE_EXTERNAL_SEASOCKS@)
+
+get_filename_component(Scalopus_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include(CMakeFindDependencyMacro)
+
+list(APPEND CMAKE_PREFIX_PATH ${Scalopus_CMAKE_DIR}/cmake)
+
+if (${SCALOPUS_USED_EXTERNAL_JSON})
+  find_package(nlohmann_json)
+else()
+  # use internal nlohmann_json.
+  list(APPEND CMAKE_PREFIX_PATH ${Scalopus_CMAKE_DIR}/thirdparty/nlohmann_json/)
+  find_package(nlohmann_json)
+  list(REMOVE_AT CMAKE_PREFIX_PATH -1)
+endif()
+
+
+if (${SCALOPUS_USED_EXTERNAL_SEASOCKS})
+  find_package(Seasocks)
+else()
+  # use internal nlohmann_json.
+  list(APPEND CMAKE_PREFIX_PATH ${Scalopus_CMAKE_DIR}/thirdparty/seasocks/)
+  find_package(Seasocks)
+  list(REMOVE_AT CMAKE_PREFIX_PATH -1)
+endif()
+
+include(FindThreads)
+find_package(ScalopusInterface)
+find_package(ScalopusTransport)
+find_package(ScalopusGeneral)
+find_package(ScalopusLttng)
+list(REMOVE_AT CMAKE_PREFIX_PATH -1)
+
+set(Scalopus_FOUND true)

@@ -5,6 +5,10 @@ project(Scalopus VERSION 0.0.1)
 # Include libraries first.
 option(SCALOPUS_USE_EXTERNAL_JSON "Obtain nlohmann_json through find_package." OFF)
 option(SCALOPUS_USE_EXTERNAL_SEASOCKS "Obtain Seasocks through find_package." OFF)
+set(SCALOPUS_CMAKE_CONFIG_DIR          "${CMAKE_CURRENT_BINARY_DIR}")
+set(SCALOPUS_COMPONENT_CMAKE_CONFIG_DIR          "${CMAKE_CURRENT_BINARY_DIR}/cmake/")
+set(SCALOPUS_CMAKE_PROJECT_CONFIG_FILE "${SCALOPUS_CMAKE_CONFIG_DIR}/${PROJECT_NAME}Config.cmake")
+set(SCALOPUS_CONFIG_INSTALL_DIR        "cmake/${PROJECT_NAME}" CACHE INTERNAL "")
 
 # We need an include here to ensure that the find package call originates from the root.
 # add_subdirectory won't work as that won't expose embedded targets to the scalopus subcomponent directories.
@@ -40,3 +44,15 @@ add_subdirectory(scalopus_lttng)
 add_subdirectory(scalopus_general)
 add_subdirectory(scalopus_examples)
 add_subdirectory(scalopus_catapult)
+
+
+configure_file(
+  ${CMAKE_CURRENT_LIST_DIR}/cmake/ScalopusConfig.cmake.in
+  ${SCALOPUS_CMAKE_PROJECT_CONFIG_FILE}
+  @ONLY
+)
+
+install(
+  FILES ${SCALOPUS_CMAKE_PROJECT_CONFIG_FILE}
+  DESTINATION ${SCALOPUS_CONFIG_INSTALL_DIR}
+)
