@@ -38,6 +38,9 @@ if(BUILD_TESTING)
   enable_testing()
 endif()
 
+# Each 'submodule' acts as a completely seperate cmake package basically, they only thing they lack is find_package()
+# to each other. This ensures that any externally created provider / source has the exact same capabilities as the
+# ones inside this cmake project.
 add_subdirectory(scalopus_interface)
 add_subdirectory(scalopus_transport)
 add_subdirectory(scalopus_tracing)

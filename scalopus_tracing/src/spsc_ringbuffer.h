@@ -30,26 +30,35 @@
 namespace scalopus
 {
 
-// This is modelled after boost's spsc_queue.
-
+/**
+ * @brief This is a single producer - single consumer ringbuffer.
+ * It is moddelled after boosts' spsc_queue, but then a lot simpler and with move semantics.
+ * It is backed by a container of a fixed size, this allows runtime determined sizes through vector, or compile time
+ * size through use of an array.
+ */
 template <typename ContainerType>
 class SPSCRingBuffer
 {
 public:
-  using ValueType = typename ContainerType::value_type;
+  using ValueType = typename ContainerType::value_type;  //!< The type of the elements in the ringbuffer.
 
-  SPSCRingBuffer(ContainerType&& c) : container_{c}, max_size_{container_.size()}
+  /**
+   * @brief Construct the ringbuffer.
+   * @param container The container that's used internally by the ringbuffer to store the data.
+   * @throws std::runtime_error If the container size is zero.
+   */
+  SPSCRingBuffer(ContainerType&& container) : container_{container}, max_size_{container_.size()}
   {
     if (max_size_ == 0)
     {
-      throw std::runtime_error("Size of container that was passed to ringbuffer is zero.");
+      throw std::runtime_error("Container passed to the ring buffer may not be zero length.");
     }
   }
 
   /**
-   * @brief Push a value onto the ringbuffer.
+   * @brief Move a value onto the ringbuffer.
    * @return true if the value was stored, false if the ring buffer was full.
-   * @note Only one thread must interact with push.
+   * @note Only one thread may interact with push, another thread may pop at the same time.
    */
   bool push(ValueType&& v)
   {
@@ -61,7 +70,7 @@ public:
       return false;
     }
 
-    container_[write_index] = std::move(v);  // assign it into the container.
+    container_[write_index] = std::move(v);  // move it into the container.
 
     write_index_.store(next, std::memory_order_release);
 
@@ -71,7 +80,7 @@ public:
   /**
    * @brief Pop a value from the ringbuffer.
    * @return false if no value could be popped.
-   * @note Only one thread must interact with pop.
+   * @note Only one thread may interact with pop, another thread may push at the same time.
    */
   bool pop(ValueType& v)
   {
@@ -99,10 +108,10 @@ public:
   }
 
 private:
-  std::atomic<std::size_t> write_index_{ 0 };
-  std::atomic<std::size_t> read_index_{ 0 };
-  ContainerType container_;
-  const std::size_t max_size_;
+  std::atomic<std::size_t> write_index_{ 0 };  //!< Current write position.
+  std::atomic<std::size_t> read_index_{ 0 };   //!< Current read position.
+  ContainerType container_;  //!< Container that holds the ringbuffer values.
+  const std::size_t max_size_;  //!< Size of the ringbuffer.
 };
 
 }

@@ -28,13 +28,11 @@
 #define SCALOPUS_TRACING_NATIVE_TRACE_ENDPOINT_SENDER_H
 
 #include <scalopus_interface/transport.h>
-#include <map>
-#include <string>
 
 namespace scalopus
 {
 /**
- *
+ * @brief This endpoint collects the events from the thread ringbuffers and broadcasts it to all connected clients.
  */
 class NativeTraceEndpointSender : public Endpoint
 {
@@ -46,7 +44,6 @@ public:
 
   // From the endpoint
   std::string getName() const;
-  bool handle(Transport& server, const Data& request, Data& response);
 private:
   void work();
   bool running_ { true };

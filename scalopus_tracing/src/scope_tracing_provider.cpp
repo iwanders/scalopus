@@ -25,11 +25,12 @@
 */
 
 #include "scalopus_tracing/scope_tracing_provider.h"
+#include <scalopus_general/endpoint_process_info.h>
 #include <sstream>
 
 namespace scalopus
 {
-ScopeTracingProvider::ScopeTracingProvider(EndpointManager::Ptr manager) : manager_(manager)
+ScopeTracingProvider::ScopeTracingProvider(EndpointManager::Ptr manager) : manager_{manager}
 {
 }
 
@@ -41,28 +42,38 @@ EndpointScopeTracing::ProcessTraceMap ScopeTracingProvider::getMapping()
 
 void ScopeTracingProvider::updateMapping()
 {
-  std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
-  mapping_.clear();
+  // Make a new mapping
+  EndpointScopeTracing::ProcessTraceMap mapping;
 
-  auto endpoints = manager_->endpoints();
-  for (const auto& transport_endpoints : endpoints)
+  // Get the current transports and their endpoints from the manager.
+  auto endpoints_by_transport = manager_->endpoints();
+  for (const auto& transport_endpoints : endpoints_by_transport)
   {
-    // Try to find the scope tracing endpoint and obtain its data.
+    // Try to find the scope tracing endpoint from this transports' endpoints and obtain its data.
     auto endpoint_scope_tracing =
         EndpointManager::findEndpoint<scalopus::EndpointScopeTracing>(transport_endpoints.second);
+
     if (endpoint_scope_tracing != nullptr)
     {
+      // We found the correct endpoint, retrieve its mappings.
       const auto process_mapping = endpoint_scope_tracing->mapping();
-      mapping_.insert(process_mapping.begin(), process_mapping.end());
+
+      // Insert the mappings into the accumulated map.
+      mapping.insert(process_mapping.begin(), process_mapping.end());
     }
+  }
+
+  // Under the lock, swap the old mapping with the new one.
+  {
+    std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
+    mapping_.swap(mapping);
   }
 }
 
-std::string ScopeTracingProvider::getScopeName(unsigned int pid, unsigned int trace_id)
+std::string ScopeTracingProvider::getScopeName(const ProcessTraceMap& mapping, const unsigned int pid, const unsigned int trace_id)
 {
-  std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
-  auto pid_info = mapping_.find(pid);
-  if (pid_info != mapping_.end())
+  auto pid_info = mapping.find(pid);
+  if (pid_info != mapping.end())
   {
     auto entry_mapping = pid_info->second.find(trace_id);
     if (entry_mapping != pid_info->second.end())

@@ -63,11 +63,8 @@ void NativeTraceProvider::incoming(const Data& incoming)
   std::set<NativeTraceSource::Ptr> recording_sources;
   {
     std::lock_guard<decltype(source_mutex_)> lock(source_mutex_);
-    if (sources_.empty())
-    {
-      return;  // no sources active, bail out.
-    }
 
+    // Add all sources that are recording.
     for (auto& source : sources_)
     {
       if (source->isRecording())
@@ -79,7 +76,7 @@ void NativeTraceProvider::incoming(const Data& incoming)
 
   if (recording_sources.empty())
   {
-    return;  // no sources are recording.
+    return;  // no sources are recording, no need to do work or allocate memory
   }
 
   // Ensure we only make one copy of the data from the server thread.

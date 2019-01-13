@@ -39,15 +39,22 @@ tracepoint_collector_types::ScopeBufferPtr TracePointCollectorNative::getBuffer(
   auto tid = static_cast<unsigned long>(pthread_self());
   if (exists(tid))
   {
+    // Buffer already existed for this thread.
     return getMap()[tid];
   }
   else
   {
-    // make the map.
-    auto buffer = std::make_shared<tracepoint_collector_types::ScopeBuffer>(tracepoint_collector_types::EventContainer{10000});
+    // Buffer did not exist for this thread, make a new one.
+    auto buffer = std::make_shared<tracepoint_collector_types::ScopeBuffer>(tracepoint_collector_types::EventContainer{ringbuffer_size_});
     insert(tid, buffer);
     return buffer;
   }
   return nullptr;
 }
+
+void TracePointCollectorNative::setRingbufferSize(std::size_t size)
+{
+  ringbuffer_size_ = size;
+}
+
 }  // namespace scalopus

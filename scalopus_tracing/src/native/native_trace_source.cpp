@@ -71,6 +71,7 @@ std::vector<json> NativeTraceSource::finishInterval()
   {
     provider->updateMapping();
   }
+  const auto mapping = provider->getMapping();
 
   // Obtain the data chunks.
   std::vector<DataPtr> data;
@@ -105,7 +106,7 @@ std::vector<json> NativeTraceSource::finishInterval()
         entry["cat"] = "PERF";
         entry["tid"] = tid;
         entry["pid"] = pid;
-        entry["name"] = provider->getScopeName(pid, trace_id);
+        entry["name"] = provider->getScopeName(mapping, pid, trace_id);
         switch (type)
         {
           case TracePointCollectorNative::ENTRY:

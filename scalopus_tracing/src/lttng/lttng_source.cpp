@@ -62,7 +62,6 @@ void LttngSource::work()
 std::vector<json> LttngSource::finishInterval()
 {
   stopInterval();
-  provider_->updateMapping();
   return convertEvents();
 }
 
@@ -76,8 +75,9 @@ std::vector<json> LttngSource::convertEvents()
   std::vector<json> result;
   result.reserve(events_.size());
 
-  //  double start_time = events_.front().time();
 
+  provider_->updateMapping();
+  const auto mapping = provider_->getMapping();
   for (auto& event : events_)
   {
     // Time stamp, relative to start.
@@ -104,7 +104,7 @@ std::vector<json> LttngSource::convertEvents()
       }
 
       // Populate the name
-      entry["name"] = provider_->getScopeName(event.pid(), id);
+      entry["name"] = provider_->getScopeName(mapping, event.pid(), id);
 
       if (event.name() == "entry")
       {

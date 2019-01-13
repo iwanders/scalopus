@@ -38,6 +38,7 @@ using EventMap = std::map<unsigned long, tracepoint_collector_types::EventContai
 
 NativeTraceEndpointSender::NativeTraceEndpointSender()
 {
+  // Start the worker thread.
   worker_ = std::thread([&]()
   {
     work();
@@ -46,36 +47,49 @@ NativeTraceEndpointSender::NativeTraceEndpointSender()
 
 NativeTraceEndpointSender::~NativeTraceEndpointSender()
 {
+  // Shut down the worker thread and join it.
   running_ = false;
   worker_.join();
 }
 
+/**
+ * @brief This function serializes the thread event map into a bson message that can be broadcast.
+ */
 static Data process_events(const EventMap& tid_event_map)
 {
   json events = json({});
+  // Need to know the PID when we consume these traces.
   events["pid"] = static_cast<unsigned long>(::getpid());
+
+  // Then, we construct a list of native types that we can serialize.
   tracepoint_collector_types::ThreadedEvents event_list;
+
   for (const auto& tid_event : tid_event_map)
   {
-    const auto& tid = tid_event.first;
-    event_list[tid].reserve(tid_event.second.size());
+    const auto& thread_id = tid_event.first;
+    event_list[thread_id].reserve(tid_event.second.size());
     for (const auto& event : tid_event.second)
     {
       const auto& time = std::get<0>(event);
-      const auto& id = std::get<1>(event);
-      const auto& type = std::get<2>(event);
+      const auto& trace_id = std::get<1>(event);
+      const auto& trace_type = std::get<2>(event);
+
+      // Calculate the timestamp since the unix epoch in nanoseconds.
       auto now_ns = std::chrono::time_point_cast<std::chrono::nanoseconds>(time);
       auto epoch = std::chrono::duration_cast<std::chrono::nanoseconds>(now_ns.time_since_epoch());
-      event_list[tid].emplace_back(epoch.count(), id, type);
+
+      event_list[thread_id].emplace_back(epoch.count(), trace_id, trace_type);
     }
-    events["events"] = event_list;
   }
+  // Finally, add the now consumable events to the json object
+  events["events"] = event_list;
   return json::to_bson(events);
 }
 
 void NativeTraceEndpointSender::work()
 {
-  auto& collector = TracePointCollectorNative::getInstance();
+  // The collector is a singleton, just retrieve it once.
+  const auto& collector = TracePointCollectorNative::getInstance();
   while (running_)
   {
     auto tid_buffers = collector.getMap();
@@ -84,13 +98,15 @@ void NativeTraceEndpointSender::work()
     for (const auto& tid_buffer : tid_buffers)
     {
       // collect all events...
-      auto& tid = tid_buffer.first;
+      auto& thread_id = tid_buffer.first;
       auto& buffer = tid_buffer.second;
       tracepoint_collector_types::ScopeTraceEvent event;
+
       // Collect all samples from this buffer.
+      // @TODO This is some low-hanging fruit, this call uses an atomic for each event, we can do better.
       while (buffer->pop(event))
       {
-        events[tid].push_back(event);
+        events[thread_id].push_back(event);
         collected++;
       }
     }
@@ -102,18 +118,13 @@ void NativeTraceEndpointSender::work()
         transport->broadcast("native_tracepoint_receiver", process_events(events));
       }
     }
+    // @TODO; do some real rate limiting here.
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 }
 
-
 std::string NativeTraceEndpointSender::getName() const
 {
   return name;
-}
-
-bool NativeTraceEndpointSender::handle(Transport& /* server */, const Data& /* request */, Data&  /* response */)
-{
-  return false;
 }
 }  // namespace scalopus

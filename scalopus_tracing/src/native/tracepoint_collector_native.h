@@ -33,28 +33,39 @@
 #include "spsc_ringbuffer.h"
 namespace scalopus
 {
-/**
- * @brief A singleton class that keeps track of the mapping between the ID's stored in the trace and the user-provided
-          name for them.
- */
-
 namespace tracepoint_collector_types
 {
-// This is quite a few template parameters that need to be stacked into each other...
+
+//! Clock to use for trace timestamps.
 using Clock = std::chrono::high_resolution_clock;
+//! Timepoint of that clock.
 using TimePoint = std::chrono::time_point<Clock>;
+//! Trace event as it is stored in the ringbuffer.
 using ScopeTraceEvent = std::tuple<TimePoint, unsigned int, uint8_t>;
+//! The container that backs the ringbuffer.
 using EventContainer = std::vector<ScopeTraceEvent>;
+//! The single producer single consumer ringbuffer with the event container.
 using ScopeBuffer = SPSCRingBuffer<EventContainer>;
+//! Pointer type to the ringbuffer.
 using ScopeBufferPtr = std::shared_ptr<ScopeBuffer>;
+//! The (grouped by thread) events composed of native types that we can serialize to binary for transfer.
 using ThreadedEvents = std::map<unsigned long, std::vector<std::tuple<uint64_t, unsigned int, uint8_t>>>;
 }
 
+/**
+ * @brief A singleton class that keeps track of the ringbuffer allocated to each thread to insert tracepoints into.
+ */
 class TracePointCollectorNative : public MapTracker<unsigned long, tracepoint_collector_types::ScopeBufferPtr>
 {
 private:
   TracePointCollectorNative() = default;
 
+  /**
+   * @brief The size of each thread's ringbuffer.
+   * If this is too small, and the thread produces events quicker than the server thread collects them this will result
+   * in lost events.
+   */
+  std::size_t ringbuffer_size_{ 10000 };
 public:
   constexpr static const uint8_t ENTRY = 1;
   constexpr static const uint8_t EXIT = 2;
@@ -65,9 +76,14 @@ public:
   static TracePointCollectorNative& getInstance();
 
   /**
-   * @brief Called by a thread to allow it to store events.
+   * @brief Called by each thread to obtain the ringbuffer in which it should store the trace events.
    */
   tracepoint_collector_types::ScopeBufferPtr getBuffer();
+
+  /**
+   * @brief Set the size of any new ringbuffers that will be created.
+   */
+  void setRingbufferSize(std::size_t size);
   
 };
 }  // namespace scalopus

@@ -28,8 +28,6 @@
 #define SCALOPUS_CATAPULT_SCOPE_TRACING_PROVIDER_H
 
 #include <scalopus_interface/trace_event_provider.h>
-
-#include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_tracing/endpoint_scope_tracing.h>
 #include <scalopus_interface/endpoint_manager.h>
 
@@ -42,6 +40,7 @@ class ScopeTracingProvider : public TraceEventProvider
 {
 public:
   using Ptr = std::shared_ptr<ScopeTracingProvider>;
+  using ProcessTraceMap = EndpointScopeTracing::ProcessTraceMap;
 
   /**
    * @brief Create the scope tracing provider.
@@ -60,16 +59,18 @@ public:
   void updateMapping();
 
   /**
-   * @brief Resolve one mapping given the process id and trace id. If the mapping is unknown a pretty string with the
-   *        trace id is returned.
+   * @brief Format the scope name using a mapping, prociess id and trace_id.
+   * @param mapping The mapping as retrieved from the providers' getMapping() call.
+   * @param pid The process id this trace id is associated with.
+   * @param trace_id The id of the tracepoint encountered.
    */
-  std::string getScopeName(unsigned int pid, unsigned int trace_id);
+  static std::string getScopeName(const ProcessTraceMap& mapping, const unsigned int pid, const unsigned int trace_id);
 
 private:
   EndpointManager::Ptr manager_;      //!< Manager for connections.
 
   std::mutex mapping_mutex_;                       //!< Mutex for the mapping.
-  EndpointScopeTracing::ProcessTraceMap mapping_;  //!< The currently known mappings.
+  ProcessTraceMap mapping_;  //!< The currently known mappings.
 };
 
 }  // namespace scalopus
