@@ -46,7 +46,7 @@ TRACEPOINT_LOGLEVEL(scalopus_scope_id, exit, TRACE_DEBUG_FUNCTION)
 #endif /* _TRACEPOINT_scalopus_scope_id_H */
 
 #undef TRACEPOINT_INCLUDE
-#define TRACEPOINT_INCLUDE "scope_tracepoint_lttng_definition.h"
+#define TRACEPOINT_INCLUDE "lttng/scope_tracepoint_lttng_definition.h"
 
 /* This part must be outside ifdef protection */
 #include <lttng/tracepoint-event.h>

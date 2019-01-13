@@ -26,7 +26,7 @@
 
 #define TRACEPOINT_DEFINE
 #define TRACEPOINT_CREATE_PROBES
-#include "scope_tracepoint_lttng_definition.h"
+#include "lttng/scope_tracepoint_lttng_definition.h"
 #include <scalopus_tracing/internal/scope_tracepoint.h>
 
 namespace scalopus

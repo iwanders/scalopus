@@ -33,7 +33,7 @@ target_link_libraries(scalopus_scope_tracing
 
 # Create the library that provides the scope tracepoints 
 add_library(scalopus_tracepoint_lttng SHARED
-  src/scope_tracepoint_lttng.cpp
+  src/lttng/scope_tracepoint_lttng.cpp
 )
 target_include_directories(scalopus_tracepoint_lttng
   PUBLIC 
@@ -60,8 +60,8 @@ target_link_libraries(scalopus_lttng
 
 # Create the library that provides the scope tracepoints 
 add_library(scalopus_tracepoint_native SHARED
-  src/tracepoint_collector_native.cpp
-  src/scope_tracepoint_native.cpp
+  src/native/tracepoint_collector_native.cpp
+  src/native/scope_tracepoint_native.cpp
 )
 target_include_directories(scalopus_tracepoint_native
   PUBLIC 
@@ -79,7 +79,7 @@ target_link_libraries(scalopus_tracepoint_native
 )
 
 add_library(scalopus_scope_tracing_native
-  src/native_trace_endpoint_sender.cpp
+  src/native/native_trace_endpoint_sender.cpp
 )
 add_library(Scalopus::scalopus_scope_tracing_native ALIAS scalopus_scope_tracing_native)
 
@@ -99,9 +99,9 @@ target_link_libraries(scalopus_scope_tracing_native
 )
 
 add_library(scalopus_babeltrace SHARED
-  src/ctfevent.cpp
-  src/babeltrace_tool.cpp
-  src/babeltrace_parser.cpp)
+  src/lttng/ctfevent.cpp
+  src/lttng/babeltrace_tool.cpp
+  src/lttng/babeltrace_parser.cpp)
 target_link_libraries(scalopus_babeltrace
   PUBLIC
     scalopus_lttng
@@ -119,12 +119,12 @@ add_library(Scalopus::scalopus_babeltrace ALIAS scalopus_babeltrace)
 
 
 add_library(scalopus_lttng_consumer
-  src/lttng_source.cpp
-  src/lttng_provider.cpp
+  src/lttng/lttng_source.cpp
+  src/lttng/lttng_provider.cpp
   src/scope_tracing_provider.cpp
-  src/native_trace_provider.cpp
-  src/native_trace_source.cpp
-  src/native_trace_endpoint_receiver.cpp
+  src/native/native_trace_provider.cpp
+  src/native/native_trace_source.cpp
+  src/native/native_trace_endpoint_receiver.cpp
 )
 target_include_directories(scalopus_lttng_consumer
   PUBLIC 

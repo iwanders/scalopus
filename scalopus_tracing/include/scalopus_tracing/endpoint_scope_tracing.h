@@ -33,6 +33,9 @@
 
 namespace scalopus
 {
+/**
+ * @brief This class provides the mapping between scope tracing point id's and their names.
+ */
 class EndpointScopeTracing : public Endpoint
 {
 public:
@@ -41,7 +44,8 @@ public:
   using ProcessTraceMap = std::map<unsigned int /* pid */, TraceIdMap /* trace_map */>;
 
   /**
-   * @brief Return the trace id to name mappings from the endpoint.
+   * @brief This function should be called from the client side, it communicates with the endpoint at the connected
+   *        server side and retrieves its mappings.
    */
   ProcessTraceMap mapping();
 

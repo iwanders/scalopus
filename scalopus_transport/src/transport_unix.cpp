@@ -389,6 +389,7 @@ bool TransportUnix::processMsg(const protocol::Msg& request, protocol::Msg& resp
     // Let the endpoint handle the data and if necessary respond.
     return it->second->handle(*this, request.data, response.data);
   }
+  // @TODO handle requests to endpoints we don't have gracefully.
   return false;
 }
 

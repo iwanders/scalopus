@@ -33,6 +33,9 @@
 
 namespace scalopus
 {
+/**
+ *
+ */
 class NativeTraceEndpointSender : public Endpoint
 {
 public:

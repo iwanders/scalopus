@@ -24,23 +24,25 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_TRACING_TRACEPOINT_H
-#define SCALOPUS_TRACING_TRACEPOINT_H
+#ifndef SCALOPUS_TRACING_SCOPE_TRACEPOINT_H
+#define SCALOPUS_TRACING_SCOPE_TRACEPOINT_H
 
 namespace scalopus
 {
 /**
- * @brief Emit an scope entry tracepoint.
- * @param id The tracepoint id to use.
+ * @brief Emit an scope entry tracepoint, the implementation of this function can be swapped to support different
+ *        tracing frameworks.
+ * @param id The tracepoint id of the scope that's being entered.
  */
 void scope_entry(const unsigned int id);
 
 /**
- * @brief Emit an scope exit tracepoint.
- * @param id The tracepoint id to use.
+ * @brief Emit an scope exit tracepoint, the implementation of this function can be swapped to support different
+ *        tracing frameworks.
+ * @param id The tracepoint id of the scope that's being exited.
  */
 void scope_exit(const unsigned int id);
 
 }  // namespace scalopus
 
-#endif  // SCALOPUS_TRACING_TRACEPOINT_H
+#endif  // SCALOPUS_TRACING_SCOPE_TRACEPOINT_H
