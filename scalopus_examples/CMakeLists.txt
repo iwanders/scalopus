@@ -21,7 +21,7 @@ target_link_libraries(example_scope_tracepoints_random Scalopus::scalopus_lttng)
 add_executable(example_scope_tracepoints_random_native
   src/example_scope_tracepoints_random_native.cpp
 )
-target_link_libraries(example_scope_tracepoints_random_native Scalopus::scalopus_scope_tracing Scalopus::scalopus_scope_tracing_native)
+target_link_libraries(example_scope_tracepoints_random_native Scalopus::scalopus_scope_tracing_native)
 
 add_executable(introspect_endpoints src/introspect_endpoints.cpp)
 target_link_libraries(introspect_endpoints Scalopus::scalopus_transport Scalopus::scalopus_consumer Scalopus::scalopus_general)

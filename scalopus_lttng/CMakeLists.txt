@@ -60,11 +60,30 @@ target_link_libraries(scalopus_lttng
 )
 
 # Create the library that provides the scope tracepoints 
-add_library(scalopus_scope_tracing_native
-  src/scope_tracepoint_native.cpp
+add_library(scalopus_tracepoint_native SHARED
   src/tracepoint_collector_native.cpp
+  src/scope_tracepoint_native.cpp
+)
+target_include_directories(scalopus_tracepoint_native
+  PUBLIC 
+    $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+add_library(Scalopus::scalopus_tracepoint_native ALIAS scalopus_tracepoint_native)
+
+target_link_libraries(scalopus_tracepoint_native
+  PRIVATE
+    Scalopus::scalopus_scope_tracing
+    nlohmann_json::nlohmann_json
+)
+
+add_library(scalopus_scope_tracing_native SHARED
   src/native_trace_endpoint_sender.cpp
 )
+add_library(Scalopus::scalopus_scope_tracing_native ALIAS scalopus_scope_tracing_native)
+
 target_include_directories(scalopus_scope_tracing_native
   PUBLIC 
     $<INSTALL_INTERFACE:include>
@@ -72,15 +91,12 @@ target_include_directories(scalopus_scope_tracing_native
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-add_library(Scalopus::scalopus_scope_tracing_native ALIAS scalopus_scope_tracing_native)
-
 target_link_libraries(scalopus_scope_tracing_native
   PUBLIC
     Scalopus::scalopus_scope_tracing
-  PRIVATE
+    Scalopus::scalopus_tracepoint_native
     nlohmann_json::nlohmann_json
 )
-
 
 add_library(scalopus_babeltrace SHARED
   src/ctfevent.cpp
@@ -132,6 +148,7 @@ export(
     scalopus_lttng_consumer
     scalopus_scope_tracing
     scalopus_tracepoint_lttng
+    scalopus_tracepoint_native
     scalopus_scope_tracing_native
   NAMESPACE Scalopus::
   FILE ScalopusLttngConfig.cmake
@@ -142,7 +159,8 @@ install(TARGETS
   scalopus_lttng_consumer
   scalopus_scope_tracing
   scalopus_tracepoint_lttng
-  scalopus_scope_tracing_native 
+  scalopus_tracepoint_native
+  scalopus_scope_tracing_native
 
   EXPORT ScalopusLttng
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
