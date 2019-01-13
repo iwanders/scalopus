@@ -34,10 +34,7 @@ void scope_entry(const unsigned int id)
 {
   thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
   // @TODO Do something with overrun, count lost events?
-  if (!buffer.push({tracepoint_collector_types::Clock::now(), id, TracePointCollectorNative::ENTRY}))
-  {
-    std::cout<<"." << std::endl;
-  }
+  buffer.push({tracepoint_collector_types::Clock::now(), id, TracePointCollectorNative::ENTRY});
 }
 
 void scope_exit(const unsigned int id)

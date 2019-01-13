@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2018, Ivor Wanders
+  Copyright (c) 2019, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -24,37 +24,32 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <chrono>
-#include <iostream>
-#include "scalopus_lttng/babeltrace_tool.h"
+#ifndef SCALOPUS_LTTNG_NATIVE_TRACE_ENDPOINT_RECEIVER_H
+#define SCALOPUS_LTTNG_NATIVE_TRACE_ENDPOINT_RECEIVER_H
 
-int main(int /*argc*/, const char* /*argv*/[])
+#include <scalopus_interface/transport.h>
+#include "scalopus_lttng/native_trace_provider.h"
+#include <map>
+#include <string>
+
+namespace scalopus
 {
-  scalopus::BabeltraceTool x;
-  x.init();
-  {
-    using namespace std::chrono_literals;
-    std::this_thread::sleep_for(1s);
-  }
-  auto eventCallback0 = [](const auto& event) { std::cout << "First callback:: " << event << std::endl; };
+class NativeTraceEndpointReceiver : public Endpoint
+{
+public:
+  using Ptr = std::shared_ptr<NativeTraceEndpointReceiver>;
+  using ReceiveFunction = std::function<void(const Data&)>;
+  constexpr static const char* name = "native_tracepoint_receiver";
 
-  auto session = x.addCallback(eventCallback0);
-  {
-    using namespace std::chrono_literals;
-    std::this_thread::sleep_for(2s);
-  }
-  session->disable();
+  NativeTraceEndpointReceiver(ReceiveFunction&& receiver);
 
-  auto eventCallback1 = [](const auto& event) { std::cout << "Second callback:: " << event << std::endl; };
+  // From the endpoint
+  std::string getName() const;
+  bool unsolicited(Transport& server, const Data& request, Data& response);
+private:
+  ReceiveFunction receiver_;
+};
 
-  auto session1 = x.addCallback(eventCallback1);
-  {
-    using namespace std::chrono_literals;
-    std::this_thread::sleep_for(2s);
-  }
-  session1->disable();
+}  // namespace scalopus
 
-  x.halt();
-
-  return 0;
-}
+#endif  // SCALOPUS_LTTNG_NATIVE_TRACE_ENDPOINT_RECEIVER_H

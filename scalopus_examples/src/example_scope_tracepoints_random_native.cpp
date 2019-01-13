@@ -45,7 +45,7 @@
 #include <scalopus_general/endpoint_introspect.h>
 #include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_general/thread_naming.h>
-#include <scalopus_lttng/endpoint_native_tracepoint_collector.h>
+#include <scalopus_lttng/native_trace_endpoint_sender.h>
 #include <scalopus_lttng/endpoint_scope_tracing.h>
 #include <scalopus_lttng/scope_tracing.h>
 #include <scalopus_transport/transport_unix.h>
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
   const auto server = factory->serve();
   server->addEndpoint(std::make_unique<scalopus::EndpointScopeTracing>());
   server->addEndpoint(std::make_unique<scalopus::EndpointIntrospect>());
-  auto collector = std::make_shared<scalopus::EndpointNativeTracepointCollector>();
+  auto collector = std::make_shared<scalopus::NativeTraceEndpointSender>();
   collector->setTransport(server);
   server->addEndpoint(collector);
   auto endpoint_process_info = std::make_shared<scalopus::EndpointProcessInfo>();

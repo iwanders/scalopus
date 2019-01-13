@@ -18,6 +18,7 @@ endif()
 if(SCALOPUS_USE_EXTERNAL_SEASOCKS)
   find_package(Seasocks REQUIRED)
 else()
+  set(UNITTESTS "Build unittests." OFF)
   add_subdirectory(thirdparty/seasocks)
 endif()
 

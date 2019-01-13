@@ -64,12 +64,7 @@ std::vector<json> NativeTraceSource::finishInterval()
   std::vector<json> res;
 
   stopInterval();
-  // Obtain the data chunks.
-  std::vector<DataPtr> data;
-  {
-    std::lock_guard<decltype(data_mutex_)> lock(data_mutex_);
-    recorded_data_.swap(data);
-  }
+
   // Update mappings.
   auto provider = provider_.lock();
   if (provider != nullptr)
@@ -77,29 +72,40 @@ std::vector<json> NativeTraceSource::finishInterval()
     provider->updateMapping();
   }
 
-  // Now, we start hard work.
+  // Obtain the data chunks.
+  std::vector<DataPtr> data;
+  {
+    std::lock_guard<decltype(data_mutex_)> lock(data_mutex_);
+    recorded_data_.swap(data);
+  }
+
+  // Now, we start converting the chunks of data we obtain into trace events.
   for (const auto& dptr : data)
   {
+    // First, we parse the bson we got and convert it to events.
     const json parsed = json::from_bson(*dptr);
     unsigned int pid{ 0 };
     parsed.at("pid").get_to(pid);
     tracepoint_collector_types::ThreadedEvents events;
     parsed.at("events").get_to(events);
+
     for (const auto& thread_events : events)
     {
+      // Events are grouped by thread id.
       const auto& tid = thread_events.first;
-      //std::vector<std::tuple<uint64_t, unsigned int, uint8_t>
       for (const auto& event : thread_events.second)
       {
         const auto& timestamp_ns_since_epoch = std::get<0>(event);
-        const auto& id = std::get<1>(event);
+        const auto& trace_id = std::get<1>(event);
         const auto& type = std::get<2>(event);
+
+        // Finally, we can create a trace type that can be used by devtools.
         json entry;
         entry["ts"] = static_cast<double>(timestamp_ns_since_epoch) / 1000.0;
         entry["cat"] = "PERF";
         entry["tid"] = tid;
         entry["pid"] = pid;
-        entry["name"] = provider->getScopeName(pid, id);
+        entry["name"] = provider->getScopeName(pid, trace_id);
         switch (type)
         {
           case TracePointCollectorNative::ENTRY:

@@ -23,7 +23,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus_lttng/endpoint_native_tracepoint_collector.h>
+#include <scalopus_lttng/native_trace_endpoint_sender.h>
 #include "tracepoint_collector_native.h"
 #include <sys/types.h>
 #include <unistd.h>
@@ -36,7 +36,7 @@ namespace scalopus
 using json = nlohmann::json;
 using EventMap = std::map<unsigned long, tracepoint_collector_types::EventContainer>;
 
-EndpointNativeTracepointCollector::EndpointNativeTracepointCollector()
+NativeTraceEndpointSender::NativeTraceEndpointSender()
 {
   worker_ = std::thread([&]()
   {
@@ -44,7 +44,7 @@ EndpointNativeTracepointCollector::EndpointNativeTracepointCollector()
   });
 }
 
-EndpointNativeTracepointCollector::~EndpointNativeTracepointCollector()
+NativeTraceEndpointSender::~NativeTraceEndpointSender()
 {
   running_ = false;
   worker_.join();
@@ -73,7 +73,7 @@ static Data process_events(const EventMap& tid_event_map)
   return json::to_bson(events);
 }
 
-void EndpointNativeTracepointCollector::work()
+void NativeTraceEndpointSender::work()
 {
   auto& collector = TracePointCollectorNative::getInstance();
   while (running_)
@@ -99,7 +99,7 @@ void EndpointNativeTracepointCollector::work()
       auto transport = transport_.lock();
       if (transport)
       {
-        transport->broadcast(getName(), process_events(events));
+        transport->broadcast("native_tracepoint_receiver", process_events(events));
       }
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -107,12 +107,12 @@ void EndpointNativeTracepointCollector::work()
 }
 
 
-std::string EndpointNativeTracepointCollector::getName() const
+std::string NativeTraceEndpointSender::getName() const
 {
   return name;
 }
 
-bool EndpointNativeTracepointCollector::handle(Transport& /* server */, const Data& /* request */, Data&  /* response */)
+bool NativeTraceEndpointSender::handle(Transport& /* server */, const Data& /* request */, Data&  /* response */)
 {
   return false;
 }

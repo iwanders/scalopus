@@ -57,7 +57,7 @@ public:
   ~NativeTraceSource();
 
   /**
-   * @brief Return whether or not this 
+   * @brief Return whether or not this source is currently in an recording interval.
    */
   bool isRecording() const;
 

@@ -23,21 +23,21 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "native_trace_endpoint_receive.h"
+#include "native_trace_endpoint_receiver.h"
 #include <iostream>
 namespace scalopus
 {
 
-NativeTraceEndpointReceive::NativeTraceEndpointReceive(ReceiveFunction&& receiver) : receiver_{receiver}
+NativeTraceEndpointReceiver::NativeTraceEndpointReceiver(ReceiveFunction&& receiver) : receiver_{receiver}
 {
 }
 
-std::string NativeTraceEndpointReceive::getName() const
+std::string NativeTraceEndpointReceiver::getName() const
 {
   return name;
 }
 
-bool NativeTraceEndpointReceive::unsolicited(Transport& /* transport */, const Data& incoming, Data&  /* outgoing */)
+bool NativeTraceEndpointReceiver::unsolicited(Transport& /* transport */, const Data& incoming, Data&  /* outgoing */)
 {
   receiver_(incoming);
   return false;

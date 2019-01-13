@@ -63,7 +63,7 @@ target_link_libraries(scalopus_lttng
 add_library(scalopus_scope_tracing_native
   src/scope_tracepoint_native.cpp
   src/tracepoint_collector_native.cpp
-  src/endpoint_native_tracepoint_collector.cpp
+  src/native_trace_endpoint_sender.cpp
 )
 target_include_directories(scalopus_scope_tracing_native
   PUBLIC 
@@ -92,15 +92,15 @@ target_link_libraries(scalopus_babeltrace
   PRIVATE
     Threads::Threads
 )
+target_include_directories(scalopus_babeltrace
+  PUBLIC 
+    $<INSTALL_INTERFACE:include_consumer>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include_consumer>
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
 add_library(Scalopus::scalopus_babeltrace ALIAS scalopus_babeltrace)
 
-
-add_executable(babeltrace_test
-  src/babeltrace_test.cpp)
-target_link_libraries(babeltrace_test
-  PRIVATE
-    scalopus_babeltrace
-)
 
 add_library(scalopus_lttng_consumer
   src/lttng_source.cpp
@@ -108,7 +108,7 @@ add_library(scalopus_lttng_consumer
   src/scope_tracing_provider.cpp
   src/native_trace_provider.cpp
   src/native_trace_source.cpp
-  src/native_trace_endpoint_receive.cpp
+  src/native_trace_endpoint_receiver.cpp
 )
 target_include_directories(scalopus_lttng_consumer
   PUBLIC 

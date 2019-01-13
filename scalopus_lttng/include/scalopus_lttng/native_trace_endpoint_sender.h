@@ -24,32 +24,32 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_LTTNG_NATIVE_TRACE_ENDPOINT_RECEIVE_H
-#define SCALOPUS_LTTNG_NATIVE_TRACE_ENDPOINT_RECEIVE_H
+#ifndef SCALOPUS_LTTNG_NATIVE_TRACE_ENDPOINT_SENDER_H
+#define SCALOPUS_LTTNG_NATIVE_TRACE_ENDPOINT_SENDER_H
 
 #include <scalopus_interface/transport.h>
-#include "scalopus_lttng/native_trace_provider.h"
 #include <map>
 #include <string>
 
 namespace scalopus
 {
-class NativeTraceEndpointReceive : public Endpoint
+class NativeTraceEndpointSender : public Endpoint
 {
 public:
-  using Ptr = std::shared_ptr<NativeTraceEndpointReceive>;
-  using ReceiveFunction = std::function<void(const Data&)>;
-  constexpr static const char* name = "native_tracepoint_collector";
+  constexpr static const char* name = "native_tracepoint_sender";
 
-  NativeTraceEndpointReceive(ReceiveFunction&& receiver);
+  NativeTraceEndpointSender();
+  ~NativeTraceEndpointSender();
 
   // From the endpoint
   std::string getName() const;
-  bool unsolicited(Transport& server, const Data& request, Data& response);
+  bool handle(Transport& server, const Data& request, Data& response);
 private:
-  ReceiveFunction receiver_;
+  void work();
+  bool running_ { true };
+  std::thread worker_;
 };
 
 }  // namespace scalopus
 
-#endif  // SCALOPUS_LTTNG_NATIVE_TRACE_ENDPOINT_RECEIVE_H
+#endif  // SCALOPUS_LTTNG_ENDPOINT_NATIVE_TRACEPOINT_COLLECTOR_H
