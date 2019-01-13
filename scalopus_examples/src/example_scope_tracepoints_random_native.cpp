@@ -45,9 +45,9 @@
 #include <scalopus_general/endpoint_introspect.h>
 #include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_general/thread_naming.h>
-#include <scalopus_lttng/native_trace_endpoint_sender.h>
-#include <scalopus_lttng/endpoint_scope_tracing.h>
-#include <scalopus_lttng/scope_tracing.h>
+#include <scalopus_tracing/native_trace_endpoint_sender.h>
+#include <scalopus_tracing/endpoint_scope_tracing.h>
+#include <scalopus_tracing/scope_tracing.h>
 #include <scalopus_transport/transport_unix.h>
 
 int randint(int min, int max)

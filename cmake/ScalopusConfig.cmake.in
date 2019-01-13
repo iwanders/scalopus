@@ -35,7 +35,7 @@ include(FindThreads)
 find_package(ScalopusInterface)
 find_package(ScalopusTransport)
 find_package(ScalopusGeneral)
-find_package(ScalopusLttng)
+find_package(ScalopusTracing)
 list(REMOVE_AT CMAKE_PREFIX_PATH -1)
 
 set(Scalopus_FOUND true)

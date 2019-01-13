@@ -40,7 +40,7 @@ endif()
 
 add_subdirectory(scalopus_interface)
 add_subdirectory(scalopus_transport)
-add_subdirectory(scalopus_lttng)
+add_subdirectory(scalopus_tracing)
 add_subdirectory(scalopus_general)
 add_subdirectory(scalopus_examples)
 add_subdirectory(scalopus_catapult)

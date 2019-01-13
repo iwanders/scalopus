@@ -27,10 +27,10 @@
 #include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_general/general_provider.h>
 
-#include <scalopus_lttng/endpoint_scope_tracing.h>
-#include <scalopus_lttng/native_trace_endpoint_sender.h>
-#include <scalopus_lttng/lttng_provider.h>
-#include <scalopus_lttng/native_trace_provider.h>
+#include <scalopus_tracing/endpoint_scope_tracing.h>
+#include <scalopus_tracing/native_trace_endpoint_sender.h>
+#include <scalopus_tracing/lttng_provider.h>
+#include <scalopus_tracing/native_trace_provider.h>
 
 #include <scalopus_transport/transport_unix.h>
 
