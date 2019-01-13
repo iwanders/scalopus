@@ -18,3 +18,6 @@ target_link_libraries(example_scope_tracepoints_random_native Scalopus::scalopus
 
 add_executable(introspect_endpoints src/introspect_endpoints.cpp)
 target_link_libraries(introspect_endpoints Scalopus::scalopus_transport Scalopus::scalopus_consumer Scalopus::scalopus_general)
+
+add_executable(readme_example src/readme_example.cpp)
+target_link_libraries(readme_example Scalopus::scalopus_tracing_native)
