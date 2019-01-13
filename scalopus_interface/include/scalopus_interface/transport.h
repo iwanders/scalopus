@@ -47,7 +47,8 @@ public:
   virtual ~Transport() = default;
 
   /**
-   * @brief Add an endpoitn to this transport, this allows endpoints to receive broadcast messages.
+   * @brief Add an endpoint to this transport, this allows endpoints to communicate with the transport.
+   * This also calls setTransport(this) on the endpoint itself. 
    */
   virtual void addEndpoint(const std::shared_ptr<Endpoint>& endpoint);
 

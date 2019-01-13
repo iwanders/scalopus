@@ -58,13 +58,12 @@ bool EndpointScopeTracing::handle(Transport& /* server */, const Data& request, 
 EndpointScopeTracing::ProcessTraceMap EndpointScopeTracing::mapping()
 {
   // send message...
-  auto transport = transport_.lock();
-  if (transport == nullptr)
+  if (transport_ == nullptr)
   {
     throw communication_error("No transport provided to endpoint, cannot communicate.");
   }
 
-  auto future_ptr = transport->request(getName(), { 'm' });
+  auto future_ptr = transport_->request(getName(), { 'm' });
   if (future_ptr->wait_for(std::chrono::milliseconds(200)) == std::future_status::ready)
   {
     ProcessTraceMap res;

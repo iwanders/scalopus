@@ -37,9 +37,12 @@ bool Endpoint::unsolicited(Transport& /* transport */, const Data& /* incoming *
   return false;
 }
 
-void Endpoint::setTransport(const std::shared_ptr<Transport>& transport)
+void Endpoint::setTransport(Transport* transport)
 {
   transport_ = transport;
 }
-
+void Endpoint::setTransport(const std::shared_ptr<Transport>& transport)
+{
+  setTransport(transport.get());
+}
 }  // namespace scalopus

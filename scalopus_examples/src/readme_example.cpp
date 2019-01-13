@@ -65,9 +65,7 @@ int main(int /* argc */, char** argv)
   const auto server = factory->serve();
   server->addEndpoint(std::make_unique<scalopus::EndpointScopeTracing>());
   server->addEndpoint(std::make_unique<scalopus::EndpointIntrospect>());
-  auto collector = std::make_shared<scalopus::NativeTraceEndpointSender>();
-  collector->setTransport(server);
-  server->addEndpoint(collector);
+  server->addEndpoint(std::make_shared<scalopus::NativeTraceEndpointSender>());
   auto endpoint_process_info = std::make_shared<scalopus::EndpointProcessInfo>();
   endpoint_process_info->setProcessName(argv[0]);
   server->addEndpoint(endpoint_process_info);

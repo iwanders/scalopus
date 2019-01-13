@@ -91,10 +91,9 @@ void NativeTraceEndpointSender::work()
     }
     if (collected)
     {
-      auto transport = transport_.lock();
-      if (transport)
+      if (transport_ != nullptr)
       {
-        transport->broadcast("native_tracepoint_receiver", process_events(events));
+        transport_->broadcast("native_tracepoint_receiver", process_events(events));
       }
     }
     // @TODO; do some real rate limiting here.

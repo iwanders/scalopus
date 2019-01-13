@@ -52,14 +52,13 @@ bool EndpointIntrospect::handle(Transport& server, const Data& /* request */, Da
 std::vector<std::string> EndpointIntrospect::supported()
 {
   // send message...
-  auto transport = transport_.lock();
-  if (transport == nullptr)
+  if (transport_ == nullptr)
   {
     throw communication_error("No transport provided to endpoint, cannot communicate.");
   }
 
   // Obtain the response data
-  auto future_ptr = transport->request(name, {});
+  auto future_ptr = transport_->request(name, {});
   if (future_ptr->wait_for(std::chrono::milliseconds(200)) == std::future_status::ready)
   {
     json jdata = json::from_bson(future_ptr->get());  // This line may throw

@@ -56,6 +56,7 @@ void Transport::addEndpoint(const std::shared_ptr<Endpoint>& endpoint)
 {
   std::lock_guard<std::mutex> lock(endpoint_mutex_);
   endpoints_[endpoint->getName()] = endpoint;
+  endpoint->setTransport(this);
 }
 
 std::map<std::string, Endpoint::Ptr> Transport::endpoints() const

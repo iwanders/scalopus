@@ -71,8 +71,7 @@ bool EndpointProcessInfo::handle(Transport& /* server */, const Data& request, D
 EndpointProcessInfo::ProcessInfo EndpointProcessInfo::processInfo()
 {
   // send message...
-  auto transport = transport_.lock();
-  if (transport == nullptr)
+  if (transport_ == nullptr)
   {
     throw communication_error("No transport provided to endpoint, cannot communicate.");
   }
@@ -80,7 +79,7 @@ EndpointProcessInfo::ProcessInfo EndpointProcessInfo::processInfo()
   ProcessInfo info;
   json request = json::object();
   request["cmd"] = "info";
-  auto future_ptr = transport->request(getName(), json::to_bson(request));
+  auto future_ptr = transport_->request(getName(), json::to_bson(request));
 
   if (future_ptr->wait_for(std::chrono::milliseconds(200)) == std::future_status::ready)
   {

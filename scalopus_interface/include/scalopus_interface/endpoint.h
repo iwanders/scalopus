@@ -61,12 +61,13 @@ public:
   /**
    * @brief Set the transport to be used by this endpoint. This is in general used by the client endpoint.
    */
-  virtual void setTransport(const std::shared_ptr<Transport>& transport);
+  virtual void setTransport(Transport* transport);
+  void setTransport(const std::shared_ptr<Transport>& transport);
 
   virtual ~Endpoint() = default;
 
 protected:
-  std::weak_ptr<Transport> transport_;
+  Transport* transport_;  // Transport has a shared pointer to the endpoint, so it cannot go out of scope before this.
 };
 
 }  // namespace scalopus
