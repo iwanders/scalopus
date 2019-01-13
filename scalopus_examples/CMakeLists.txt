@@ -2,26 +2,26 @@
 add_executable(example_scope_tracepoints
   src/example_scope_tracepoints.cpp
 )
-target_link_libraries(example_scope_tracepoints Scalopus::scalopus_lttng)
+target_link_libraries(example_scope_tracepoints Scalopus::scalopus_tracing_lttng)
 
 add_executable(example_scope_tracepoints_native
   src/example_scope_tracepoints_native.cpp
 )
-target_link_libraries(example_scope_tracepoints_native Scalopus::scalopus_scope_tracing_native)
+target_link_libraries(example_scope_tracepoints_native Scalopus::scalopus_tracing_native)
 
 add_executable(dump_mappings src/dump_mappings.cpp)
-target_link_libraries(dump_mappings Scalopus::scalopus_lttng)
+target_link_libraries(dump_mappings Scalopus::scalopus_tracing_lttng)
 
 add_executable(example_scope_tracepoints_random
   src/example_scope_tracepoints_random.cpp
 )
-target_link_libraries(example_scope_tracepoints_random Scalopus::scalopus_lttng)
+target_link_libraries(example_scope_tracepoints_random Scalopus::scalopus_tracing_lttng)
 
 
 add_executable(example_scope_tracepoints_random_native
   src/example_scope_tracepoints_random_native.cpp
 )
-target_link_libraries(example_scope_tracepoints_random_native Scalopus::scalopus_scope_tracing_native)
+target_link_libraries(example_scope_tracepoints_random_native Scalopus::scalopus_tracing_native)
 
 add_executable(introspect_endpoints src/introspect_endpoints.cpp)
 target_link_libraries(introspect_endpoints Scalopus::scalopus_transport Scalopus::scalopus_consumer Scalopus::scalopus_general)

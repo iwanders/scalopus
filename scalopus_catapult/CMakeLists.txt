@@ -17,16 +17,9 @@ add_library(Scalopus::scalopus_catapult ALIAS scalopus_catapult)
 target_link_libraries(scalopus_catapult
 PUBLIC
   Seasocks::seasocks
-  nlohmann_json::nlohmann_json
-  Scalopus::scalopus_babeltrace
-  Scalopus::scalopus_interface
-  Scalopus::scalopus_consumer
   Scalopus::scalopus_general_consumer
-  Scalopus::scalopus_lttng_consumer
-  Scalopus::scalopus_scope_tracing_native
+  Scalopus::scalopus_tracing_consumer
 )
 
-add_executable(catapult_server
-  src/catapult_server.cpp)
-
+add_executable(catapult_server src/catapult_server.cpp)
 target_link_libraries(catapult_server PRIVATE Scalopus::scalopus_catapult)
