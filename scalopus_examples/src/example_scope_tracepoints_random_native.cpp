@@ -127,7 +127,7 @@ int main(int argc, char** argv)
   std::atomic_bool threads_running{ true };
   for (size_t i = 0; i < thread_count; i++)
   {
-    active_threads.emplace_back([&]() {
+    active_threads.emplace_back([i, &threads_running, time_base]() {
       std::stringstream thread_name;
       thread_name << "Thread 0x" << std::hex << i;
       TRACE_THREAD_NAME(thread_name.str());
