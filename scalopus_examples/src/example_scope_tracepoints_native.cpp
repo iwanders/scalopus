@@ -76,6 +76,22 @@ void a()
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
+void sync()
+{
+  std::mutex mutex_to_be_locked;
+  std::condition_variable cv;
+  std::unique_lock<decltype(mutex_to_be_locked)> lock(mutex_to_be_locked);
+  auto now = std::chrono::system_clock::now();
+  auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
+  std::uint64_t epoch = std::chrono::duration_cast<std::chrono::milliseconds>(now_ms.time_since_epoch()).count();
+  std::cout << "Going to block until: " << (epoch - (epoch % 2000) + 2500) << std::endl;
+  cv.wait_until(lock, now + std::chrono::milliseconds(-(epoch % 2000) + 2500));
+  {
+    TRACE_TRACKED_RAII("post wait_until");
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+}
+
 int main(int /* argc */, char** argv)
 {
   auto factory = std::make_shared<scalopus::TransportUnixFactory>();
@@ -101,6 +117,7 @@ int main(int /* argc */, char** argv)
   while (true)
   {
     a();
+    sync();
   }
 
   return 0;
