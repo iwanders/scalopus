@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # Create the named session in live output mode.
-lttng create scalopus_target_session --live
+# The parameter to the live option is documented here: https://lttng.org/man/1/lttng-create/v2.10/#doc-_mode_selection
+# It is the maximum duration in microseconds before the data is flushed, shorter means less delay between tracepoint
+# being created and output by babeltrace, but at the cost of more cpu usage by the consumer daemon and relay daemon.
+lttng create scalopus_target_session --live=10000
 
 # enable all userspace events.
 lttng enable-event -u -a

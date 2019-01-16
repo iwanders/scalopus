@@ -1,0 +1,6 @@
+#!/bin/bash
+
+
+lttng stop scalopus_target_session
+
+lttng destroy scalopus_target_session
