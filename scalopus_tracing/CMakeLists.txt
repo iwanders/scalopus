@@ -90,7 +90,7 @@ target_link_libraries(scalopus_tracepoint_native
 list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracepoint_native)
 
 add_library(scalopus_tracing_native
-  src/native/native_trace_endpoint_sender.cpp
+  src/native/endpoint_native_trace_sender.cpp
 )
 add_library(Scalopus::scalopus_tracing_native ALIAS scalopus_tracing_native)
 
@@ -135,7 +135,7 @@ add_library(scalopus_tracing_consumer
   src/scope_tracing_provider.cpp
   src/native/native_trace_provider.cpp
   src/native/native_trace_source.cpp
-  src/native/native_trace_endpoint_receiver.cpp
+  src/native/endpoint_native_trace_receiver.cpp
 )
 target_include_directories(scalopus_tracing_consumer
   PUBLIC 

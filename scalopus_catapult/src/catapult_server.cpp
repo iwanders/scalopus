@@ -28,7 +28,7 @@
 #include <scalopus_general/general_provider.h>
 
 #include <scalopus_tracing/endpoint_trace_mapping.h>
-#include <scalopus_tracing/native_trace_endpoint_sender.h>
+#include <scalopus_tracing/endpoint_native_trace_sender.h>
 #include <scalopus_tracing/lttng_provider.h>
 #include <scalopus_tracing/native_trace_provider.h>
 
@@ -85,7 +85,7 @@ int main(int /* argc */, char** /* argv */)
   });
 
   auto native_trace_provider = std::make_shared<scalopus::NativeTraceProvider>(manager);
-  manager->addEndpointFactory(scalopus::NativeTraceEndpointSender::name,
+  manager->addEndpointFactory(scalopus::EndpointNativeTraceSender::name,
     [provider = std::weak_ptr<scalopus::NativeTraceProvider>(native_trace_provider)](const auto& transport) {
     auto ptr = provider.lock();
     if (ptr)

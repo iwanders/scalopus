@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019, Ivor Wanders
+  Copyright (c) 2018, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -23,33 +23,23 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#ifndef SCALOPUS_TRACING_NATIVE_TRACE_ENDPOINT_SENDER_H
-#define SCALOPUS_TRACING_NATIVE_TRACE_ENDPOINT_SENDER_H
-
-#include <scalopus_interface/transport.h>
-
+#include "endpoint_native_trace_receiver.h"
+#include <iostream>
 namespace scalopus
 {
-/**
- * @brief This endpoint collects the events from the thread ringbuffers and broadcasts it to all connected clients.
- */
-class NativeTraceEndpointSender : public Endpoint
+
+EndpointNativeTraceReceiver::EndpointNativeTraceReceiver(ReceiveFunction&& receiver) : receiver_{receiver}
 {
-public:
-  constexpr static const char* name = "native_tracepoint_sender";
+}
 
-  NativeTraceEndpointSender();
-  ~NativeTraceEndpointSender();
+std::string EndpointNativeTraceReceiver::getName() const
+{
+  return name;
+}
 
-  // From the endpoint
-  std::string getName() const;
-private:
-  void work();
-  bool running_ { true };
-  std::thread worker_;
-};
-
+bool EndpointNativeTraceReceiver::unsolicited(Transport& /* transport */, const Data& incoming, Data&  /* outgoing */)
+{
+  receiver_(incoming);
+  return false;
+}
 }  // namespace scalopus
-
-#endif  // SCALOPUS_TRACING_ENDPOINT_NATIVE_TRACEPOINT_COLLECTOR_H

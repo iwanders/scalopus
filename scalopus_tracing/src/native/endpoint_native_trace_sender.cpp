@@ -23,7 +23,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus_tracing/native_trace_endpoint_sender.h>
+#include "scalopus_tracing/endpoint_native_trace_sender.h"
 #include "tracepoint_collector_native.h"
 #include <sys/types.h>
 #include <unistd.h>
@@ -36,7 +36,7 @@ namespace scalopus
 using json = nlohmann::json;
 using EventMap = std::map<unsigned long, tracepoint_collector_types::EventContainer>;
 
-NativeTraceEndpointSender::NativeTraceEndpointSender()
+EndpointNativeTraceSender::EndpointNativeTraceSender()
 {
   // Start the worker thread.
   worker_ = std::thread([&]()
@@ -45,7 +45,7 @@ NativeTraceEndpointSender::NativeTraceEndpointSender()
   });
 }
 
-NativeTraceEndpointSender::~NativeTraceEndpointSender()
+EndpointNativeTraceSender::~EndpointNativeTraceSender()
 {
   // Shut down the worker thread and join it.
   running_ = false;
@@ -65,7 +65,7 @@ static Data process_events(const EventMap& tid_event_map)
   return json::to_bson(events);
 }
 
-void NativeTraceEndpointSender::work()
+void EndpointNativeTraceSender::work()
 {
   // The collector is a singleton, just retrieve it once.
   const auto& collector = TracePointCollectorNative::getInstance();
@@ -93,7 +93,7 @@ void NativeTraceEndpointSender::work()
     {
       if (transport_ != nullptr)
       {
-        transport_->broadcast("native_tracepoint_receiver", process_events(events));
+        transport_->broadcast("native_trace_receiver", process_events(events));
       }
     }
     // @TODO; do some real rate limiting here.
@@ -101,7 +101,7 @@ void NativeTraceEndpointSender::work()
   }
 }
 
-std::string NativeTraceEndpointSender::getName() const
+std::string EndpointNativeTraceSender::getName() const
 {
   return name;
 }

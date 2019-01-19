@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2018, Ivor Wanders
+  Copyright (c) 2019, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -23,23 +23,33 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "native_trace_endpoint_receiver.h"
-#include <iostream>
+
+#ifndef SCALOPUS_TRACING_ENDPOINT_NATIVE_TRACE_RECEIVER_H
+#define SCALOPUS_TRACING_ENDPOINT_NATIVE_TRACE_RECEIVER_H
+
+#include <scalopus_interface/transport.h>
+#include "scalopus_tracing/native_trace_provider.h"
+#include <map>
+#include <string>
+
 namespace scalopus
 {
-
-NativeTraceEndpointReceiver::NativeTraceEndpointReceiver(ReceiveFunction&& receiver) : receiver_{receiver}
+class EndpointNativeTraceReceiver : public Endpoint
 {
-}
+public:
+  using Ptr = std::shared_ptr<EndpointNativeTraceReceiver>;
+  using ReceiveFunction = std::function<void(const Data&)>;
+  constexpr static const char* name = "native_trace_receiver";
 
-std::string NativeTraceEndpointReceiver::getName() const
-{
-  return name;
-}
+  EndpointNativeTraceReceiver(ReceiveFunction&& receiver);
 
-bool NativeTraceEndpointReceiver::unsolicited(Transport& /* transport */, const Data& incoming, Data&  /* outgoing */)
-{
-  receiver_(incoming);
-  return false;
-}
+  // From the endpoint
+  std::string getName() const;
+  bool unsolicited(Transport& server, const Data& request, Data& response);
+private:
+  ReceiveFunction receiver_;
+};
+
 }  // namespace scalopus
+
+#endif  // SCALOPUS_TRACING_ENDPOINT_NATIVE_TRACE_RECEIVER_H

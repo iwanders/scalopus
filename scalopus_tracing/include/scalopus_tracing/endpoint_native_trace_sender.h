@@ -24,32 +24,32 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_TRACING_NATIVE_TRACE_ENDPOINT_RECEIVER_H
-#define SCALOPUS_TRACING_NATIVE_TRACE_ENDPOINT_RECEIVER_H
+#ifndef SCALOPUS_TRACING_ENDPOINT_NATIVE_TRACE_SENDER_H
+#define SCALOPUS_TRACING_ENDPOINT_NATIVE_TRACE_SENDER_H
 
 #include <scalopus_interface/transport.h>
-#include "scalopus_tracing/native_trace_provider.h"
-#include <map>
-#include <string>
 
 namespace scalopus
 {
-class NativeTraceEndpointReceiver : public Endpoint
+/**
+ * @brief This endpoint collects the events from the thread ringbuffers and broadcasts it to all connected clients.
+ */
+class EndpointNativeTraceSender : public Endpoint
 {
 public:
-  using Ptr = std::shared_ptr<NativeTraceEndpointReceiver>;
-  using ReceiveFunction = std::function<void(const Data&)>;
-  constexpr static const char* name = "native_tracepoint_receiver";
+  constexpr static const char* name = "native_trace_sender";
 
-  NativeTraceEndpointReceiver(ReceiveFunction&& receiver);
+  EndpointNativeTraceSender();
+  ~EndpointNativeTraceSender();
 
   // From the endpoint
   std::string getName() const;
-  bool unsolicited(Transport& server, const Data& request, Data& response);
 private:
-  ReceiveFunction receiver_;
+  void work();
+  bool running_ { true };
+  std::thread worker_;
 };
 
 }  // namespace scalopus
 
-#endif  // SCALOPUS_TRACING_NATIVE_TRACE_ENDPOINT_RECEIVER_H
+#endif  // SCALOPUS_TRACING_ENDPOINT_NATIVE_TRACE_SENDER_H
