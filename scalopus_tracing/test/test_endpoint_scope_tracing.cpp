@@ -26,8 +26,7 @@
 
 #include <scalopus_transport/transport_mock.h>
 #include <iostream>
-#include "scalopus_tracing/endpoint_scope_tracing.h"
-#include "scalopus_tracing/scope_tracing.h"
+#include "scalopus_tracing/tracing.h"
 
 template <typename A, typename B>
 void test_map(const A& a, const B& b)
@@ -51,7 +50,7 @@ void test(const A& a, const B& b)
 }
 int main(int /* argc */, char** /* argv */)
 {
-  scalopus::EndpointScopeTracing::TraceIdMap test_mapping;
+  scalopus::EndpointTraceMapping::TraceIdMap test_mapping;
   test_mapping[0] = "foo";
   test_mapping[1] = "bar";
   test_mapping[2] = "buz";
@@ -62,7 +61,7 @@ int main(int /* argc */, char** /* argv */)
   }
 
   // Create the endpoint.
-  auto server_endpoint = std::make_shared<scalopus::EndpointScopeTracing>();
+  auto server_endpoint = std::make_shared<scalopus::EndpointTraceMapping>();
 
   auto factory = std::make_shared<scalopus::TransportMockFactory>();
   auto server = factory->serve();
@@ -70,7 +69,7 @@ int main(int /* argc */, char** /* argv */)
   auto client = factory->connect(server);
 
   // Add the endpoint to the client.
-  auto client_endpoint = std::make_shared<scalopus::EndpointScopeTracing>();
+  auto client_endpoint = std::make_shared<scalopus::EndpointTraceMapping>();
   client_endpoint->setTransport(client);
 
   auto retrieved_mapping = client_endpoint->mapping();

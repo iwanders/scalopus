@@ -57,8 +57,14 @@
 
 #define TRACE_SCOPE_START_NAMED_ID(name, id)                                                                           \
   TRACE_TRACKED_MAPPING_REGISTER_ONCE(name, id, SCALOPUS_MAKE_UNIQUE(scalopus_trace_id_))                              \
-  scalopus::scope_entry(id);
+  scalopus::scope_entry(id);                                                                                           \
+  do                                                                                                                   \
+  {                                                                                                                    \
+  } while (0)
 
-#define TRACE_SCOPE_END_NAMED_ID(name, id) scalopus::scope_exit(id);
+#define TRACE_SCOPE_END_NAMED_ID(name, id) scalopus::scope_exit(id);                                                   \
+  do                                                                                                                   \
+  {                                                                                                                    \
+  } while (0)
 
 #endif  // SCALOPUS_TRACING_INTERNAL_SCOPE_TRACING_H

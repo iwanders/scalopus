@@ -42,11 +42,7 @@
 
 #include <signal.h>
 
-#include <scalopus_general/endpoint_introspect.h>
-#include <scalopus_general/endpoint_process_info.h>
-#include <scalopus_general/thread_naming.h>
-#include <scalopus_tracing/endpoint_scope_tracing.h>
-#include <scalopus_tracing/scope_tracing.h>
+#include <scalopus_tracing/tracing.h>
 #include <scalopus_transport/transport_unix.h>
 
 int randint(int min, int max)
@@ -111,7 +107,7 @@ int main(int argc, char** argv)
   // Instantiating the scalopus transport.
   auto factory = std::make_shared<scalopus::TransportUnixFactory>();
   const auto server = factory->serve();
-  server->addEndpoint(std::make_unique<scalopus::EndpointScopeTracing>());
+  server->addEndpoint(std::make_unique<scalopus::EndpointTraceMapping>());
   server->addEndpoint(std::make_unique<scalopus::EndpointIntrospect>());
   auto endpoint_process_info = std::make_shared<scalopus::EndpointProcessInfo>();
   endpoint_process_info->setProcessName(argv[0]);

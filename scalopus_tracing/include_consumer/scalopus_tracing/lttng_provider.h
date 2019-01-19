@@ -32,7 +32,7 @@
 #include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_tracing/babeltrace_tool.h>
 #include <scalopus_tracing/ctfevent.h>
-#include <scalopus_tracing/endpoint_scope_tracing.h>
+#include <scalopus_tracing/endpoint_trace_mapping.h>
 #include <scalopus_tracing/scope_tracing_provider.h>
 
 #include <scalopus_interface/endpoint_manager.h>

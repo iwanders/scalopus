@@ -5,7 +5,7 @@ include(FindThreads)
 add_library(scalopus_scope_tracing
   src/scope_trace_raii.cpp
   src/scope_trace_tracker.cpp
-  src/endpoint_scope_tracing.cpp
+  src/endpoint_trace_mapping.cpp
 )
 target_include_directories(scalopus_scope_tracing
   PUBLIC 

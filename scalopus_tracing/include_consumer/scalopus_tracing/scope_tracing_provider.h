@@ -28,7 +28,7 @@
 #define SCALOPUS_CATAPULT_SCOPE_TRACING_PROVIDER_H
 
 #include <scalopus_interface/trace_event_provider.h>
-#include <scalopus_tracing/endpoint_scope_tracing.h>
+#include <scalopus_tracing/endpoint_trace_mapping.h>
 #include <scalopus_interface/endpoint_manager.h>
 
 namespace scalopus
@@ -40,7 +40,7 @@ class ScopeTracingProvider : public TraceEventProvider
 {
 public:
   using Ptr = std::shared_ptr<ScopeTracingProvider>;
-  using ProcessTraceMap = EndpointScopeTracing::ProcessTraceMap;
+  using ProcessTraceMap = EndpointTraceMapping::ProcessTraceMap;
 
   /**
    * @brief Create the scope tracing provider.
@@ -51,7 +51,7 @@ public:
   /**
    * @brief Return all currently known mappings.
    */
-  EndpointScopeTracing::ProcessTraceMap getMapping();
+  EndpointTraceMapping::ProcessTraceMap getMapping();
 
   /**
    * @brief Update the current mapping by retrieving the currently known maps from the endpoints.

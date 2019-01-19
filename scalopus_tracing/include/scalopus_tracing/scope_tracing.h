@@ -46,17 +46,9 @@
 #define TRACE_PRETTY_FUNCTION() TRACE_TRACKED_RAII_ID(__PRETTY_FUNCTION__, SCALOPUS_TRACKED_TRACE_ID_CREATOR())
 
 // Macro to explicitly emit a start scope, needs to be paired with TRACE_SCOPE_END(name) with the same name.
-#define TRACE_SCOPE_START(name)                                                                                        \
-  TRACE_SCOPE_START_NAMED_ID(name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))                                             \
-  do                                                                                                                   \
-  {                                                                                                                    \
-  } while (0)
+#define TRACE_SCOPE_START(name) TRACE_SCOPE_START_NAMED_ID(name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))
 
 // Macro to explicitly emit a start scope, needs to be paired with TRACE_SCOPE_START(name) with the same name.
-#define TRACE_SCOPE_END(name)                                                                                          \
-  TRACE_SCOPE_END_NAMED_ID(name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))                                               \
-  do                                                                                                                   \
-  {                                                                                                                    \
-  } while (0)
+#define TRACE_SCOPE_END(name) TRACE_SCOPE_END_NAMED_ID(name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))
 
 #endif  // SCALOPUS_TRACING_SCOPE_TRACING_H

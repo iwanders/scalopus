@@ -24,8 +24,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_TRACING_ENDPOINT_SCOPE_TRACING_H
-#define SCALOPUS_TRACING_ENDPOINT_SCOPE_TRACING_H
+#ifndef SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H
+#define SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H
 
 #include <scalopus_interface/transport.h>
 #include <map>
@@ -36,7 +36,7 @@ namespace scalopus
 /**
  * @brief This class provides the mapping between scope tracing point id's and their names.
  */
-class EndpointScopeTracing : public Endpoint
+class EndpointTraceMapping : public Endpoint
 {
 public:
   constexpr static const char* name = "scope_tracing";
@@ -56,4 +56,4 @@ public:
 
 }  // namespace scalopus
 
-#endif  // SCALOPUS_TRACING_ENDPOINT_SCOPE_TRACING_H
+#endif  // SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H

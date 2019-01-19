@@ -34,7 +34,7 @@ ScopeTracingProvider::ScopeTracingProvider(EndpointManager::Ptr manager) : manag
 {
 }
 
-EndpointScopeTracing::ProcessTraceMap ScopeTracingProvider::getMapping()
+EndpointTraceMapping::ProcessTraceMap ScopeTracingProvider::getMapping()
 {
   std::lock_guard<decltype(mapping_mutex_)> lock(mapping_mutex_);
   return mapping_;
@@ -43,7 +43,7 @@ EndpointScopeTracing::ProcessTraceMap ScopeTracingProvider::getMapping()
 void ScopeTracingProvider::updateMapping()
 {
   // Make a new mapping
-  EndpointScopeTracing::ProcessTraceMap mapping;
+  EndpointTraceMapping::ProcessTraceMap mapping;
 
   // Get the current transports and their endpoints from the manager.
   auto endpoints_by_transport = manager_->endpoints();
@@ -51,7 +51,7 @@ void ScopeTracingProvider::updateMapping()
   {
     // Try to find the scope tracing endpoint from this transports' endpoints and obtain its data.
     auto endpoint_scope_tracing =
-        EndpointManager::findEndpoint<scalopus::EndpointScopeTracing>(transport_endpoints.second);
+        EndpointManager::findEndpoint<scalopus::EndpointTraceMapping>(transport_endpoints.second);
 
     if (endpoint_scope_tracing != nullptr)
     {

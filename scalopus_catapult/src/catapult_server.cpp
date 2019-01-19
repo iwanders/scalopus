@@ -27,7 +27,7 @@
 #include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_general/general_provider.h>
 
-#include <scalopus_tracing/endpoint_scope_tracing.h>
+#include <scalopus_tracing/endpoint_trace_mapping.h>
 #include <scalopus_tracing/native_trace_endpoint_sender.h>
 #include <scalopus_tracing/lttng_provider.h>
 #include <scalopus_tracing/native_trace_provider.h>
@@ -71,8 +71,8 @@ int main(int /* argc */, char** /* argv */)
   auto manager = std::make_shared<scalopus::EndpointManagerPoll>(std::make_shared<scalopus::TransportUnixFactory>());
 
   // Add scope tracing endpoint factory function.
-  manager->addEndpointFactory(scalopus::EndpointScopeTracing::name, [](const auto& transport) {
-    auto tracing_endpoint = std::make_shared<scalopus::EndpointScopeTracing>();
+  manager->addEndpointFactory(scalopus::EndpointTraceMapping::name, [](const auto& transport) {
+    auto tracing_endpoint = std::make_shared<scalopus::EndpointTraceMapping>();
     tracing_endpoint->setTransport(transport);
     return tracing_endpoint;
   });

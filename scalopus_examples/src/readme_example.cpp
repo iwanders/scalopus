@@ -70,7 +70,7 @@ int main(int /* argc */, char** argv)
 {
   auto factory = std::make_shared<scalopus::TransportUnixFactory>();
   const auto server = factory->serve();
-  server->addEndpoint(std::make_unique<scalopus::EndpointScopeTracing>());
+  server->addEndpoint(std::make_unique<scalopus::EndpointTraceMapping>());
   server->addEndpoint(std::make_unique<scalopus::EndpointIntrospect>());
   server->addEndpoint(std::make_shared<scalopus::NativeTraceEndpointSender>());
   auto endpoint_process_info = std::make_shared<scalopus::EndpointProcessInfo>();

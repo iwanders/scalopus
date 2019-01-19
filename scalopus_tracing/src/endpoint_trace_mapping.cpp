@@ -23,7 +23,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus_tracing/endpoint_scope_tracing.h>
+#include <scalopus_tracing/endpoint_trace_mapping.h>
 #include <scalopus_tracing/internal/scope_trace_tracker.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -35,12 +35,12 @@ namespace scalopus
 {
 using json = nlohmann::json;
 
-std::string EndpointScopeTracing::getName() const
+std::string EndpointTraceMapping::getName() const
 {
   return name;
 }
 
-bool EndpointScopeTracing::handle(Transport& /* server */, const Data& request, Data& response)
+bool EndpointTraceMapping::handle(Transport& /* server */, const Data& request, Data& response)
 {
   ProcessTraceMap mapping = { { ::getpid(), scalopus::ScopeTraceTracker::getInstance().getMap() } };
   // cool, we have the mappings... now we need to serialize this...
@@ -55,7 +55,7 @@ bool EndpointScopeTracing::handle(Transport& /* server */, const Data& request, 
   return false;
 }
 
-EndpointScopeTracing::ProcessTraceMap EndpointScopeTracing::mapping()
+EndpointTraceMapping::ProcessTraceMap EndpointTraceMapping::mapping()
 {
   // send message...
   if (transport_ == nullptr)
