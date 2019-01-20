@@ -3,9 +3,10 @@ set(SCALOPUS_TRACING_EXPORTS "")
 include(FindThreads)
 
 add_library(scalopus_scope_tracing STATIC
-  src/scope_trace_raii.cpp
   src/scope_trace_tracker.cpp
   src/endpoint_trace_mapping.cpp
+  src/native/tracepoint_collector_native.cpp
+  src/native/endpoint_native_trace_sender.cpp
 )
 set_property(TARGET scalopus_scope_tracing PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_include_directories(scalopus_scope_tracing
@@ -38,7 +39,6 @@ if (SCALOPUS_BUILD_TRACING_LTTNG)
     # Create the library that provides the scope tracepoints 
     add_library(scalopus_tracepoint_lttng SHARED
       src/lttng/lttng_tracepoint.cpp
-      src/lttng/scope_tracepoint_lttng.cpp
     )
     target_compile_options(scalopus_tracepoint_lttng PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
     target_include_directories(scalopus_tracepoint_lttng
@@ -56,8 +56,17 @@ if (SCALOPUS_BUILD_TRACING_LTTNG)
     )
     list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracepoint_lttng)
 
-    add_library(scalopus_tracing_lttng INTERFACE)
+    add_library(scalopus_tracing_lttng SHARED
+      src/lttng/scope_tracepoint_lttng.cpp
+      src/scope_trace_raii.cpp)
     add_library(Scalopus::scalopus_tracing_lttng ALIAS scalopus_tracing_lttng)
+    target_include_directories(scalopus_tracing_lttng
+      PUBLIC 
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+      PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+    )
 
     target_link_libraries(scalopus_tracing_lttng
       INTERFACE
@@ -75,8 +84,6 @@ endif()
 
 # Create the library that provides the scope tracepoints 
 add_library(scalopus_tracepoint_native SHARED
-  src/native/tracepoint_collector_native.cpp
-  src/native/scope_tracepoint_native.cpp
   src/native/native_tracepoint.cpp
 )
 target_compile_options(scalopus_tracepoint_native PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
@@ -96,13 +103,16 @@ target_link_libraries(scalopus_tracepoint_native
 )
 list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracepoint_native)
 
-add_library(scalopus_tracing_native
-  src/native/endpoint_native_trace_sender.cpp
+add_library(scalopus_tracing_native 
+  src/scope_trace_raii.cpp
+  src/native/scope_tracepoint_native.cpp
 )
-set_property(TARGET scalopus_tracing_native PROPERTY POSITION_INDEPENDENT_CODE ON)
-target_compile_options(scalopus_tracing_native PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 add_library(Scalopus::scalopus_tracing_native ALIAS scalopus_tracing_native)
-
+target_link_libraries(scalopus_tracing_native
+  INTERFACE
+    Scalopus::scalopus_tracepoint_native
+    Scalopus::scalopus_scope_tracing
+)
 target_include_directories(scalopus_tracing_native
   PUBLIC 
     $<INSTALL_INTERFACE:include>
@@ -110,14 +120,9 @@ target_include_directories(scalopus_tracing_native
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-target_link_libraries(scalopus_tracing_native
-  PUBLIC
-    Scalopus::scalopus_scope_tracing
-    Scalopus::scalopus_tracepoint_native
-  PRIVATE
-    nlohmann_json::nlohmann_json
-)
 list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracing_native)
+
+
 
 add_library(scalopus_lttng_babeltrace SHARED
   src/lttng/ctfevent.cpp

@@ -121,5 +121,10 @@ PYBIND11_MODULE(scalopus_python_lib, m) {
   endpoint_native_trace_sender.def(py::init<>());
 
 
+#ifdef SCALOPUS_TRACING_HAVE_LTTNG
+  m.def("lttng_scope_entry", &scalopus::lttng_scope_entry);  
+  m.def("lttng_scope_exit", &scalopus::lttng_scope_exit);  
+#endif
+  m.def("native_scope_entry", &scalopus::native_scope_entry);  
 
 }

@@ -32,6 +32,7 @@ target_link_libraries(spsc_ringbuffer
 target_include_directories(spsc_ringbuffer
   PRIVATE
     $<TARGET_PROPERTY:Scalopus::scalopus_tracing_native,INCLUDE_DIRECTORIES>
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src
 )
 add_test(test_ringbuffer spsc_ringbuffer)
 
