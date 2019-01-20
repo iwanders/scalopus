@@ -23,22 +23,18 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#define TRACEPOINT_DEFINE
-#define TRACEPOINT_CREATE_PROBES
-#include "lttng/scope_tracepoint_lttng_definition.h"
-#include <scalopus_tracing/internal/scope_tracepoint.h>
+#include "lttng_tracepoint.h"
 
 namespace scalopus
 {
 void scope_entry(const unsigned int id)
 {
-  tracepoint(scalopus_scope_id, entry, id);
+  lttng_scope_entry(id);
 }
 
 void scope_exit(const unsigned int id)
 {
-  tracepoint(scalopus_scope_id, exit, id);
+  lttng_scope_exit(id);
 }
 
 }  // namespace scalopus

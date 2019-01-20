@@ -23,17 +23,43 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include <iostream>
+#include <time.h>
+
+#include <scalopus_tracing/internal/scope_tracepoint.h>
+#include "tracepoint_collector_native.h"
 #include "native_tracepoint.h"
+
 namespace scalopus
 {
-void scope_entry(const unsigned int id)
+
+uint64_t nativeGetTime()
 {
-  native_scope_entry(id);
+  timespec ts;
+  clock_gettime(CLOCK_REALTIME, &ts);
+  return (static_cast<uint64_t>(ts.tv_sec) * 1000000000ULL) + ts.tv_nsec;
 }
 
-void scope_exit(const unsigned int id)
+uint64_t nativeGetChrono()
 {
-  native_scope_exit(id);
+  using Clock = std::chrono::high_resolution_clock;
+  auto now_ns = std::chrono::time_point_cast<std::chrono::nanoseconds>(Clock::now());
+  auto epoch = std::chrono::duration_cast<std::chrono::nanoseconds>(now_ns.time_since_epoch());
+  return epoch.count();
+}
+
+void native_scope_entry(const unsigned int id)
+{
+  thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
+  // @TODO Do something with overrun, count lost events?
+  buffer.push(tracepoint_collector_types::ScopeTraceEvent{nativeGetChrono(), id, TracePointCollectorNative::ENTRY});
+}
+
+void native_scope_exit(const unsigned int id)
+{
+  thread_local auto& buffer =  *(TracePointCollectorNative::getInstance().getBuffer());
+  // @TODO Do something with overrun, count lost events?
+  buffer.push(tracepoint_collector_types::ScopeTraceEvent{nativeGetChrono(), id, TracePointCollectorNative::EXIT});
 }
 
 }  // namespace scalopus

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019, Ivor Wanders
+  Copyright (c) 2018, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -23,17 +23,22 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "native_tracepoint.h"
+
+#define TRACEPOINT_DEFINE
+#define TRACEPOINT_CREATE_PROBES
+#include "lttng/scope_tracepoint_lttng_definition.h"
+#include <scalopus_tracing/internal/scope_tracepoint.h>
+
 namespace scalopus
 {
-void scope_entry(const unsigned int id)
+void lttng_scope_entry(const unsigned int id)
 {
-  native_scope_entry(id);
+  tracepoint(scalopus_scope_id, entry, id);
 }
 
-void scope_exit(const unsigned int id)
+void lttng_scope_exit(const unsigned int id)
 {
-  native_scope_exit(id);
+  tracepoint(scalopus_scope_id, exit, id);
 }
 
 }  // namespace scalopus

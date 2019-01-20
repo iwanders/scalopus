@@ -37,6 +37,7 @@ if (SCALOPUS_BUILD_TRACING_LTTNG)
   if (LTTngUST_FOUND)
     # Create the library that provides the scope tracepoints 
     add_library(scalopus_tracepoint_lttng SHARED
+      src/lttng/lttng_tracepoint.cpp
       src/lttng/scope_tracepoint_lttng.cpp
     )
     target_compile_options(scalopus_tracepoint_lttng PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
@@ -76,6 +77,7 @@ endif()
 add_library(scalopus_tracepoint_native SHARED
   src/native/tracepoint_collector_native.cpp
   src/native/scope_tracepoint_native.cpp
+  src/native/native_tracepoint.cpp
 )
 target_compile_options(scalopus_tracepoint_native PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_include_directories(scalopus_tracepoint_native

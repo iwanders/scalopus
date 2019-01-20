@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019, Ivor Wanders
+  Copyright (c) 2018, Ivor Wanders
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -23,17 +23,12 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "native_tracepoint.h"
+
+#ifndef SCALOPUS_TRACING_NATIVE_TRACEPOINT_H
+#define SCALOPUS_TRACING_NATIVE_TRACEPOINT_H
 namespace scalopus
 {
-void scope_entry(const unsigned int id)
-{
-  native_scope_entry(id);
-}
-
-void scope_exit(const unsigned int id)
-{
-  native_scope_exit(id);
-}
-
+void native_scope_entry(const unsigned int id);
+void native_scope_exit(const unsigned int id);
 }  // namespace scalopus
+#endif  // SCALOPUS_TRACING_NATIVE_TRACEPOINT_H
