@@ -1,0 +1,7 @@
+from distutils.core import setup
+
+setup(name='scalopus',
+      version='@PACKAGE_VERSION@',
+      package_dir={ '': '@CMAKE_CURRENT_SOURCE_DIR@' },
+      #package_data={'scalopus': ['*.so']}, ??
+      packages=['scalopus'])

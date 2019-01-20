@@ -27,6 +27,10 @@
 #include <pybind11/stl.h>
 #include <scalopus_transport/transport_unix.h>
 #include <scalopus_general/general.h>
+#include <scalopus_tracing/tracing.h>
+
+#ifdef SCALOPUS_TRACING_HAVE_BUILT_LTTNG
+#endif
 
 namespace py = pybind11;
 
@@ -104,6 +108,16 @@ PYBIND11_MODULE(scalopus_python_lib, m) {
   endpoint_process_info.def(py::init<>());
   endpoint_process_info.def("setProcessName", &scalopus::EndpointProcessInfo::setProcessName);
   endpoint_process_info.def("processInfo", &scalopus::EndpointProcessInfo::processInfo);
+
+  // scalopus_tracing
+  
+  py::class_<scalopus::EndpointTraceMapping> endpoint_trace_mapping(m, "EndpointTraceMapping", endpoint);
+  endpoint_trace_mapping.def(py::init<>());
+  endpoint_trace_mapping.def("mapping", &scalopus::EndpointTraceMapping::mapping);
+
+  py::class_<scalopus::EndpointNativeTraceSender> endpoint_native_trace_sender(m, "EndpointNativeTraceSender", endpoint);
+  endpoint_native_trace_sender.def(py::init<>());
+
 
 
 }

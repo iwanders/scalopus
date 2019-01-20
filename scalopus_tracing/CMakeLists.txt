@@ -2,11 +2,12 @@ set(SCALOPUS_TRACING_EXPORTS "")
 
 include(FindThreads)
 
-add_library(scalopus_scope_tracing
+add_library(scalopus_scope_tracing STATIC
   src/scope_trace_raii.cpp
   src/scope_trace_tracker.cpp
   src/endpoint_trace_mapping.cpp
 )
+set_property(TARGET scalopus_scope_tracing PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_include_directories(scalopus_scope_tracing
   PUBLIC 
     $<INSTALL_INTERFACE:include>
@@ -63,6 +64,7 @@ if (SCALOPUS_BUILD_TRACING_LTTNG)
         Scalopus::scalopus_tracepoint_lttng
     )
     list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracing_lttng)
+    set(SCALOPUS_TRACING_HAVE_BUILT_LTTNG ON PARENT_SCOPE)
   else()
     message(WARNING "Could not find lttng-ust this build will NOT provide the scalopus_tracing_lttng target.")
   endif()
@@ -95,6 +97,7 @@ list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracepoint_native)
 add_library(scalopus_tracing_native
   src/native/endpoint_native_trace_sender.cpp
 )
+set_property(TARGET scalopus_tracing_native PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_options(scalopus_tracing_native PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 add_library(Scalopus::scalopus_tracing_native ALIAS scalopus_tracing_native)
 
