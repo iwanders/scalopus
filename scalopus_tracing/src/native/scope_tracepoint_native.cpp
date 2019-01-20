@@ -23,7 +23,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "native_tracepoint.h"
+#include "scalopus_tracing/native_tracepoint.h"
 namespace scalopus
 {
 void scope_entry(const unsigned int id)

@@ -42,10 +42,6 @@ void scope_entry(const unsigned int id);
  * @param id The tracepoint id of the scope that's being exited.
  */
 void scope_exit(const unsigned int id);
-
-void lttng_scope_entry(const unsigned int id);
-void lttng_scope_exit(const unsigned int id);
-void native_scope_entry(const unsigned int id);
 }  // namespace scalopus
 
 #endif  // SCALOPUS_TRACING_SCOPE_TRACEPOINT_H

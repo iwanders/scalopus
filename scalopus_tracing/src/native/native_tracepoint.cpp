@@ -28,7 +28,7 @@
 
 #include <scalopus_tracing/internal/scope_tracepoint.h>
 #include "tracepoint_collector_native.h"
-#include "native_tracepoint.h"
+#include "scalopus_tracing/native_tracepoint.h"
 
 namespace scalopus
 {

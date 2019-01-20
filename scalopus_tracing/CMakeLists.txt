@@ -45,6 +45,8 @@ if (SCALOPUS_BUILD_TRACING_LTTNG)
       PUBLIC 
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:src/lttng/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lttng/include>
       PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
@@ -69,7 +71,7 @@ if (SCALOPUS_BUILD_TRACING_LTTNG)
     )
 
     target_link_libraries(scalopus_tracing_lttng
-      INTERFACE
+      PUBLIC
         Scalopus::scalopus_scope_tracing
         Scalopus::scalopus_tracepoint_lttng
     )
@@ -91,6 +93,8 @@ target_include_directories(scalopus_tracepoint_native
   PUBLIC 
     $<INSTALL_INTERFACE:include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:src/native/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/native/include>
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
@@ -109,7 +113,7 @@ add_library(scalopus_tracing_native
 )
 add_library(Scalopus::scalopus_tracing_native ALIAS scalopus_tracing_native)
 target_link_libraries(scalopus_tracing_native
-  INTERFACE
+  PUBLIC
     Scalopus::scalopus_tracepoint_native
     Scalopus::scalopus_scope_tracing
 )

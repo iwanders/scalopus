@@ -28,11 +28,13 @@
 #include <scalopus_transport/transport_unix.h>
 #include <scalopus_general/general.h>
 #include <scalopus_tracing/tracing.h>
+#include <scalopus_tracing/native_tracepoint.h>
 #include <scalopus_interface/trace_event_provider.h>
 #include <scalopus_interface/trace_event_source.h>
 #include <scalopus_interface/endpoint_manager.h>
 
-#ifdef SCALOPUS_TRACING_HAVE_BUILT_LTTNG
+#ifdef SCALOPUS_TRACING_HAVE_LTTNG
+#include <scalopus_tracing/lttng_tracepoint.h>
 #endif
 
 namespace py = pybind11;
@@ -125,6 +127,8 @@ PYBIND11_MODULE(scalopus_python_lib, m) {
   m.def("lttng_scope_entry", &scalopus::lttng_scope_entry);  
   m.def("lttng_scope_exit", &scalopus::lttng_scope_exit);  
 #endif
+
   m.def("native_scope_entry", &scalopus::native_scope_entry);  
+  m.def("native_scope_eexit", &scalopus::native_scope_exit);  
 
 }
