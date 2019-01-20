@@ -15,6 +15,7 @@ target_link_libraries(scalopus_python_lib
     Scalopus::scalopus_transport
     Scalopus::scalopus_general
     Scalopus::scalopus_scope_tracing
+    Scalopus::scalopus_general_consumer
 )
 
 if (SCALOPUS_PYTHON_USE_LTTNG_TRACEPOINTS AND SCALOPUS_PYTHON_USE_NATIVE_TRACEPOINTS)

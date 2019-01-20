@@ -28,6 +28,9 @@
 #include <scalopus_transport/transport_unix.h>
 #include <scalopus_general/general.h>
 #include <scalopus_tracing/tracing.h>
+#include <scalopus_interface/trace_event_provider.h>
+#include <scalopus_interface/trace_event_source.h>
+#include <scalopus_interface/endpoint_manager.h>
 
 #ifdef SCALOPUS_TRACING_HAVE_BUILT_LTTNG
 #endif
@@ -37,40 +40,23 @@ namespace py = pybind11;
 namespace scalopus
 {
 
-/*
-class PyTransportFactory : public TransportUnixFactory
-{
-public:
-  using TransportUnixFactory::TransportUnixFactory; // Inherit constructors
-  std::vector<Destination::Ptr> discover() override
-  {
-  }
-  Transport::Ptr serve() override
-  {
-  }
-  Transport::Ptr connect(const Destination::Ptr& destination) override
-  {
-  }
-};
 
-class PyTransport : public Transport
+class PyEndpoint : public Endpoint
 {
 public:
-  using Transport::Transport; // Inherit constructors
-  PendingResponse request(const std::string& remote_endpoint_name, const Data& outgoing) override
+  using Ptr = std::shared_ptr<PyEndpoint>;
+  using Endpoint::Endpoint; // Inherit constructors
+
+  std::string getName() const override
   {
-    PYBIND11_OVERLOAD_PURE(PendingResponse, Transport, request, remote_endpoint_name, outgoing);
+    PYBIND11_OVERLOAD_PURE(std::string, PyEndpoint, getName,);
   }
-  std::size_t pendingRequests() const override
+
+  bool handle(Transport& transport, const Data& incoming, Data& outgoing) override
   {
-    PYBIND11_OVERLOAD_PURE(std::size_t, Transport, pendingRequests, );
-  }
-  bool isConnected() const override
-  {
-    PYBIND11_OVERLOAD(bool, Transport, isConnected,);
+    PYBIND11_OVERLOAD(bool, Endpoint, handle, transport, incoming, outgoing);
   }
 };
-*/
 
 }
 
@@ -86,6 +72,23 @@ PYBIND11_MODULE(scalopus_python_lib, m) {
 
   py::class_<scalopus::Endpoint, scalopus::Endpoint::Ptr> endpoint(m, "Endpoint");
   endpoint.def("getName", &scalopus::Endpoint::getName);
+
+  py::class_<scalopus::PyEndpoint, scalopus::PyEndpoint::Ptr> py_endpoint(m, "PyEndpoint", endpoint);
+  py_endpoint.def(py::init<>());
+  py_endpoint.def("getName", &scalopus::PyEndpoint::getName);
+
+  py::class_<scalopus::TraceEventProvider, scalopus::TraceEventProvider::Ptr> trace_event_provider(m, "TraceEventProvider");
+  trace_event_provider.def("makeSource", &scalopus::TraceEventProvider::makeSource);
+
+  py::class_<scalopus::TraceEventSource, scalopus::TraceEventSource::Ptr> trace_event_source(m, "TraceEventSource");
+  trace_event_source.def("startInterval", &scalopus::TraceEventSource::startInterval);
+  trace_event_source.def("stopInterval", &scalopus::TraceEventSource::stopInterval);
+  trace_event_source.def("work", &scalopus::TraceEventSource::work);
+  //  trace_event_source.def("finishInterval", &scalopus::TraceEventSource::finishInterval);
+
+  py::class_<scalopus::EndpointManager, scalopus::EndpointManager::Ptr> endpoint_manager(m, "EndpointManager");
+  endpoint_manager.def("endpoints", &scalopus::EndpointManager::endpoints);
+  //  endpoint_manager.def("addEndpointFactory", &scalopus::EndpointManager::addEndpointFactory);
 
   // scalopus_transport
   py::class_<scalopus::TransportUnixFactory, scalopus::TransportUnixFactory::Ptr> transport_factory_unix(m, "TransportUnixFactory");
@@ -110,7 +113,6 @@ PYBIND11_MODULE(scalopus_python_lib, m) {
   endpoint_process_info.def("processInfo", &scalopus::EndpointProcessInfo::processInfo);
 
   // scalopus_tracing
-  
   py::class_<scalopus::EndpointTraceMapping> endpoint_trace_mapping(m, "EndpointTraceMapping", endpoint);
   endpoint_trace_mapping.def(py::init<>());
   endpoint_trace_mapping.def("mapping", &scalopus::EndpointTraceMapping::mapping);
