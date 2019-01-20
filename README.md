@@ -96,6 +96,10 @@ make -j8
 make test
 ```
 
+## License
+
+The Python bindings are produced using [Pybind11][pybind11] which used a BSD style [license](/thirdparty/pybind11/LICENSE).
+
 [catapult_trace_viewer]: https://github.com/catapult-project/catapult/blob/master/tracing/README.md
 [catapult]: https://github.com/catapult-project/catapult
 [devtools_protocol]: https://chromedevtools.github.io/devtools-protocol/tot/Tracing
@@ -104,3 +108,4 @@ make test
 [chrome_tracing]: chrome://inspect?tracing
 [cppcon_2016_quest_for_performance]: https://youtu.be/tD4xRNB0M_Q?t=468
 [liblttng-ust-cyg-profile]: https://lttng.org/docs/v2.10/#doc-liblttng-ust-cyg-profile
+[pybind11]: https://github.com/pybind/pybind11

@@ -21,6 +21,7 @@ target_link_libraries(scalopus_transport
     Threads::Threads
     nlohmann_json::nlohmann_json
 )
+target_compile_options(scalopus_transport PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 
 export(
   TARGETS scalopus_transport

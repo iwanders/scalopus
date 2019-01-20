@@ -3,6 +3,7 @@ add_library(scalopus_general SHARED
   src/endpoint_introspect.cpp
   src/thread_name_tracker.cpp
 )
+target_compile_options(scalopus_general PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 
 target_include_directories(scalopus_general
   PUBLIC 
@@ -25,6 +26,7 @@ add_library(scalopus_general_consumer SHARED
   src/general_source.cpp
   src/general_provider.cpp
 )
+target_compile_options(scalopus_general_consumer PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_include_directories(scalopus_general_consumer
   PUBLIC 
     $<INSTALL_INTERFACE:include_consumer>

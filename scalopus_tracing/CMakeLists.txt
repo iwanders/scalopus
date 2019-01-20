@@ -14,6 +14,7 @@ target_include_directories(scalopus_scope_tracing
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
+target_compile_options(scalopus_scope_tracing PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 add_library(Scalopus::scalopus_scope_tracing ALIAS scalopus_scope_tracing)
 
 target_link_libraries(scalopus_scope_tracing
@@ -37,6 +38,7 @@ if (SCALOPUS_BUILD_TRACING_LTTNG)
     add_library(scalopus_tracepoint_lttng SHARED
       src/lttng/scope_tracepoint_lttng.cpp
     )
+    target_compile_options(scalopus_tracepoint_lttng PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
     target_include_directories(scalopus_tracepoint_lttng
       PUBLIC 
         $<INSTALL_INTERFACE:include>
@@ -73,6 +75,7 @@ add_library(scalopus_tracepoint_native SHARED
   src/native/tracepoint_collector_native.cpp
   src/native/scope_tracepoint_native.cpp
 )
+target_compile_options(scalopus_tracepoint_native PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_include_directories(scalopus_tracepoint_native
   PUBLIC 
     $<INSTALL_INTERFACE:include>
@@ -92,6 +95,7 @@ list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracepoint_native)
 add_library(scalopus_tracing_native
   src/native/endpoint_native_trace_sender.cpp
 )
+target_compile_options(scalopus_tracing_native PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 add_library(Scalopus::scalopus_tracing_native ALIAS scalopus_tracing_native)
 
 target_include_directories(scalopus_tracing_native
@@ -114,6 +118,7 @@ add_library(scalopus_lttng_babeltrace SHARED
   src/lttng/ctfevent.cpp
   src/lttng/babeltrace_tool.cpp
   src/lttng/babeltrace_parser.cpp)
+target_compile_options(scalopus_lttng_babeltrace PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_link_libraries(scalopus_lttng_babeltrace
   PRIVATE
     Threads::Threads
@@ -137,6 +142,7 @@ add_library(scalopus_tracing_consumer
   src/native/native_trace_source.cpp
   src/native/endpoint_native_trace_receiver.cpp
 )
+target_compile_options(scalopus_tracing_consumer PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_include_directories(scalopus_tracing_consumer
   PUBLIC 
     $<INSTALL_INTERFACE:include>

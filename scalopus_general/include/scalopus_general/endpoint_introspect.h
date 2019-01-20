@@ -34,6 +34,7 @@ namespace scalopus
 class EndpointIntrospect : public Endpoint
 {
 public:
+  using Ptr = std::shared_ptr<EndpointIntrospect>;
   constexpr static const char* name = "introspect";
 
   /**

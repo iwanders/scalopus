@@ -22,3 +22,20 @@ else()
   add_subdirectory(thirdparty/seasocks)
 endif()
 
+
+# Ideally we'd just build both, depending on availability, but that's hard at the moment:
+# https://github.com/pybind/pybind11/issues/748
+if(SCALOPUS_USE_PYTHON2)
+  set(PYBIND11_PYTHON_VERSION 2)
+endif()
+
+if(SCALOPUS_USE_PYTHON3)
+  set(PYBIND11_PYTHON_VERSION 3)
+endif()
+
+if(SCALOPUS_USE_EXTERNAL_PYBIND)
+  find_package(pybind11 QUIET)
+else()
+  add_subdirectory(thirdparty/pybind11)
+endif()
+

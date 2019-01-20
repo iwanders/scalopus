@@ -5,7 +5,13 @@ project(Scalopus VERSION 0.0.1)
 # Include libraries first.
 option(SCALOPUS_USE_EXTERNAL_JSON "Obtain nlohmann_json through find_package." OFF)
 option(SCALOPUS_USE_EXTERNAL_SEASOCKS "Obtain Seasocks through find_package." OFF)
+option(SCALOPUS_USE_EXTERNAL_PYBIND "Try to obtain pybind11 through find_package." OFF)
 option(SCALOPUS_BUILD_TRACING_LTTNG "Try to build the LTTNG tracing target." ON)
+
+# Allow quick configuration of the Python version. For manually specfiying the version use PYBIND11_PYTHON_VERSION.
+option(SCALOPUS_USE_PYTHON2 "Set PYBIND11_PYTHON_VERSION to 2." OFF)
+option(SCALOPUS_USE_PYTHON3 "Set PYBIND11_PYTHON_VERSION to 3." OFF)
+
 set(SCALOPUS_CMAKE_CONFIG_DIR          "${CMAKE_CURRENT_BINARY_DIR}")
 set(SCALOPUS_COMPONENT_CMAKE_CONFIG_DIR          "${CMAKE_CURRENT_BINARY_DIR}/cmake/")
 set(SCALOPUS_CMAKE_PROJECT_CONFIG_FILE "${SCALOPUS_CMAKE_CONFIG_DIR}/${PROJECT_NAME}Config.cmake")
@@ -19,6 +25,7 @@ include(thirdparty/CMakeLists.txt)
 
 
 # Set properties for the remainder of the builds
+# TODO: Change into target_feature commands.
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -28,8 +35,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CLANG_ONLY_COMPILE_FLAGS "-Wconversion;")
   message(STATUS "Compiler is clang, adding options: ${CLANG_ONLY_COMPILE_FLAGS}")
 endif()
-
-add_compile_options("-Werror;-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-Wpedantic;${CLANG_ONLY_COMPILE_FLAGS}")
+set(SCALOPUS_COMPILE_OPTIONS "-Werror;-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-Wpedantic;${CLANG_ONLY_COMPILE_FLAGS}")
 
 include(GNUInstallDirs)
 include(FindThreads)
@@ -48,6 +54,7 @@ add_subdirectory(scalopus_tracing)
 add_subdirectory(scalopus_general)
 add_subdirectory(scalopus_examples)
 add_subdirectory(scalopus_catapult)
+add_subdirectory(scalopus_python)
 
 
 configure_file(

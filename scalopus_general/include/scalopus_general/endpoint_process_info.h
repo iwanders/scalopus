@@ -39,6 +39,7 @@ namespace scalopus
 class EndpointProcessInfo : public Endpoint
 {
 public:
+  using Ptr = std::shared_ptr<EndpointProcessInfo>;
   constexpr static const char* name = "process_info";
 
   //! Struct used to represent the data from the endpoint.

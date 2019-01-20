@@ -4,6 +4,7 @@ add_library(scalopus_interface SHARED
   src/destination.cpp
   src/transport.cpp
 )
+target_compile_options(scalopus_interface PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 
 target_include_directories(scalopus_interface
   PUBLIC
@@ -17,6 +18,7 @@ add_library(Scalopus::scalopus_interface ALIAS scalopus_interface)
 add_library(scalopus_consumer SHARED
   src/trace_event_source.cpp
 )
+target_compile_options(scalopus_consumer PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_include_directories(scalopus_consumer
   PUBLIC
     $<INSTALL_INTERFACE:include_consumer>
