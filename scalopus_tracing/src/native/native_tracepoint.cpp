@@ -32,7 +32,8 @@
 
 namespace scalopus
 {
-
+namespace native
+{
 uint64_t nativeGetTime()
 {
   timespec ts;
@@ -48,18 +49,18 @@ uint64_t nativeGetChrono()
   return epoch.count();
 }
 
-void native_scope_entry(const unsigned int id)
+void scope_entry(const unsigned int id)
 {
   thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
   // @TODO Do something with overrun, count lost events?
   buffer.push(tracepoint_collector_types::ScopeTraceEvent{nativeGetChrono(), id, TracePointCollectorNative::ENTRY});
 }
 
-void native_scope_exit(const unsigned int id)
+void scope_exit(const unsigned int id)
 {
   thread_local auto& buffer =  *(TracePointCollectorNative::getInstance().getBuffer());
   // @TODO Do something with overrun, count lost events?
   buffer.push(tracepoint_collector_types::ScopeTraceEvent{nativeGetChrono(), id, TracePointCollectorNative::EXIT});
 }
-
+}  // namespace native
 }  // namespace scalopus

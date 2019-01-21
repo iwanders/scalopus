@@ -31,14 +31,16 @@
 
 namespace scalopus
 {
-void lttng_scope_entry(const unsigned int id)
+namespace lttng
+{
+void scope_entry(const unsigned int id)
 {
   tracepoint(scalopus_scope_id, entry, id);
 }
 
-void lttng_scope_exit(const unsigned int id)
+void scope_exit(const unsigned int id)
 {
   tracepoint(scalopus_scope_id, exit, id);
 }
-
+}
 }  // namespace scalopus

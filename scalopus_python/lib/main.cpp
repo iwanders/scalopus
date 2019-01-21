@@ -25,8 +25,9 @@
 */
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <scalopus_transport/transport_unix.h>
 #include <scalopus_general/general.h>
+#include <scalopus_transport/transport_unix.h>
+#include <scalopus_transport/transport_mock.h>
 #include <scalopus_tracing/tracing.h>
 #include <scalopus_tracing/native_tracepoint.h>
 #include <scalopus_interface/trace_event_provider.h>
@@ -62,15 +63,16 @@ public:
 
 }
 
-PYBIND11_MODULE(scalopus_python_lib, m) {
+PYBIND11_MODULE(scalopus_python_lib, m)
+{
   // scalopus_interface
   py::class_<scalopus::Destination, scalopus::Destination::Ptr> destination(m, "Destination");
   destination.def("__str__", &scalopus::Destination::operator std::string);
   destination.def("hash_code", &scalopus::Destination::hash_code);
 
-  py::class_<scalopus::Transport, scalopus::Transport::Ptr> transport(m, "Transport");
-  transport.def("addEndpoint", &scalopus::Transport::addEndpoint);
-  transport.def("isConnected", &scalopus::Transport::isConnected);
+  py::class_<scalopus::Transport, scalopus::Transport::Ptr> transport_interface(m, "Transport");
+  transport_interface.def("addEndpoint", &scalopus::Transport::addEndpoint);
+  transport_interface.def("isConnected", &scalopus::Transport::isConnected);
 
   py::class_<scalopus::Endpoint, scalopus::Endpoint::Ptr> endpoint(m, "Endpoint");
   endpoint.def("getName", &scalopus::Endpoint::getName);
@@ -92,43 +94,61 @@ PYBIND11_MODULE(scalopus_python_lib, m) {
   endpoint_manager.def("endpoints", &scalopus::EndpointManager::endpoints);
   //  endpoint_manager.def("addEndpointFactory", &scalopus::EndpointManager::addEndpointFactory);
 
+  py::class_<scalopus::TransportFactory, scalopus::TransportFactory::Ptr> transport_factory(m, "TransportFactory");
+  transport_factory.def("discover", &scalopus::TransportFactory::discover);
+  transport_factory.def("serve", &scalopus::TransportFactory::serve);
+  transport_factory.def("connect", &scalopus::TransportFactory::connect);
+
   // scalopus_transport
-  py::class_<scalopus::TransportUnixFactory, scalopus::TransportUnixFactory::Ptr> transport_factory_unix(m, "TransportUnixFactory");
+  py::module transport = m.def_submodule("transport", "The transport related components.");
+  py::class_<scalopus::TransportUnixFactory, scalopus::TransportUnixFactory::Ptr> transport_factory_unix(transport, "TransportUnixFactory", transport_factory);
   transport_factory_unix.def(py::init<>());
-  transport_factory_unix.def("discover", &scalopus::TransportUnixFactory::discover);
-  transport_factory_unix.def("serve", &scalopus::TransportUnixFactory::serve);
-  transport_factory_unix.def("connect", &scalopus::TransportUnixFactory::connect);
+  py::class_<scalopus::TransportMockFactory, scalopus::TransportMockFactory::Ptr> transport_factory_mock(transport, "TransportMockFactory", transport_factory);
+  transport_factory_mock.def(py::init<>());
 
   // scalopus_general
-  py::class_<scalopus::EndpointIntrospect, scalopus::EndpointIntrospect::Ptr> endpoint_introspect(m, "EndpointIntrospect", endpoint);
+  py::module general = m.def_submodule("general", "The general components.");
+  py::class_<scalopus::EndpointIntrospect, scalopus::EndpointIntrospect::Ptr> endpoint_introspect(general, "EndpointIntrospect", endpoint);
   endpoint_introspect.def(py::init<>());
   endpoint_introspect.def("supported", &scalopus::EndpointIntrospect::supported);
 
-
-  py::class_<scalopus::EndpointProcessInfo::ProcessInfo> endpoint_process_info_info(m, "ProcessInfo");
+  py::class_<scalopus::EndpointProcessInfo::ProcessInfo> endpoint_process_info_info(general, "ProcessInfo");
   endpoint_process_info_info.def_readwrite("name", &scalopus::EndpointProcessInfo::ProcessInfo::name);
   endpoint_process_info_info.def_readwrite("threads", &scalopus::EndpointProcessInfo::ProcessInfo::threads);
   
-  py::class_<scalopus::EndpointProcessInfo, scalopus::EndpointProcessInfo::Ptr> endpoint_process_info(m, "EndpointProcessInfo", endpoint);
+  py::class_<scalopus::EndpointProcessInfo, scalopus::EndpointProcessInfo::Ptr> endpoint_process_info(general, "EndpointProcessInfo", endpoint);
   endpoint_process_info.def(py::init<>());
   endpoint_process_info.def("setProcessName", &scalopus::EndpointProcessInfo::setProcessName);
   endpoint_process_info.def("processInfo", &scalopus::EndpointProcessInfo::processInfo);
 
+  general.def("setThreadName", [](const std::string& name)
+    {
+      scalopus::ThreadNameTracker::getInstance().setCurrentName(name);
+    });
+
   // scalopus_tracing
-  py::class_<scalopus::EndpointTraceMapping> endpoint_trace_mapping(m, "EndpointTraceMapping", endpoint);
+  py::module tracing = m.def_submodule("tracing", "The tracing specific components.");
+  py::class_<scalopus::EndpointTraceMapping> endpoint_trace_mapping(tracing, "EndpointTraceMapping", endpoint);
   endpoint_trace_mapping.def(py::init<>());
   endpoint_trace_mapping.def("mapping", &scalopus::EndpointTraceMapping::mapping);
 
-  py::class_<scalopus::EndpointNativeTraceSender> endpoint_native_trace_sender(m, "EndpointNativeTraceSender", endpoint);
+  py::module native = tracing.def_submodule("native", "The native specific components.");
+  py::class_<scalopus::EndpointNativeTraceSender> endpoint_native_trace_sender(native, "EndpointNativeTraceSender", endpoint);
   endpoint_native_trace_sender.def(py::init<>());
+
+  tracing.def("setTraceName", [](const unsigned int id, const std::string& name)
+  {
+    scalopus::ScopeTraceTracker::getInstance().insert(id, name);
+  });
 
 
 #ifdef SCALOPUS_TRACING_HAVE_LTTNG
-  m.def("lttng_scope_entry", &scalopus::lttng_scope_entry);  
-  m.def("lttng_scope_exit", &scalopus::lttng_scope_exit);  
+  py::module lttng = tracing.def_submodule("lttng", "The lttng specific components.");
+  lttng.def("scope_entry", &scalopus::lttng::scope_entry);  
+  lttng.def("scope_exit", &scalopus::lttng::scope_exit);  
 #endif
 
-  m.def("native_scope_entry", &scalopus::native_scope_entry);  
-  m.def("native_scope_eexit", &scalopus::native_scope_exit);  
+  native.def("scope_entry", &scalopus::native::scope_entry);  
+  native.def("scope_exit", &scalopus::native::scope_exit);  
 
 }

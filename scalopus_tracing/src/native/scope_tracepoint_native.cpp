@@ -28,12 +28,12 @@ namespace scalopus
 {
 void scope_entry(const unsigned int id)
 {
-  native_scope_entry(id);
+  native::scope_entry(id);
 }
 
 void scope_exit(const unsigned int id)
 {
-  native_scope_exit(id);
+  native::scope_exit(id);
 }
 
 }  // namespace scalopus

@@ -28,7 +28,10 @@
 #define SCALOPUS_TRACING_LTTNG_TRACEPOINT_H
 namespace scalopus
 {
-void lttng_scope_entry(const unsigned int id);
-void lttng_scope_exit(const unsigned int id);
+namespace lttng
+{
+void scope_entry(const unsigned int id);
+void scope_exit(const unsigned int id);
+}
 }  // namespace scalopus
 #endif  // SCALOPUS_TRACING_LTTNG_TRACEPOINT_H

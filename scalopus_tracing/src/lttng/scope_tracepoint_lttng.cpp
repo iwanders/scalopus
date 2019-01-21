@@ -29,12 +29,12 @@ namespace scalopus
 {
 void scope_entry(const unsigned int id)
 {
-  lttng_scope_entry(id);
+  lttng::scope_entry(id);
 }
 
 void scope_exit(const unsigned int id)
 {
-  lttng_scope_exit(id);
+  lttng::scope_exit(id);
 }
 
 }  // namespace scalopus

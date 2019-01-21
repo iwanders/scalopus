@@ -35,9 +35,6 @@
  * @param name The name to assign to this thread.
  */
 #define TRACE_THREAD_NAME(name)                                                                                        \
-  TRACE_THREAD_NAME_ONCE(name, SCALOPUS_MAKE_UNIQUE(scalopus_threadname_id_))                                          \
-  do                                                                                                                   \
-  {                                                                                                                    \
-  } while (0)
+  TRACE_THREAD_NAME_ONCE(name, SCALOPUS_MAKE_UNIQUE(scalopus_threadname_id_))
 
 #endif  // SCALOPUS_GENERAL_THREAD_NAMING_H

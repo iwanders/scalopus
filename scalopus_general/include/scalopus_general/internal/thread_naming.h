@@ -37,6 +37,9 @@
   {                                                                                                                    \
     have_done_once_varname = true;                                                                                     \
     scalopus::ThreadNameTracker::getInstance().setCurrentName(name);                                                   \
-  }
+  }                                                                                                                    \
+  do                                                                                                                   \
+  {                                                                                                                    \
+  } while (0)
 
 #endif  // SCALOPUS_SCOPE_INTERNAL_THREAD_NAMING_H
