@@ -31,3 +31,9 @@ std::integral_constant<uint32_t, scalopus_crcdetail::compute(__FILE__,sizeof(__F
 ```
 Which guarantees a compile time constant CRC is calculated from the file name, to which we add the line number to ensure
 we get a unique trace id.
+
+
+## LTTng
+
+To be able to receive the LTTng tracepoints, be sure to start a session of the appropriate name. The [start](/scalopus_tracing/test/start), [stop](/scalopus_tracing/test/stop) and [listen](/scalopus_tracing/test/listen) scripts provide some starting point for this. Only one viewer can be connected to the live session. The catapult server starts babeltrace internally and parses the text output it produces. We need this ascii conversion step because that's the [only implemented](https://github.com/efficios/babeltrace/blob/5223ed80d6517378def2da969c96b177ccc98e4d/formats/lttng-live/lttng-live-plugin.c#L325-L330) output plugin for live sessions.
+

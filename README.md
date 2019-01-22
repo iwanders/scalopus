@@ -78,6 +78,8 @@ This interface is part of the `scalopus_consumer` target. A source is created fr
 
 ## Building
 
+The three required dependencies are embedded in the `thirdparty` folder and use git submodules. Cmake 3.5.0 or higher is required and a compiler that supports C++14 features.
+
 In order to use LTTng to get the traces out of the program under test one must install `liblttng-ust-dev` to consume
 the traces from lttng the `babeltrace` package is required:
 ```bash
@@ -86,19 +88,42 @@ apt-get install liblttng-ust-dev babeltrace
 
 Then, building should be as simple as:
 ```bash
-# Clone repo, recursively to ensure Seasocks and Nlohmann_json are cloned as well.
-git clone --recurse-submodules Scalopus
+# Clone repo, recursively to ensure git submodules are cloned as well.
+git clone --recurse-submodules https://github.com/iwanders/scalopus
 # Build:
 mkdir build; cd build
-cmake ../Scalopus/
+cmake ../scalopus/
 make -j8
-# Run tests with:
-make test
+# run tests with:
+ctest .
 ```
 
-## License
+## Quickstart
+After building and succesfully being able to run the tests, use the following steps to view some tracepoints:
+1. Run `./scalopus_examples/example_scope_tracepoints_random_native` to start a process that produces tracepoints.
+2. Run `./scalopus_catapult/catapult_server`, this should output something like:
+```
+[main] Using port: 9222, 9222 is default, it is default remote debugging port
+[main] Using path: ""  (empty defaults to lttng view scalopus_target_session)
+[main] Everything started, falling into loop to detect transports. Use ctrl + c to quit.
+[BabeltraceParser] Reached end of file, quiting parser function.
+[scalopus] Creating transport to: <unix:8343>
+```
+3. Go go [chrome://inspect?tracing][chrome_tracing] (copy the link, clicking doesn't work), next to `Target (Scalopus Devtools Target)` click trace. You should now be in the tracing viewer and see `This about:tracing is connected to a remote device...` at the top. Click record, record, wait a bit and press stop.
+4. Profit.
 
-The Python bindings are produced using [Pybind11][pybind11] which used a BSD style [license](/thirdparty/pybind11/LICENSE).
+## Legal
+
+- The Python bindings are produced using [Pybind11][pybind11]. This uses the BSD-3-clause [license](/thirdparty/pybind11/LICENSE).
+- Json and bson handling is done with the [json for modern C++][nlohmann_json] library. This uses the MIT [license](/thirdparty/nlohmann_json/LICENSE.MIT).
+- The webserver and websocket handling is done with [seasocks][seasocks]. This uses the BSD-2-clause [license](/thirdparty/seasocks/LICENSE)
+
+Scalopus itself is licensed under the BSD-3-clause [license](/LICENSE).
+  
+
+
+
+
 
 [catapult_trace_viewer]: https://github.com/catapult-project/catapult/blob/master/tracing/README.md
 [catapult]: https://github.com/catapult-project/catapult
@@ -109,3 +134,5 @@ The Python bindings are produced using [Pybind11][pybind11] which used a BSD sty
 [cppcon_2016_quest_for_performance]: https://youtu.be/tD4xRNB0M_Q?t=468
 [liblttng-ust-cyg-profile]: https://lttng.org/docs/v2.10/#doc-liblttng-ust-cyg-profile
 [pybind11]: https://github.com/pybind/pybind11
+[nlohmann_json]: https://github.com/nlohmann/json
+[seasocks]: https://github.com/mattgodbolt/seasocks/
