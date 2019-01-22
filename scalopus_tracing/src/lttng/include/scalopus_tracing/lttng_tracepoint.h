@@ -35,6 +35,6 @@ namespace lttng
 {
 void scope_entry(const unsigned int id);
 void scope_exit(const unsigned int id);
-}
+}  // namespace lttng
 }  // namespace scalopus
 #endif  // SCALOPUS_TRACING_LTTNG_TRACEPOINT_H

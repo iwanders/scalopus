@@ -28,8 +28,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_tracing/native_trace_provider.h"
-#include "scalopus_tracing/native_trace_source.h"
 #include "endpoint_native_trace_receiver.h"
+#include "scalopus_tracing/native_trace_source.h"
 
 #include <nlohmann/json.hpp>
 #include <sstream>
@@ -37,7 +37,7 @@
 namespace scalopus
 {
 using json = nlohmann::json;
-NativeTraceProvider::NativeTraceProvider(EndpointManager::Ptr manager) : ScopeTracingProvider{manager}
+NativeTraceProvider::NativeTraceProvider(EndpointManager::Ptr manager) : ScopeTracingProvider{ manager }
 {
 }
 
@@ -51,7 +51,7 @@ TraceEventSource::Ptr NativeTraceProvider::makeSource()
 
 Endpoint::Ptr NativeTraceProvider::receiveEndpoint()
 {
-  return std::make_shared<EndpointNativeTraceReceiver>([provider = WeakPtr{shared_from_this()}](const Data& data) {
+  return std::make_shared<EndpointNativeTraceReceiver>([provider = WeakPtr{ shared_from_this() }](const Data& data) {
     // This function is called from the server thread
     auto ptr = provider.lock();
     if (ptr)

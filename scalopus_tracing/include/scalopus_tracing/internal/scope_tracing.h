@@ -65,7 +65,8 @@
   {                                                                                                                    \
   } while (0)
 
-#define TRACE_SCOPE_END_NAMED_ID(name, id) scalopus::scope_exit(id);                                                   \
+#define TRACE_SCOPE_END_NAMED_ID(name, id)                                                                             \
+  scalopus::scope_exit(id);                                                                                            \
   do                                                                                                                   \
   {                                                                                                                    \
   } while (0)

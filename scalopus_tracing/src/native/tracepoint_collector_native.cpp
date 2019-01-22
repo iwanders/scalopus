@@ -49,7 +49,8 @@ tracepoint_collector_types::ScopeBufferPtr TracePointCollectorNative::getBuffer(
   else
   {
     // Buffer did not exist for this thread, make a new one.
-    auto buffer = std::make_shared<tracepoint_collector_types::ScopeBuffer>(tracepoint_collector_types::EventContainer{ringbuffer_size_});
+    auto buffer = std::make_shared<tracepoint_collector_types::ScopeBuffer>(
+        tracepoint_collector_types::EventContainer{ ringbuffer_size_ });
     insert(tid, buffer);
     return buffer;
   }

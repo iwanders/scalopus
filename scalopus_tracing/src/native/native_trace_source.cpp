@@ -28,8 +28,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_tracing/native_trace_source.h"
-#include "tracepoint_collector_native.h"
 #include <sstream>
+#include "tracepoint_collector_native.h"
 
 namespace scalopus
 {

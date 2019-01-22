@@ -33,7 +33,6 @@
 
 namespace scalopus
 {
-
 /**
  * @brief This is a single producer - single consumer ringbuffer.
  * It is moddelled after boosts' spsc_queue, but then a lot simpler and with move semantics.
@@ -51,7 +50,7 @@ public:
    * @param container The container that's used internally by the ringbuffer to store the data.
    * @throws std::runtime_error If the container size is zero.
    */
-  SPSCRingBuffer(ContainerType&& container) : container_{container}, max_size_{container_.size()}
+  SPSCRingBuffer(ContainerType&& container) : container_{ container }, max_size_{ container_.size() }
   {
     if (max_size_ == 0)
     {
@@ -89,7 +88,7 @@ public:
   bool pop(ValueType& v)
   {
     const std::size_t write_index = write_index_.load(std::memory_order_acquire);
-    const std::size_t read_index  = read_index_.load(std::memory_order_relaxed);
+    const std::size_t read_index = read_index_.load(std::memory_order_relaxed);
 
     if (write_index == read_index)
     {
@@ -114,8 +113,8 @@ public:
 private:
   std::atomic<std::size_t> write_index_{ 0 };  //!< Current write position.
   std::atomic<std::size_t> read_index_{ 0 };   //!< Current read position.
-  ContainerType container_;  //!< Container that holds the ringbuffer values.
-  const std::size_t max_size_;  //!< Size of the ringbuffer.
+  ContainerType container_;                    //!< Container that holds the ringbuffer values.
+  const std::size_t max_size_;                 //!< Size of the ringbuffer.
 };
 
-}
+}  // namespace scalopus

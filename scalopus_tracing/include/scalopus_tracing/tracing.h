@@ -31,8 +31,8 @@
 #define SCALOPUS_TRACING_TRACING_H
 
 #include <scalopus_general/general.h>
-#include <scalopus_tracing/endpoint_trace_mapping.h>
 #include <scalopus_tracing/endpoint_native_trace_sender.h>
+#include <scalopus_tracing/endpoint_trace_mapping.h>
 #include <scalopus_tracing/scope_tracing.h>
 
 #endif  // SCALOPUS_TRACING_TRACING_H

@@ -27,12 +27,12 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <iostream>
 #include <time.h>
+#include <iostream>
 
 #include <scalopus_tracing/internal/scope_tracepoint.h>
-#include "tracepoint_collector_native.h"
 #include "scalopus_tracing/native_tracepoint.h"
+#include "tracepoint_collector_native.h"
 
 namespace scalopus
 {
@@ -57,14 +57,14 @@ void scope_entry(const unsigned int id)
 {
   thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
   // @TODO Do something with overrun, count lost events?
-  buffer.push(tracepoint_collector_types::ScopeTraceEvent{nativeGetChrono(), id, TracePointCollectorNative::ENTRY});
+  buffer.push(tracepoint_collector_types::ScopeTraceEvent{ nativeGetChrono(), id, TracePointCollectorNative::ENTRY });
 }
 
 void scope_exit(const unsigned int id)
 {
-  thread_local auto& buffer =  *(TracePointCollectorNative::getInstance().getBuffer());
+  thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
   // @TODO Do something with overrun, count lost events?
-  buffer.push(tracepoint_collector_types::ScopeTraceEvent{nativeGetChrono(), id, TracePointCollectorNative::EXIT});
+  buffer.push(tracepoint_collector_types::ScopeTraceEvent{ nativeGetChrono(), id, TracePointCollectorNative::EXIT });
 }
 }  // namespace native
 }  // namespace scalopus

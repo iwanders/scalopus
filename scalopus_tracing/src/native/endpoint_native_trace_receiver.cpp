@@ -31,8 +31,7 @@
 #include <iostream>
 namespace scalopus
 {
-
-EndpointNativeTraceReceiver::EndpointNativeTraceReceiver(ReceiveFunction&& receiver) : receiver_{receiver}
+EndpointNativeTraceReceiver::EndpointNativeTraceReceiver(ReceiveFunction&& receiver) : receiver_{ receiver }
 {
 }
 
@@ -41,7 +40,7 @@ std::string EndpointNativeTraceReceiver::getName() const
   return name;
 }
 
-bool EndpointNativeTraceReceiver::unsolicited(Transport& /* transport */, const Data& incoming, Data&  /* outgoing */)
+bool EndpointNativeTraceReceiver::unsolicited(Transport& /* transport */, const Data& incoming, Data& /* outgoing */)
 {
   receiver_(incoming);
   return false;

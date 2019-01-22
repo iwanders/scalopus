@@ -29,8 +29,8 @@
 */
 #define TRACEPOINT_DEFINE
 #define TRACEPOINT_CREATE_PROBES
-#include "lttng/scope_tracepoint_lttng_definition.h"
 #include <scalopus_tracing/internal/scope_tracepoint.h>
+#include "lttng/scope_tracepoint_lttng_definition.h"
 
 namespace scalopus
 {
@@ -45,5 +45,5 @@ void scope_exit(const unsigned int id)
 {
   tracepoint(scalopus_scope_id, exit, id);
 }
-}
+}  // namespace lttng
 }  // namespace scalopus

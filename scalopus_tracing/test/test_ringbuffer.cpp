@@ -27,11 +27,10 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include <array>
 #include <iostream>
 #include <vector>
-#include <array>
 #include "spsc_ringbuffer.h"
-
 
 template <typename A, typename B>
 void test(const A& a, const B& b)
@@ -48,20 +47,19 @@ void run_tests(RingType& ring)
 {
   int res;
   // queue should start empty:
-  test(ring.pop(res), false);// Check if popping an empty queue fails.
+  test(ring.pop(res), false);  // Check if popping an empty queue fails.
   test(ring.empty(), true);
 
   // We should be able to add to it.
   test(ring.push(1), true);
   test(ring.push(2), true);
-  test(ring.push(3), false); // queue is full.
+  test(ring.push(3), false);  // queue is full.
 
   test(ring.pop(res), true);
   test(res, 1);
   test(ring.pop(res), true);
   test(res, 2);
-  test(ring.pop(res), false); // popping on empty queue
-
+  test(ring.pop(res), false);  // popping on empty queue
 
   test(ring.push(2), true);
   test(ring.pop(res), true);
@@ -71,9 +69,9 @@ void run_tests(RingType& ring)
 
 int main(int /* argc */, char** /* argv */)
 {
-  scalopus::SPSCRingBuffer<std::vector<int>> ring_vector{std::vector<int>(3, 0)};
+  scalopus::SPSCRingBuffer<std::vector<int>> ring_vector{ std::vector<int>(3, 0) };
   run_tests(ring_vector);
-  scalopus::SPSCRingBuffer<std::array<int, 3>> ring_array{std::array<int, 3>()};
+  scalopus::SPSCRingBuffer<std::array<int, 3>> ring_array{ std::array<int, 3>() };
   run_tests(ring_array);
   return 0;
 }

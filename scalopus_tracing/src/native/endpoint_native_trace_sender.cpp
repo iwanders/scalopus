@@ -28,12 +28,12 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_tracing/endpoint_native_trace_sender.h"
-#include "tracepoint_collector_native.h"
 #include <sys/types.h>
 #include <unistd.h>
 #include <cstring>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include "tracepoint_collector_native.h"
 
 namespace scalopus
 {
@@ -43,10 +43,7 @@ using EventMap = std::map<unsigned long, tracepoint_collector_types::EventContai
 EndpointNativeTraceSender::EndpointNativeTraceSender()
 {
   // Start the worker thread.
-  worker_ = std::thread([&]()
-  {
-    work();
-  });
+  worker_ = std::thread([&]() { work(); });
 }
 
 EndpointNativeTraceSender::~EndpointNativeTraceSender()

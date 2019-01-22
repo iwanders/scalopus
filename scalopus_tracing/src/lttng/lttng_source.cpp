@@ -78,7 +78,6 @@ std::vector<json> LttngSource::convertEvents()
   std::vector<json> result;
   result.reserve(events_.size());
 
-
   provider_->updateMapping();
   const auto mapping = provider_->getMapping();
   for (auto& event : events_)

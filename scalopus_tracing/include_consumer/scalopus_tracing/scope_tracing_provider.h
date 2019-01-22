@@ -30,9 +30,9 @@
 #ifndef SCALOPUS_CATAPULT_SCOPE_TRACING_PROVIDER_H
 #define SCALOPUS_CATAPULT_SCOPE_TRACING_PROVIDER_H
 
+#include <scalopus_interface/endpoint_manager.h>
 #include <scalopus_interface/trace_event_provider.h>
 #include <scalopus_tracing/endpoint_trace_mapping.h>
-#include <scalopus_interface/endpoint_manager.h>
 
 namespace scalopus
 {
@@ -70,10 +70,10 @@ public:
   static std::string getScopeName(const ProcessTraceMap& mapping, const unsigned int pid, const unsigned int trace_id);
 
 private:
-  EndpointManager::Ptr manager_;      //!< Manager for connections.
+  EndpointManager::Ptr manager_;  //!< Manager for connections.
 
-  std::mutex mapping_mutex_;                       //!< Mutex for the mapping.
-  ProcessTraceMap mapping_;  //!< The currently known mappings.
+  std::mutex mapping_mutex_;  //!< Mutex for the mapping.
+  ProcessTraceMap mapping_;   //!< The currently known mappings.
 };
 
 }  // namespace scalopus

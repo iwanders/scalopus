@@ -47,9 +47,10 @@ public:
 
   // From the endpoint
   std::string getName() const;
+
 private:
   void work();
-  bool running_ { true };
+  bool running_{ true };
   std::thread worker_;
 };
 

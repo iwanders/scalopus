@@ -50,7 +50,7 @@ using ScopeBuffer = SPSCRingBuffer<EventContainer>;
 using ScopeBufferPtr = std::shared_ptr<ScopeBuffer>;
 //! The (grouped by thread) events composed of native types that we can serialize to binary for transfer.
 using ThreadedEvents = std::map<unsigned long, std::vector<std::tuple<TimePoint, unsigned int, uint8_t>>>;
-}
+}  // namespace tracepoint_collector_types
 
 /**
  * @brief A singleton class that keeps track of the ringbuffer allocated to each thread to insert tracepoints into.
@@ -66,6 +66,7 @@ private:
    * in lost events.
    */
   std::size_t ringbuffer_size_{ 10000 };
+
 public:
   constexpr static const uint8_t ENTRY = 1;
   constexpr static const uint8_t EXIT = 2;
@@ -84,7 +85,6 @@ public:
    * @brief Set the size of any new ringbuffers that will be created.
    */
   void setRingbufferSize(std::size_t size);
-  
 };
 }  // namespace scalopus
 

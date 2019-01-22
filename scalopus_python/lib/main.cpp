@@ -30,13 +30,13 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <scalopus_general/general.h>
-#include <scalopus_transport/transport_unix.h>
-#include <scalopus_transport/transport_mock.h>
-#include <scalopus_tracing/tracing.h>
-#include <scalopus_tracing/native_tracepoint.h>
+#include <scalopus_interface/endpoint_manager.h>
 #include <scalopus_interface/trace_event_provider.h>
 #include <scalopus_interface/trace_event_source.h>
-#include <scalopus_interface/endpoint_manager.h>
+#include <scalopus_tracing/native_tracepoint.h>
+#include <scalopus_tracing/tracing.h>
+#include <scalopus_transport/transport_mock.h>
+#include <scalopus_transport/transport_unix.h>
 
 #ifdef SCALOPUS_TRACING_HAVE_LTTNG
 #include <scalopus_tracing/lttng_tracepoint.h>
@@ -46,17 +46,15 @@ namespace py = pybind11;
 
 namespace scalopus
 {
-
-
 class PyEndpoint : public Endpoint
 {
 public:
   using Ptr = std::shared_ptr<PyEndpoint>;
-  using Endpoint::Endpoint; // Inherit constructors
+  using Endpoint::Endpoint;  // Inherit constructors
 
   std::string getName() const override
   {
-    PYBIND11_OVERLOAD_PURE(std::string, PyEndpoint, getName,);
+    PYBIND11_OVERLOAD_PURE(std::string, PyEndpoint, getName, );
   }
 
   bool handle(Transport& transport, const Data& incoming, Data& outgoing) override
@@ -65,7 +63,7 @@ public:
   }
 };
 
-}
+}  // namespace scalopus
 
 PYBIND11_MODULE(scalopus_python_lib, m)
 {
@@ -85,7 +83,8 @@ PYBIND11_MODULE(scalopus_python_lib, m)
   py_endpoint.def(py::init<>());
   py_endpoint.def("getName", &scalopus::PyEndpoint::getName);
 
-  py::class_<scalopus::TraceEventProvider, scalopus::TraceEventProvider::Ptr> trace_event_provider(m, "TraceEventProvider");
+  py::class_<scalopus::TraceEventProvider, scalopus::TraceEventProvider::Ptr> trace_event_provider(m, "TraceEventProvid"
+                                                                                                      "er");
   trace_event_provider.def("makeSource", &scalopus::TraceEventProvider::makeSource);
 
   py::class_<scalopus::TraceEventSource, scalopus::TraceEventSource::Ptr> trace_event_source(m, "TraceEventSource");
@@ -105,30 +104,32 @@ PYBIND11_MODULE(scalopus_python_lib, m)
 
   // scalopus_transport
   py::module transport = m.def_submodule("transport", "The transport related components.");
-  py::class_<scalopus::TransportUnixFactory, scalopus::TransportUnixFactory::Ptr> transport_factory_unix(transport, "TransportUnixFactory", transport_factory);
+  py::class_<scalopus::TransportUnixFactory, scalopus::TransportUnixFactory::Ptr> transport_factory_unix(
+      transport, "TransportUnixFactory", transport_factory);
   transport_factory_unix.def(py::init<>());
-  py::class_<scalopus::TransportMockFactory, scalopus::TransportMockFactory::Ptr> transport_factory_mock(transport, "TransportMockFactory", transport_factory);
+  py::class_<scalopus::TransportMockFactory, scalopus::TransportMockFactory::Ptr> transport_factory_mock(
+      transport, "TransportMockFactory", transport_factory);
   transport_factory_mock.def(py::init<>());
 
   // scalopus_general
   py::module general = m.def_submodule("general", "The general components.");
-  py::class_<scalopus::EndpointIntrospect, scalopus::EndpointIntrospect::Ptr> endpoint_introspect(general, "EndpointIntrospect", endpoint);
+  py::class_<scalopus::EndpointIntrospect, scalopus::EndpointIntrospect::Ptr> endpoint_introspect(
+      general, "EndpointIntrospect", endpoint);
   endpoint_introspect.def(py::init<>());
   endpoint_introspect.def("supported", &scalopus::EndpointIntrospect::supported);
 
   py::class_<scalopus::EndpointProcessInfo::ProcessInfo> endpoint_process_info_info(general, "ProcessInfo");
   endpoint_process_info_info.def_readwrite("name", &scalopus::EndpointProcessInfo::ProcessInfo::name);
   endpoint_process_info_info.def_readwrite("threads", &scalopus::EndpointProcessInfo::ProcessInfo::threads);
-  
-  py::class_<scalopus::EndpointProcessInfo, scalopus::EndpointProcessInfo::Ptr> endpoint_process_info(general, "EndpointProcessInfo", endpoint);
+
+  py::class_<scalopus::EndpointProcessInfo, scalopus::EndpointProcessInfo::Ptr> endpoint_process_info(
+      general, "EndpointProcessInfo", endpoint);
   endpoint_process_info.def(py::init<>());
   endpoint_process_info.def("setProcessName", &scalopus::EndpointProcessInfo::setProcessName);
   endpoint_process_info.def("processInfo", &scalopus::EndpointProcessInfo::processInfo);
 
-  general.def("setThreadName", [](const std::string& name)
-    {
-      scalopus::ThreadNameTracker::getInstance().setCurrentName(name);
-    });
+  general.def("setThreadName",
+              [](const std::string& name) { scalopus::ThreadNameTracker::getInstance().setCurrentName(name); });
 
   // scalopus_tracing
   py::module tracing = m.def_submodule("tracing", "The tracing specific components.");
@@ -137,22 +138,20 @@ PYBIND11_MODULE(scalopus_python_lib, m)
   endpoint_trace_mapping.def("mapping", &scalopus::EndpointTraceMapping::mapping);
 
   py::module native = tracing.def_submodule("native", "The native specific components.");
-  py::class_<scalopus::EndpointNativeTraceSender> endpoint_native_trace_sender(native, "EndpointNativeTraceSender", endpoint);
+  py::class_<scalopus::EndpointNativeTraceSender> endpoint_native_trace_sender(native, "EndpointNativeTraceSender",
+                                                                               endpoint);
   endpoint_native_trace_sender.def(py::init<>());
 
-  tracing.def("setTraceName", [](const unsigned int id, const std::string& name)
-  {
+  tracing.def("setTraceName", [](const unsigned int id, const std::string& name) {
     scalopus::ScopeTraceTracker::getInstance().insert(id, name);
   });
 
-
 #ifdef SCALOPUS_TRACING_HAVE_LTTNG
   py::module lttng = tracing.def_submodule("lttng", "The lttng specific components.");
-  lttng.def("scope_entry", &scalopus::lttng::scope_entry);  
-  lttng.def("scope_exit", &scalopus::lttng::scope_exit);  
+  lttng.def("scope_entry", &scalopus::lttng::scope_entry);
+  lttng.def("scope_exit", &scalopus::lttng::scope_exit);
 #endif
 
-  native.def("scope_entry", &scalopus::native::scope_entry);  
-  native.def("scope_exit", &scalopus::native::scope_exit);  
-
+  native.def("scope_entry", &scalopus::native::scope_entry);
+  native.def("scope_exit", &scalopus::native::scope_exit);
 }

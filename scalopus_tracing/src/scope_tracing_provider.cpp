@@ -33,7 +33,7 @@
 
 namespace scalopus
 {
-ScopeTracingProvider::ScopeTracingProvider(EndpointManager::Ptr manager) : manager_{manager}
+ScopeTracingProvider::ScopeTracingProvider(EndpointManager::Ptr manager) : manager_{ manager }
 {
 }
 
@@ -73,7 +73,8 @@ void ScopeTracingProvider::updateMapping()
   }
 }
 
-std::string ScopeTracingProvider::getScopeName(const ProcessTraceMap& mapping, const unsigned int pid, const unsigned int trace_id)
+std::string ScopeTracingProvider::getScopeName(const ProcessTraceMap& mapping, const unsigned int pid,
+                                               const unsigned int trace_id)
 {
   auto pid_info = mapping.find(pid);
   if (pid_info != mapping.end())

@@ -34,7 +34,7 @@
 
 namespace scalopus
 {
-LttngProvider::LttngProvider(std::string path, EndpointManager::Ptr manager) : ScopeTracingProvider{manager}
+LttngProvider::LttngProvider(std::string path, EndpointManager::Ptr manager) : ScopeTracingProvider{ manager }
 {
   // Start the tracing tool.
   tracing_tool_ = std::make_shared<BabeltraceTool>();

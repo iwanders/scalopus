@@ -114,11 +114,10 @@ After building and succesfully being able to run the tests, use the following st
 
 ## Legal
 
-- The Python bindings are produced using [Pybind11][pybind11]. This uses the BSD-3-clause [license](/thirdparty/pybind11/LICENSE).
-- Json and bson handling is done with the [json for modern C++][nlohmann_json] library. This uses the MIT [license](/thirdparty/nlohmann_json/LICENSE.MIT).
-- The webserver and websocket handling is done with [seasocks][seasocks]. This uses the BSD-2-clause [license](/thirdparty/seasocks/LICENSE)
-
-Scalopus itself is licensed under the BSD-3-clause [license](/LICENSE).
+- The Python bindings are produced using [Pybind11][pybind11]. This uses the BSD-3-clause [license](https://github.com/pybind/pybind11/blob/master/LICENSE).
+- Json and bson handling is done with the [json for modern C++][nlohmann_json] library. This uses the MIT [license](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT).
+- The webserver and websocket handling is done with [seasocks][seasocks]. This uses the BSD-2-clause [license](https://github.com/mattgodbolt/seasocks/blob/master/LICENSE)
+- The Scalopus project itself is licensed under the BSD-3-clause [license](/LICENSE).
   
 
 

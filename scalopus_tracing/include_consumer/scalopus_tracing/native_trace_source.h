@@ -68,10 +68,11 @@ public:
    * @brief This is called by the server's receiving thread and contains chunks of incoming data.
    */
   void addData(const DataPtr& incoming_data);
+
 private:
   NativeTraceProvider::WeakPtr provider_;  //!< Pointer to the provider.
 
-  std::atomic_bool in_interval_ { false };
+  std::atomic_bool in_interval_{ false };
 
   std::mutex data_mutex_;
   std::vector<DataPtr> recorded_data_;

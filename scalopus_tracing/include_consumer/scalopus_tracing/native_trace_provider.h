@@ -30,8 +30,8 @@
 #ifndef SCALOPUS_CATAPULT_NATIVE_TRACE_PROVIDER_H
 #define SCALOPUS_CATAPULT_NATIVE_TRACE_PROVIDER_H
 
-#include <scalopus_tracing/scope_tracing_provider.h>
 #include <scalopus_interface/endpoint.h>
+#include <scalopus_tracing/scope_tracing_provider.h>
 #include <set>
 
 namespace scalopus

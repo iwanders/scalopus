@@ -35,6 +35,6 @@ namespace native
 {
 void scope_entry(const unsigned int id);
 void scope_exit(const unsigned int id);
-}
+}  // namespace native
 }  // namespace scalopus
 #endif  // SCALOPUS_TRACING_NATIVE_TRACEPOINT_H

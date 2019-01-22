@@ -30,8 +30,8 @@
 #include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_general/general_provider.h>
 
-#include <scalopus_tracing/endpoint_trace_mapping.h>
 #include <scalopus_tracing/endpoint_native_trace_sender.h>
+#include <scalopus_tracing/endpoint_trace_mapping.h>
 #include <scalopus_tracing/lttng_provider.h>
 #include <scalopus_tracing/native_trace_provider.h>
 
@@ -88,23 +88,23 @@ int main(int /* argc */, char** /* argv */)
   });
 
   auto native_trace_provider = std::make_shared<scalopus::NativeTraceProvider>(manager);
-  manager->addEndpointFactory(scalopus::EndpointNativeTraceSender::name,
-    [provider = std::weak_ptr<scalopus::NativeTraceProvider>(native_trace_provider)](const auto& transport) {
-    auto ptr = provider.lock();
-    if (ptr)
-    {
-      auto endpoint = ptr->receiveEndpoint();
-      endpoint->setTransport(transport);
-      return endpoint;
-    }
-    return scalopus::Endpoint::Ptr{nullptr};
-  });
+  manager->addEndpointFactory(
+      scalopus::EndpointNativeTraceSender::name,
+      [provider = std::weak_ptr<scalopus::NativeTraceProvider>(native_trace_provider)](const auto& transport) {
+        auto ptr = provider.lock();
+        if (ptr)
+        {
+          auto endpoint = ptr->receiveEndpoint();
+          endpoint->setTransport(transport);
+          return endpoint;
+        }
+        return scalopus::Endpoint::Ptr{ nullptr };
+      });
 
   // Create the providers.
   std::vector<scalopus::TraceEventProvider::Ptr> providers;
   providers.push_back(std::make_shared<scalopus::LttngProvider>(path, manager));
   providers.push_back(native_trace_provider);
-
 
   providers.push_back(std::make_shared<scalopus::GeneralProvider>(manager));
 
@@ -113,7 +113,7 @@ int main(int /* argc */, char** /* argv */)
 
   // Make a webserver and add the endpoints
   namespace ss = seasocks;
-  auto logger = std::make_shared<ss::PrintfLogger>(ss::Logger::Level::WARNING);
+  auto logger = std::make_shared<ss::PrintfLogger>(ss::Logger::Level::Warning);
   ss::Server server(logger);
 
   // Set the function that's to be used to execute functions on the seasocks thread.

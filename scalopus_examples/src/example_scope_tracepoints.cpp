@@ -112,7 +112,6 @@ int main(int /* argc */, char** argv)
   test_two_raiis_in_same_scope();
   test_two_named_in_same_scope();
 
-
   while (true)
   {
     a();
