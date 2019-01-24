@@ -6,7 +6,13 @@ else()
   message(STATUS "Detected pybind11 target, building python bindings.")
 endif()
 
-pybind11_add_module(scalopus_python_lib lib/main.cpp)
+pybind11_add_module(scalopus_python_lib
+  lib/main.cpp
+  lib/scalopus_interface.cpp
+  lib/scalopus_transport.cpp
+  lib/scalopus_general.cpp
+  lib/scalopus_tracing.cpp
+  )
 target_link_libraries(scalopus_python_lib
   PRIVATE
     Scalopus::scalopus_transport

@@ -36,11 +36,16 @@ except ModuleNotFoundError as e:
 class MyEndpoint(scalopus_lib.PyEndpoint):
     def __init__(self):
         scalopus_lib.PyEndpoint.__init__(self)
+        print(dir(self))
         pass
     def getName(self):
         print("getname called")
         return "foo"
 
+foo = scalopus_lib.PyEndpoint()
+print(dir(foo))
+my_end = MyEndpoint()
+print(dir(my_end))
 
 fact = scalopus_lib.transport.TransportUnixFactory()
 

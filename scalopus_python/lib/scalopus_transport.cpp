@@ -27,37 +27,22 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H
-#define SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H
-
-#include <scalopus_interface/transport.h>
-#include <map>
-#include <string>
+#include "scalopus_transport.h"
+#include "scalopus_interface.h"
+#include <scalopus_transport/transport_mock.h>
+#include <scalopus_transport/transport_unix.h>
 
 namespace scalopus
 {
-/**
- * @brief This class provides the mapping between scope tracing point id's and their names.
- */
-class EndpointTraceMapping : public Endpoint
+namespace py = pybind11;
+void add_scalopus_transport(py::module& m)
 {
-public:
-  using Ptr = std::shared_ptr<EndpointTraceMapping>;
-  constexpr static const char* name = "scope_tracing";
-  using TraceIdMap = std::map<unsigned int /* trace_id */, std::string /* name */>;
-  using ProcessTraceMap = std::map<unsigned int /* pid */, TraceIdMap /* trace_map */>;
-
-  /**
-   * @brief This function should be called from the client side, it communicates with the endpoint at the connected
-   *        server side and retrieves its mappings.
-   */
-  ProcessTraceMap mapping();
-
-  // From the endpoint
-  std::string getName() const;
-  bool handle(Transport& server, const Data& request, Data& response);
-};
-
+  py::module transport = m.def_submodule("transport", "The transport related components.");
+  py::class_<TransportUnixFactory, TransportUnixFactory::Ptr, TransportFactory> transport_factory_unix(
+      transport, "TransportUnixFactory");
+  transport_factory_unix.def(py::init<>());
+  py::class_<TransportMockFactory, TransportMockFactory::Ptr, TransportFactory> transport_factory_mock(
+      transport, "TransportMockFactory");
+  transport_factory_mock.def(py::init<>());
+}
 }  // namespace scalopus
-
-#endif  // SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H

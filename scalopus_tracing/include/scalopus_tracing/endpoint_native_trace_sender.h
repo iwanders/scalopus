@@ -40,6 +40,7 @@ namespace scalopus
 class EndpointNativeTraceSender : public Endpoint
 {
 public:
+  using Ptr = std::shared_ptr<EndpointNativeTraceSender>;
   constexpr static const char* name = "native_trace_sender";
 
   EndpointNativeTraceSender();

@@ -27,37 +27,30 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H
-#define SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H
-
-#include <scalopus_interface/transport.h>
-#include <map>
-#include <string>
+#include "scalopus_general.h"
+#include <scalopus_general/general.h>
+#include <pybind11/stl.h>
 
 namespace scalopus
 {
-/**
- * @brief This class provides the mapping between scope tracing point id's and their names.
- */
-class EndpointTraceMapping : public Endpoint
+namespace py = pybind11;
+void add_scalopus_general(py::module& m)
 {
-public:
-  using Ptr = std::shared_ptr<EndpointTraceMapping>;
-  constexpr static const char* name = "scope_tracing";
-  using TraceIdMap = std::map<unsigned int /* trace_id */, std::string /* name */>;
-  using ProcessTraceMap = std::map<unsigned int /* pid */, TraceIdMap /* trace_map */>;
+  py::module general = m.def_submodule("general", "The general components.");
+  py::class_<EndpointIntrospect, EndpointIntrospect::Ptr, Endpoint> endpoint_introspect(general, "EndpointIntrospect");
+  endpoint_introspect.def(py::init<>());
+  endpoint_introspect.def("supported", &EndpointIntrospect::supported);
 
-  /**
-   * @brief This function should be called from the client side, it communicates with the endpoint at the connected
-   *        server side and retrieves its mappings.
-   */
-  ProcessTraceMap mapping();
+  py::class_<EndpointProcessInfo::ProcessInfo> endpoint_process_info_info(general, "ProcessInfo");
+  endpoint_process_info_info.def_readwrite("name", &EndpointProcessInfo::ProcessInfo::name);
+  endpoint_process_info_info.def_readwrite("threads", &EndpointProcessInfo::ProcessInfo::threads);
 
-  // From the endpoint
-  std::string getName() const;
-  bool handle(Transport& server, const Data& request, Data& response);
-};
+  py::class_<EndpointProcessInfo, EndpointProcessInfo::Ptr, Endpoint> endpoint_process_info(
+      general, "EndpointProcessInfo");
+  endpoint_process_info.def(py::init<>());
+  endpoint_process_info.def("setProcessName", &EndpointProcessInfo::setProcessName);
+  endpoint_process_info.def("processInfo", &EndpointProcessInfo::processInfo);
 
+  general.def("setThreadName", [](const std::string& name) { ThreadNameTracker::getInstance().setCurrentName(name); });
+}
 }  // namespace scalopus
-
-#endif  // SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H

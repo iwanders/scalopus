@@ -27,37 +27,43 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H
-#define SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H
+#include "scalopus_tracing.h"
 
-#include <scalopus_interface/transport.h>
-#include <map>
-#include <string>
+#include <scalopus_tracing/native_tracepoint.h>
+#include <scalopus_tracing/tracing.h>
+#include <pybind11/stl.h>
+
+#ifdef SCALOPUS_TRACING_HAVE_LTTNG
+#include <scalopus_tracing/lttng_tracepoint.h>
+#endif
 
 namespace scalopus
 {
-/**
- * @brief This class provides the mapping between scope tracing point id's and their names.
- */
-class EndpointTraceMapping : public Endpoint
+namespace py = pybind11;
+void add_scalopus_tracing(py::module& m)
 {
-public:
-  using Ptr = std::shared_ptr<EndpointTraceMapping>;
-  constexpr static const char* name = "scope_tracing";
-  using TraceIdMap = std::map<unsigned int /* trace_id */, std::string /* name */>;
-  using ProcessTraceMap = std::map<unsigned int /* pid */, TraceIdMap /* trace_map */>;
+  py::module tracing = m.def_submodule("tracing", "The tracing specific components.");
+  py::class_<EndpointTraceMapping, EndpointTraceMapping::Ptr, Endpoint> endpoint_trace_mapping(tracing,
+      "EndpointTraceMapping");
+  endpoint_trace_mapping.def(py::init<>());
+  endpoint_trace_mapping.def("mapping", &EndpointTraceMapping::mapping);
 
-  /**
-   * @brief This function should be called from the client side, it communicates with the endpoint at the connected
-   *        server side and retrieves its mappings.
-   */
-  ProcessTraceMap mapping();
+  py::module native = tracing.def_submodule("native", "The native specific components.");
+  py::class_<EndpointNativeTraceSender, EndpointNativeTraceSender::Ptr, Endpoint> endpoint_native_trace_sender(native,
+      "EndpointNativeTraceSender");
+  endpoint_native_trace_sender.def(py::init<>());
 
-  // From the endpoint
-  std::string getName() const;
-  bool handle(Transport& server, const Data& request, Data& response);
-};
+  tracing.def("setTraceName", [](const unsigned int id, const std::string& name) {
+    ScopeTraceTracker::getInstance().insert(id, name);
+  });
 
+#ifdef SCALOPUS_TRACING_HAVE_LTTNG
+  py::module lttng = tracing.def_submodule("lttng", "The lttng specific components.");
+  lttng.def("scope_entry", &lttng::scope_entry);
+  lttng.def("scope_exit", &lttng::scope_exit);
+#endif
+
+  native.def("scope_entry", &native::scope_entry);
+  native.def("scope_exit", &native::scope_exit);
+}
 }  // namespace scalopus
-
-#endif  // SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H
