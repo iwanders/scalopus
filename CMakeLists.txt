@@ -59,6 +59,8 @@ add_subdirectory(scalopus_examples)
 add_subdirectory(scalopus_catapult)
 add_subdirectory(scalopus_python)
 
+file(GLOB_RECURSE FORMAT_SRC_FILES  "${PROJECT_SOURCE_DIR}/scalopus*/**.h"  "${PROJECT_SOURCE_DIR}/scalopus*/**.cpp")
+add_custom_target(clang_format_scalopus COMMAND clang-format-7 -i ${FORMAT_SRC_FILES})
 
 configure_file(
   ${CMAKE_CURRENT_LIST_DIR}/cmake/ScalopusConfig.cmake.in
