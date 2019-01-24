@@ -48,9 +48,7 @@ void BabeltraceTool::init(std::string path)
     // lttng view call, eliminates need for hostname:$ lttng view test_session -e "babeltrace --input-format=lttng-live"
     process_ =
         std::make_shared<subprocess::popen>("lttng", std::vector<std::string>{ "view", "scalopus_target_session", "-e",
-                                                                               "babeltrace --clock-seconds --clock-gmt "
-                                                                               "--no-delta "
-                                                                               "--input-format=lttng-live" });
+                                    "babeltrace --clock-seconds --clock-gmt --no-delta --input-format=lttng-live" });
   }
   else
   {

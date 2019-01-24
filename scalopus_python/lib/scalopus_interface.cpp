@@ -32,7 +32,6 @@
 #include <scalopus_interface/trace_event_provider.h>
 #include <scalopus_interface/trace_event_source.h>
 
-
 namespace scalopus
 {
 namespace py = pybind11;
@@ -88,7 +87,6 @@ void add_scalopus_interface(py::module& m)
   transport_factory.def("discover", &TransportFactory::discover);
   transport_factory.def("serve", &TransportFactory::serve);
   transport_factory.def("connect", &TransportFactory::connect);
-
 }
 
 }  // namespace scalopus

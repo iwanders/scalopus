@@ -28,8 +28,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_general.h"
-#include <scalopus_general/general.h>
 #include <pybind11/stl.h>
+#include <scalopus_general/general.h>
 
 namespace scalopus
 {
@@ -45,8 +45,8 @@ void add_scalopus_general(py::module& m)
   endpoint_process_info_info.def_readwrite("name", &EndpointProcessInfo::ProcessInfo::name);
   endpoint_process_info_info.def_readwrite("threads", &EndpointProcessInfo::ProcessInfo::threads);
 
-  py::class_<EndpointProcessInfo, EndpointProcessInfo::Ptr, Endpoint> endpoint_process_info(
-      general, "EndpointProcessInfo");
+  py::class_<EndpointProcessInfo, EndpointProcessInfo::Ptr, Endpoint> endpoint_process_info(general,
+                                                                                            "EndpointProcessInfo");
   endpoint_process_info.def(py::init<>());
   endpoint_process_info.def("setProcessName", &EndpointProcessInfo::setProcessName);
   endpoint_process_info.def("processInfo", &EndpointProcessInfo::processInfo);

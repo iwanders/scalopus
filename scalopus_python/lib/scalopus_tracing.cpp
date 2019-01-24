@@ -29,9 +29,9 @@
 */
 #include "scalopus_tracing.h"
 
+#include <pybind11/stl.h>
 #include <scalopus_tracing/native_tracepoint.h>
 #include <scalopus_tracing/tracing.h>
-#include <pybind11/stl.h>
 
 #ifdef SCALOPUS_TRACING_HAVE_LTTNG
 #include <scalopus_tracing/lttng_tracepoint.h>
@@ -44,13 +44,13 @@ void add_scalopus_tracing(py::module& m)
 {
   py::module tracing = m.def_submodule("tracing", "The tracing specific components.");
   py::class_<EndpointTraceMapping, EndpointTraceMapping::Ptr, Endpoint> endpoint_trace_mapping(tracing,
-      "EndpointTraceMapping");
+                                                                                               "EndpointTraceMapping");
   endpoint_trace_mapping.def(py::init<>());
   endpoint_trace_mapping.def("mapping", &EndpointTraceMapping::mapping);
 
   py::module native = tracing.def_submodule("native", "The native specific components.");
-  py::class_<EndpointNativeTraceSender, EndpointNativeTraceSender::Ptr, Endpoint> endpoint_native_trace_sender(native,
-      "EndpointNativeTraceSender");
+  py::class_<EndpointNativeTraceSender, EndpointNativeTraceSender::Ptr, Endpoint> endpoint_native_trace_sender(
+      native, "EndpointNativeTraceSender");
   endpoint_native_trace_sender.def(py::init<>());
 
   tracing.def("setTraceName", [](const unsigned int id, const std::string& name) {

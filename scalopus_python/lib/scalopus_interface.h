@@ -50,5 +50,5 @@ public:
   bool unsolicited(Transport& transport, const Data& incoming, Data& outgoing) override;
 };
 
-void add_scalopus_interface(py::module& );
+void add_scalopus_interface(py::module&);
 }  // namespace scalopus

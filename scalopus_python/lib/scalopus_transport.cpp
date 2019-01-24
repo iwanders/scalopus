@@ -28,9 +28,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_transport.h"
-#include "scalopus_interface.h"
 #include <scalopus_transport/transport_mock.h>
 #include <scalopus_transport/transport_unix.h>
+#include "scalopus_interface.h"
 
 namespace scalopus
 {

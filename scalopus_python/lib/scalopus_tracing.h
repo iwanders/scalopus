@@ -33,5 +33,5 @@
 namespace scalopus
 {
 namespace py = pybind11;
-void add_scalopus_tracing(py::module& );
+void add_scalopus_tracing(py::module&);
 }  // namespace scalopus
