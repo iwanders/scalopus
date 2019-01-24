@@ -55,27 +55,6 @@ The subcomponents of scalopus are clearly separated:
 - [scalopus_catapult](/scalopus_catapult) Provides the chrome devtools protocol endpoint webserver that allows consuming the traces.
 - [scalopus_examples](/scalopus_examples) This provides some examples on how to write instrumented source code.
 
-### Interface
-The interface specifies how the interaction between the components happens.
-
-#### Endpoint
-The Endpoint is a class instantiated at the server and client sides of the transport. An endpoint can interact with the transport and thus with the endpoints at the other end of a transport. Endpoints are stored by name and their name must be unique. The Endpoint interface is the same at both sides of the transport. If data comes in for an endpoint the transport will call the appropriate method, if part of a request (client initiated) this will be `handle`, sent by the server side it will call `unsolicited`. When an Endpoint's `handle` method is called it can immediately respond from the server' thread with a response.
-
-#### TransportFactory
-The TransportFactory provides an abstracted way of creating a server of a specific type, discovering other servers and returning a list of Destinations and creating a Transport that's connected to a certain Destination.
-
-#### Transport
-A Transport provides a means of storing a list of Endpoints and allowing those to communicate with the Transport and receive data from the Transport. On the server side the Endpoints can send data through the `broadcast` method, which sends the data to all connected clients. At the client side of the Transport the main way of interacting is with the `request` method, that sends a request and returns a `std::Future` that will be populated with the response.
-
-#### Endpoint Manager
-This interface is part of the `scalopus_consumer` target, it provides a way to query the available Endpoints from something that manages endpoints. This is necessary because the Providers need to be able to obtain the Endpoint in the catapult server.
-
-#### TraceEventProvider
-This interface is part of the `scalopus_consumer` target. The provider is a class that persists for the lifetime of the catapult server and has one method called `makeSource`, this method returns a TraceEventSource for tracing sessions to use.
-
-#### TraceEventSource
-This interface is part of the `scalopus_consumer` target. A source is created from its associated Provider, it is responsible for producing json representations of [traces][trace_event_format] that will be sent to the browser. The browser must start an interval, during which the source should collect traces. At the end of the interval the source must provide valid trace events ready for consumption by catapult's trace viewer. 
-
 ## Building
 
 The three required dependencies are embedded in the `thirdparty` folder and use git submodules. Cmake 3.5.0 or higher is required and a compiler that supports C++14 features.
@@ -119,10 +98,6 @@ After building and succesfully being able to run the tests, use the following st
 - The webserver and websocket handling is done with [seasocks][seasocks]. This uses the BSD-2-clause [license](https://github.com/mattgodbolt/seasocks/blob/master/LICENSE)
 - The Scalopus project itself is licensed under the BSD-3-clause [license](/LICENSE).
   
-
-
-
-
 
 [catapult_trace_viewer]: https://github.com/catapult-project/catapult/blob/master/tracing/README.md
 [catapult]: https://github.com/catapult-project/catapult
