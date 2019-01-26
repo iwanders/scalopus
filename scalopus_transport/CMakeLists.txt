@@ -1,7 +1,7 @@
 # Create the library that provides the scope tracepoints 
 add_library(scalopus_transport SHARED
   src/transport_unix.cpp
-  src/transport_mock.cpp
+  src/transport_loopback.cpp
   src/protocol.cpp
 )
 add_library(Scalopus::scalopus_transport ALIAS scalopus_transport)

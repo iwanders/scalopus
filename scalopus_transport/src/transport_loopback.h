@@ -27,11 +27,11 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef SCALOPUS_TRANSPORT_TRANSPORT_MOCK_INTERNAL_H
-#define SCALOPUS_TRANSPORT_TRANSPORT_MOCK_INTERNAL_H
+#ifndef SCALOPUS_TRANSPORT_TRANSPORT_LOOPBACK_INTERNAL_H
+#define SCALOPUS_TRANSPORT_TRANSPORT_LOOPBACK_INTERNAL_H
 
 #include <scalopus_interface/transport_factory.h>
-#include <scalopus_transport/transport_mock.h>
+#include <scalopus_transport/transport_loopback.h>
 #include <future>
 #include <map>
 #include <memory>
@@ -39,32 +39,42 @@
 #include <thread>
 #include <utility>
 #include <vector>
-#include "protocol.h"
 
 namespace scalopus
 {
 /**
  * @brief A transport for testing basically, a server is created to which clients can be attached.
  */
-class TransportMock : public Transport, public std::enable_shared_from_this<TransportMock>
+class TransportLoopback : public Transport, public std::enable_shared_from_this<TransportLoopback>
 {
 public:
-  using Ptr = std::shared_ptr<TransportMock>;
-  TransportMock();
-  TransportMock(Ptr server);  // Create a mock transport client side connected to the server.
+  using Ptr = std::shared_ptr<TransportLoopback>;
+  ~TransportLoopback();
+  TransportLoopback();
+  TransportLoopback(Ptr server);  // Create a mock transport client side connected to the server.
 
   // From Transport superclass.
   PendingResponse request(const std::string& remote_endpoint_name, const Data& outgoing);
-  void broadcast(const std::string& remote_endpoint_name, const Data& outgoing);
-
   std::size_t pendingRequests() const;
 
   void addClient(Transport::WeakPtr client);
   bool isConnected() const;
 
 private:
+  using PendingRequest = std::tuple<std::string, Data, std::promise<Data>, std::weak_ptr<std::future<Data>>>;
   Ptr server_;
   std::vector<Transport::WeakPtr> clients_;
+
+  void work();
+  bool running_{ true };
+  std::thread thread_;
+
+  mutable std::mutex request_lock_;  //!< Lock to guard modification of ongoing_requests_ map.
+
+  //! The outstanding requests and their promised data.
+  std::vector<PendingRequest> ongoing_requests_;
+
+  mutable std::mutex broadcast_lock_;  //!< Lock to guard modification of the pending
 };
 
 }  // namespace scalopus

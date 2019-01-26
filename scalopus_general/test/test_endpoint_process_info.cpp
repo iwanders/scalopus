@@ -27,7 +27,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus_transport/transport_mock.h>
+#include <scalopus_transport/transport_loopback.h>
 #include <iostream>
 #include "scalopus_general/endpoint_process_info.h"
 #include "scalopus_general/thread_naming.h"
@@ -54,7 +54,7 @@ int main(int /* argc */, char** /* argv */)
   // Assign a process name.
   server_info->setProcessName("Fooo");
 
-  auto factory = std::make_shared<scalopus::TransportMockFactory>();
+  auto factory = std::make_shared<scalopus::TransportLoopbackFactory>();
   auto server = factory->serve();
   server->addEndpoint(server_info);
   auto client = factory->connect(server);

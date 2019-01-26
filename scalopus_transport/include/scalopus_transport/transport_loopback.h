@@ -28,18 +28,18 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SCALOPUS_TRANSPORT_TRANSPORT_MOCK_H
-#define SCALOPUS_TRANSPORT_TRANSPORT_MOCK_H
+#ifndef SCALOPUS_TRANSPORT_TRANSPORT_LOOPBACK_H
+#define SCALOPUS_TRANSPORT_TRANSPORT_LOOPBACK_H
 
 #include <scalopus_interface/transport_factory.h>
 #include <memory>
 
 namespace scalopus
 {
-class TransportMockFactory : public TransportFactory
+class TransportLoopbackFactory : public TransportFactory
 {
 public:
-  using Ptr = std::shared_ptr<TransportMockFactory>;
+  using Ptr = std::shared_ptr<TransportLoopbackFactory>;
   std::vector<Destination::Ptr> discover();
   Transport::Ptr serve();
   Transport::Ptr connect(const Destination::Ptr& destination);
@@ -51,4 +51,4 @@ public:
 };
 }  // namespace scalopus
 
-#endif  // SCALOPUS_TRANSPORT_TRANSPORT_MOCK_H
+#endif  // SCALOPUS_TRANSPORT_TRANSPORT_LOOPBACK_H

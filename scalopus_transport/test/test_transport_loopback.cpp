@@ -31,11 +31,11 @@
 #include <chrono>
 #include <iostream>
 #include "test_transport_util.h"
-#include "transport_mock.h"
+#include "transport_loopback.h"
 
 int main(int /* argc */, char** /* argv */)
 {
-  auto factory = std::make_shared<scalopus::TransportMockFactory>();
+  auto factory = std::make_shared<scalopus::TransportLoopbackFactory>();
 
   // Create the server
   auto server = factory->serve();
@@ -82,6 +82,14 @@ int main(int /* argc */, char** /* argv */)
   // Wait for the broadcast to propagate.
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   test(received_unsolicited, 'a');
+
+  // next, create a request and let the pointer to the response go out of scope. This should clean it up.
+  {
+    auto resp_ptr = client0->request("this_endpoint_doesnt_exist", { 'a' });
+    test(client0->pendingRequests(), 1U);
+  }
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  test(client0->pendingRequests(), 0U);
 
   return 0;
 }

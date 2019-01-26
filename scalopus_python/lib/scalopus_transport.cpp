@@ -28,7 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_transport.h"
-#include <scalopus_transport/transport_mock.h>
+#include <scalopus_transport/transport_loopback.h>
 #include <scalopus_transport/transport_unix.h>
 #include "scalopus_interface.h"
 
@@ -41,8 +41,8 @@ void add_scalopus_transport(py::module& m)
   py::class_<TransportUnixFactory, TransportUnixFactory::Ptr, TransportFactory> transport_factory_unix(
       transport, "TransportUnixFactory");
   transport_factory_unix.def(py::init<>());
-  py::class_<TransportMockFactory, TransportMockFactory::Ptr, TransportFactory> transport_factory_mock(
-      transport, "TransportMockFactory");
-  transport_factory_mock.def(py::init<>());
+  py::class_<TransportLoopbackFactory, TransportLoopbackFactory::Ptr, TransportFactory> transport_factory_loopback(
+      transport, "TransportLoopbackFactory");
+  transport_factory_loopback.def(py::init<>());
 }
 }  // namespace scalopus

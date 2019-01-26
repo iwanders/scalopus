@@ -27,7 +27,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus_transport/transport_mock.h>
+#include <scalopus_transport/transport_loopback.h>
 #include <iostream>
 #include "scalopus_tracing/tracing.h"
 
@@ -66,7 +66,7 @@ int main(int /* argc */, char** /* argv */)
   // Create the endpoint.
   auto server_endpoint = std::make_shared<scalopus::EndpointTraceMapping>();
 
-  auto factory = std::make_shared<scalopus::TransportMockFactory>();
+  auto factory = std::make_shared<scalopus::TransportLoopbackFactory>();
   auto server = factory->serve();
   server->addEndpoint(server_endpoint);
   auto client = factory->connect(server);
