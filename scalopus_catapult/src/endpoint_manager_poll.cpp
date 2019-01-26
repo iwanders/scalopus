@@ -44,6 +44,11 @@ EndpointManagerPoll::EndpointManagerPoll(const TransportFactory::Ptr factory) : 
   };
 }
 
+EndpointManagerPoll::~EndpointManagerPoll()
+{
+  stopPolling();
+}
+
 void EndpointManagerPoll::manage()
 {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -56,8 +61,8 @@ void EndpointManagerPoll::manage()
     {
       std::cerr << "[scalopus] Cleaning up transport to: " << transport.first << std::endl;
       transports_.erase(transport.first);
-      endpoints_.erase(std::find_if(endpoints_.begin(), endpoints_.end(),
-                                    [&](const auto& v) { return v.first == transport.second; }));
+      transport_endpoints_.erase(std::find_if(transport_endpoints_.begin(), transport_endpoints_.end(),
+                                              [&](const auto& v) { return v.first == transport.second; }));
     }
   }
 
@@ -78,7 +83,7 @@ void EndpointManagerPoll::manage()
       continue;
     }
     transports_[destination->hash_code()] = transport;
-    endpoints_[transport] = {};
+    transport_endpoints_[transport] = {};
 
     // Investigate which endpoints are supported by this transport.
     auto introspect_client = std::make_shared<EndpointIntrospect>();
@@ -91,7 +96,7 @@ void EndpointManagerPoll::manage()
       {
         // we support this endpoint, construct it and add it to the list.
         auto new_endpoint = endpoint_factories_[supported_endpoint](transport);
-        endpoints_[transport][supported_endpoint] = new_endpoint;
+        transport_endpoints_[transport][supported_endpoint] = new_endpoint;
         // Also register the new endpoint with the transport in case it needs to listen to broadcast messages.
         transport->addEndpoint(new_endpoint);
       }
@@ -103,10 +108,35 @@ void EndpointManagerPoll::manage()
   }
 }
 
+void EndpointManagerPoll::startPolling(const double interval)
+{
+  stopPolling();
+  is_polling_ = true;
+  poll_interval_ = interval;
+  thread_ = std::thread([&](){ work();});
+}
+
+void EndpointManagerPoll::stopPolling()
+{
+  if (is_polling_)
+  {
+    is_polling_ = false;
+    thread_.join();
+  }
+}
+void EndpointManagerPoll::work()
+{
+  while (is_polling_)
+  {
+    manage();
+    std::this_thread::sleep_for(std::chrono::duration<double>(poll_interval_));
+  }
+}
+
 EndpointManagerPoll::TransportEndpoints EndpointManagerPoll::endpoints() const
 {
   std::lock_guard<std::mutex> lock(mutex_);
-  return endpoints_;
+  return transport_endpoints_;
 }
 
 void EndpointManagerPoll::addEndpointFactory(const std::string& name, EndpointFactory&& factory_function)

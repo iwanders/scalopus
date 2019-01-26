@@ -52,9 +52,11 @@ public:
   using TransportEndpoints = std::map<Transport::Ptr, EndpointMap>;
 
   EndpointManagerPoll(TransportFactory::Ptr factory);
+  ~EndpointManagerPoll();
 
   /**
-   * @brief This function should be called periodically to discover transports and connect.
+   * @brief This function should be called periodically to discover transports and connect. Either from an external
+   *        thread or from the polling thread in this one.
    */
   void manage();
 
@@ -68,15 +70,31 @@ public:
    */
   void addEndpointFactory(const std::string& name, EndpointFactory&& factory_function);
 
+  /**
+   * @brief Start polling with the requested interval.
+   * @param interval The interval to wait between manage calls in seconds.
+   */
+  void startPolling(const double interval);
+
+  /**
+   * @brief Disable polling.
+   */
+  void stopPolling();
+
 private:
   mutable std::mutex mutex_;
   std::map<std::string, EndpointFactory> endpoint_factories_;  //!< Map of factory functions to construct endpoints.
-  TransportEndpoints endpoints_;  //!< Map of endpoints, each endpoint holds a map of [name] = endpoint
+  TransportEndpoints transport_endpoints_;  //!< Map of endpoints, each endpoint holds a map of [name] = endpoint
 
-  //! Map to keep track of which transport is already created, this is not transport agnostic.
+  //! Map to keep track of which transport is already created.
   std::map<std::size_t, Transport::Ptr> transports_;
 
-  TransportFactory::Ptr factory_;
+  TransportFactory::Ptr factory_;  //!< The transport factory to use to discover and create connections.
+
+  bool is_polling_ { false };  //!< Should the worker thread continue polling?
+  double poll_interval_ { 1.0 };  //!< The poll interval in seconds.
+  std::thread thread_;   //!< Thread in which the polling takes place.
+  void work();  //!< Function in which the work the poller does takes place.
 };
 }  // namespace scalopus
 #endif  // SCALOPUS_CATAPULT_ENDPOINT_MANANGER_POLL_H

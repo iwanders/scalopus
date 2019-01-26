@@ -133,12 +133,12 @@ int main(int /* argc */, char** /* argv */)
 
   std::cout << "[main] Everything started, falling into loop to detect transports. Use ctrl + c to quit." << std::endl;
 
+  manager->startPolling(1.0);
+
   // block while we serve requests.
   while (running)
   {
-    using namespace std::chrono_literals;
-    std::this_thread::sleep_for(1s);
-    manager->manage();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 
   std::cout << "[main] Shutting down." << std::endl;
