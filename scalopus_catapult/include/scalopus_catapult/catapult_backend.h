@@ -58,6 +58,7 @@ class CatapultBackend : public ss::PageHandler, public ss::WebSocket::Handler
 {
 public:
   using Ptr = std::shared_ptr<CatapultBackend>;
+  using WeakPtr = std::weak_ptr<CatapultBackend>;
   using Runnable = std::function<void()>;
   using ExecuteFunction = std::function<void(Runnable&&)>;
 

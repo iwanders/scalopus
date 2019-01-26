@@ -91,10 +91,10 @@ private:
 
   TransportFactory::Ptr factory_;  //!< The transport factory to use to discover and create connections.
 
-  bool is_polling_ { false };  //!< Should the worker thread continue polling?
-  double poll_interval_ { 1.0 };  //!< The poll interval in seconds.
-  std::thread thread_;   //!< Thread in which the polling takes place.
-  void work();  //!< Function in which the work the poller does takes place.
+  bool is_polling_{ false };     //!< Should the worker thread continue polling?
+  double poll_interval_{ 1.0 };  //!< The poll interval in seconds.
+  std::thread thread_;           //!< Thread in which the polling takes place.
+  void work();                   //!< Function in which the work the poller does takes place.
 };
 }  // namespace scalopus
 #endif  // SCALOPUS_CATAPULT_ENDPOINT_MANANGER_POLL_H

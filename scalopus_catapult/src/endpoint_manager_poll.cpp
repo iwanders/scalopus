@@ -113,7 +113,7 @@ void EndpointManagerPoll::startPolling(const double interval)
   stopPolling();
   is_polling_ = true;
   poll_interval_ = interval;
-  thread_ = std::thread([&](){ work();});
+  thread_ = std::thread([&]() { work(); });
 }
 
 void EndpointManagerPoll::stopPolling()

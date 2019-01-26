@@ -47,7 +47,7 @@ std::shared_ptr<ss::Response> CatapultBackend::handle(const ss::Request& request
                       "Chromium/64.0.3282.119 Chrome/64.0.3282.119 Safari/537.36" },
       { "V8-Version", "6.4.388.40" },
       { "WebKit-Version", "537.36 (@2ba93af511033c75c55cac08672b808e2c3fbe71)" },
-      { "webSocketDebuggerUrl", "ws://127.0.0.1:9090/devtools/page/bar" },
+      { "webSocketDebuggerUrl", "devtools/page/bar" },
     };
 
     return ss::Response::htmlResponse(j2.dump());

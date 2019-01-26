@@ -27,125 +27,63 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus_general/endpoint_process_info.h>
-#include <scalopus_general/general_provider.h>
-
-#include <scalopus_tracing/endpoint_native_trace_sender.h>
-#include <scalopus_tracing/endpoint_trace_mapping.h>
-#include <scalopus_tracing/lttng_provider.h>
-#include <scalopus_tracing/native_trace_provider.h>
-
-#include <scalopus_transport/transport_unix.h>
-
-#include "scalopus_catapult/catapult_backend.h"
-#include "scalopus_catapult/endpoint_manager_poll.h"
-
+#include "scalopus_catapult/catapult_server.h"
+#include <seasocks/IgnoringLogger.h>
 #include <seasocks/PrintfLogger.h>
 #include <seasocks/Server.h>
 
-#include <chrono>
-#include <thread>
-
-#include <signal.h>
-#include <cstdlib>
-
-// Signal handling.
-bool running{ true };
-void sigint_handler(int /* s */)
+namespace scalopus
 {
-  running = false;
+CatapultServer::CatapultServer(CatapultBackend::Ptr backend) : backend_{ backend }
+{
+  logger_ = std::make_shared<ss::IgnoringLogger>();
 }
 
-int main(int /* argc */, char** /* argv */)
+void CatapultServer::setLogger(std::shared_ptr<ss::Logger> logger)
 {
-  // hook control+c for graceful quitting
-  ::signal(SIGINT, &sigint_handler);
+  logger_ = std::move(logger);
+}
 
-  // retrieve the port number to bind the webserver on
-  int port = 9222;  // 9222 is default chrom(e/ium) remote debugging port.
-  std::cout << "[main] Using port: " << port << ", 9222 is default, it is default remote debugging port" << std::endl;
+void CatapultServer::setDefaultLogger()
+{
+  setLogger(std::make_shared<ss::PrintfLogger>(ss::Logger::Level::Warning));
+}
 
-  // Retrieve the path to run babeltrace on.
-  std::string path = "";  // empty path defaults to 'lttng view'
-  std::cout << "[main] Using path: \"" << path << "\"  (empty defaults to lttng view scalopus_target_session)"
-            << std::endl;
+void CatapultServer::start(std::size_t port)
+{
+  // Create the server with the provided logger specification.
+  server_ = std::make_shared<ss::Server>(logger_);
 
-  // Create the transport & endpoint manager.
-  auto manager = std::make_shared<scalopus::EndpointManagerPoll>(std::make_shared<scalopus::TransportUnixFactory>());
+  // Set the send buffer to to the specified value, this is merely the limit, it's not necissarily allocated or used.
+  server_->setClientBufferSize(max_buffer_);
 
-  // Add scope tracing endpoint factory function.
-  manager->addEndpointFactory(scalopus::EndpointTraceMapping::name, [](const auto& transport) {
-    auto tracing_endpoint = std::make_shared<scalopus::EndpointTraceMapping>();
-    tracing_endpoint->setTransport(transport);
-    return tracing_endpoint;
-  });
-
-  // Add endpoint factory function for the process information.
-  manager->addEndpointFactory(scalopus::EndpointProcessInfo::name, [](const auto& transport) {
-    auto endpoint = std::make_shared<scalopus::EndpointProcessInfo>();
-    endpoint->setTransport(transport);
-    return endpoint;
-  });
-
-  auto native_trace_provider = std::make_shared<scalopus::NativeTraceProvider>(manager);
-  manager->addEndpointFactory(
-      scalopus::EndpointNativeTraceSender::name,
-      [provider = std::weak_ptr<scalopus::NativeTraceProvider>(native_trace_provider)](const auto& transport) {
-        auto ptr = provider.lock();
-        if (ptr)
-        {
-          auto endpoint = ptr->receiveEndpoint();
-          endpoint->setTransport(transport);
-          return endpoint;
-        }
-        return scalopus::Endpoint::Ptr{ nullptr };
-      });
-
-  // Create the providers.
-  std::vector<scalopus::TraceEventProvider::Ptr> providers;
-  providers.push_back(std::make_shared<scalopus::LttngProvider>(path, manager));
-  providers.push_back(native_trace_provider);
-
-  providers.push_back(std::make_shared<scalopus::GeneralProvider>(manager));
-
-  // Create the catapult backend.
-  auto backend = std::make_shared<scalopus::CatapultBackend>(providers);
-
-  // Make a webserver and add the endpoints
-  namespace ss = seasocks;
-  auto logger = std::make_shared<ss::PrintfLogger>(ss::Logger::Level::Warning);
-  ss::Server server(logger);
+  server_->addWebSocketHandler("/devtools/page/bar", backend_);  // needed for chrom(e/ium) 65.0+
+  server_->addWebSocketHandler("/devtools/browser", backend_);   // needed for chrome 60.0
+  server_->addPageHandler(backend_);                             // This is retrieved in the overview page.
 
   // Set the function that's to be used to execute functions on the seasocks thread.
-  backend->setExecutor(
-      [&server](scalopus::CatapultBackend::Runnable&& runnable) { server.execute(std::move(runnable)); });
+  backend_->setExecutor(
+      [weak_server = std::weak_ptr<ss::Server>(server_)](scalopus::CatapultBackend::Runnable&& runnable) {
+        auto server = weak_server.lock();
+        if (server != nullptr)
+        {
+          server->execute(std::move(runnable));
+        }
+      });
 
-  // Set the send buffer to 128 mb. At the end of the trace, the json representation needs to fit in this buffer.
-  server.setClientBufferSize(128 * 1024 * 1024u);
-
-  server.addWebSocketHandler("/devtools/page/bar", backend);  // needed for chrom(e/ium) 65.0+
-  server.addWebSocketHandler("/devtools/browser", backend);   // needed for chrome 60.0
-  server.addPageHandler(backend);                             // This is retrieved in the overview page.
-
-  // Start the server in a separate thread.
-  server.startListening(port);
-  std::thread seasocksThread([&] { server.loop(); });
-
-  std::cout << "[main] Everything started, falling into loop to detect transports. Use ctrl + c to quit." << std::endl;
-
-  manager->startPolling(1.0);
-
-  // block while we serve requests.
-  while (running)
-  {
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  }
-
-  std::cout << "[main] Shutting down." << std::endl;
-  server.terminate();  // send terminate signal to the server
-
-  // Wait for the webserver thread to join.
-  seasocksThread.join();
-
-  return 0;
+  // start listening, create the worker thread.
+  server_->startListening(port);
+  thread_ = std::thread([&] { server_->loop(); });
 }
+
+void CatapultServer::setMaxBuffersize(std::size_t max_buffer)
+{
+  max_buffer_ = max_buffer;
+}
+
+CatapultServer::~CatapultServer()
+{
+  server_->terminate();
+  thread_.join();
+}
+}  // namespace scalopus

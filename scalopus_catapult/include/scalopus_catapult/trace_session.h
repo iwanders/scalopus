@@ -43,7 +43,8 @@ namespace scalopus
 /**
  * @brief This class is created for every individual websocket connection. It uses its own thread to perform actions and
  *        accepts messages from the websocket. It responds at its discretion or initiates communication from its worker
- *        thread. All data that is sent through the websocket must be sent through the response_function.
+ *        thread. All data that is sent through the websocket must be sent through the response_function, as such it is
+ *        server agnostic.
  */
 class TraceSession
 {
