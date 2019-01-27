@@ -78,4 +78,12 @@ EndpointTraceMapping::ProcessTraceMap EndpointTraceMapping::mapping()
 
   return {};
 }
+
+EndpointTraceMapping::Ptr EndpointTraceMapping::factory(const Transport::Ptr& transport)
+{
+  auto endpoint = std::make_shared<scalopus::EndpointTraceMapping>();
+  endpoint->setTransport(transport);
+  return endpoint;
+}
+
 }  // namespace scalopus

@@ -38,9 +38,7 @@ EndpointManagerPoll::EndpointManagerPoll(const TransportFactory::Ptr factory) : 
 {
   std::lock_guard<std::mutex> lock(mutex_);
   endpoint_factories_[EndpointIntrospect::name] = [](const auto& transport) {
-    auto introspect_client = std::make_shared<EndpointIntrospect>();
-    introspect_client->setTransport(transport);
-    return introspect_client;
+    return EndpointIntrospect::factory(transport);
   };
 }
 

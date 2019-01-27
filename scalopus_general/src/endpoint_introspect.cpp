@@ -72,4 +72,11 @@ std::vector<std::string> EndpointIntrospect::supported()
   return {};
 }
 
+EndpointIntrospect::Ptr EndpointIntrospect::factory(const Transport::Ptr& transport)
+{
+  auto endpoint = std::make_shared<scalopus::EndpointIntrospect>();
+  endpoint->setTransport(transport);
+  return endpoint;
+}
+
 }  // namespace scalopus

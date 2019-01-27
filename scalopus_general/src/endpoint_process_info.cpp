@@ -96,4 +96,10 @@ EndpointProcessInfo::ProcessInfo EndpointProcessInfo::processInfo()
   return info;
 }
 
+EndpointProcessInfo::Ptr EndpointProcessInfo::factory(const Transport::Ptr& transport)
+{
+  auto endpoint = std::make_shared<EndpointProcessInfo>();
+  endpoint->setTransport(transport);
+  return endpoint;
+}
 }  // namespace scalopus

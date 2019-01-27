@@ -53,6 +53,11 @@ public:
    */
   ProcessTraceMap mapping();
 
+  /**
+   * @brief Function to create a new instance of this class and assign the transport to it.
+   */
+  static Ptr factory(const Transport::Ptr& transport);
+
   // From the endpoint
   std::string getName() const;
   bool handle(Transport& server, const Data& request, Data& response);

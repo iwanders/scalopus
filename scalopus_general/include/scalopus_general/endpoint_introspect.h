@@ -31,6 +31,7 @@
 #define SCALOPUS_GENERAL_ENDPOINT_INTROSPECT_H
 
 #include <scalopus_interface/endpoint.h>
+#include <scalopus_interface/transport.h>
 
 namespace scalopus
 {
@@ -44,6 +45,11 @@ public:
    * @brief Provide a list of endpoint names supported by the remote endpoint.
    */
   std::vector<std::string> supported();
+
+  /**
+   * @brief Function to create a new instance of this class and assign the transport to it.
+   */
+  static Ptr factory(const Transport::Ptr& transport);
 
   // Methods from the superclass
   std::string getName() const;

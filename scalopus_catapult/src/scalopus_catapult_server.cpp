@@ -72,18 +72,12 @@ int main(int /* argc */, char** /* argv */)
   auto manager = std::make_shared<scalopus::EndpointManagerPoll>(std::make_shared<scalopus::TransportUnixFactory>());
 
   // Add scope tracing endpoint factory function.
-  manager->addEndpointFactory(scalopus::EndpointTraceMapping::name, [](const auto& transport) {
-    auto tracing_endpoint = std::make_shared<scalopus::EndpointTraceMapping>();
-    tracing_endpoint->setTransport(transport);
-    return tracing_endpoint;
-  });
+  manager->addEndpointFactory(scalopus::EndpointTraceMapping::name,
+                              [](const auto& transport) { return scalopus::EndpointTraceMapping::factory(transport); });
 
   // Add endpoint factory function for the process information.
-  manager->addEndpointFactory(scalopus::EndpointProcessInfo::name, [](const auto& transport) {
-    auto endpoint = std::make_shared<scalopus::EndpointProcessInfo>();
-    endpoint->setTransport(transport);
-    return endpoint;
-  });
+  manager->addEndpointFactory(scalopus::EndpointProcessInfo::name,
+                              [](const auto& transport) { return scalopus::EndpointProcessInfo::factory(transport); });
 
   auto native_trace_provider = std::make_shared<scalopus::NativeTraceProvider>(manager);
   manager->addEndpointFactory(

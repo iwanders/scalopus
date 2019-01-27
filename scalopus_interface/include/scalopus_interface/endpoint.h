@@ -63,13 +63,25 @@ public:
   virtual bool unsolicited(Transport& transport, const Data& incoming, Data& outgoing);
 
   /**
-   * @brief Set the transport to be used by this endpoint. This is in general used by the client endpoint.
+   * @brief Set the transport to be used by this endpoint. This must be used by the client, it may be used by the server
+   *        side if it is to do defered or unsolicited communication.
    */
   virtual void setTransport(Transport* transport);
+
+  /**
+   * @brief Set the transport to be used by this endpoint.
+   */
   void setTransport(const std::shared_ptr<Transport>& transport);
 
+  /**
+   * @brief Virtual destructor.
+   */
   virtual ~Endpoint() = default;
 
+  /**
+   * This commented out method is a convention to the managers' addEndpointFactory.
+   */
+  // static Endpoint::Ptr factory(const std::shared_ptr<Transport>& transport);
 protected:
   Transport* transport_;  // Transport has a shared pointer to the endpoint, so it cannot go out of scope before this.
 };
