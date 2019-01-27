@@ -50,7 +50,7 @@ int main(int /* argc */, char** /* argv */)
   server->addEndpoint(endpoint0_at_server);
 
   // Create a client that's connected to the mock server.
-  auto client0 = factory->connect(server);
+  auto client0 = factory->connect(server->getAddress());
   test(client0->isConnected(), true);
 
   // Check if we can retrieve the introspect endpoint from the server over the transport.

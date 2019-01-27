@@ -43,15 +43,25 @@
 namespace scalopus
 {
 /**
- * @brief A transport for testing basically, a server is created to which clients can be attached.
+ * @brief A loopback transport that just uses pointers to talk to the other side, no serialization or bus. It does
+ *        create a worker thread at the server.
  */
 class TransportLoopback : public Transport, public std::enable_shared_from_this<TransportLoopback>
 {
 public:
   using Ptr = std::shared_ptr<TransportLoopback>;
-  ~TransportLoopback();
+  using WeakPtr = std::weak_ptr<TransportLoopback>;
+
+  /**
+   * @brief Constructor without argument is the server side, this starts a worker thread.
+   */
   TransportLoopback();
-  TransportLoopback(Ptr server);  // Create a mock transport client side connected to the server.
+
+  /**
+   * @brief Create the client side of the loopback and connect it to the provided server.
+   * @param server The server to connect this client instance to.
+   */
+  TransportLoopback(Ptr server);
 
   // From Transport superclass.
   PendingResponse request(const std::string& remote_endpoint_name, const Data& outgoing);
@@ -60,21 +70,43 @@ public:
   void addClient(Transport::WeakPtr client);
   bool isConnected() const;
 
-private:
-  using PendingRequest = std::tuple<std::string, Data, std::promise<Data>, std::weak_ptr<std::future<Data>>>;
-  Ptr server_;
-  std::vector<Transport::WeakPtr> clients_;
+  Destination::Ptr getAddress();
 
+  ~TransportLoopback();
+
+private:
+  //! Type to keep a list of the pending requests.
+  using PendingRequest = std::tuple<std::string, Data, std::promise<Data>, std::weak_ptr<std::future<Data>>>;
+
+  Ptr server_;  //!< If populated this is the server the client is connected to.
+
+  std::vector<Transport::WeakPtr> clients_;  //!< List of the clients connected to the server.
+
+  /**
+   * @brief Function in which we server the ongoing requests and broadcasts.
+   */
   void work();
-  bool running_{ true };
-  std::thread thread_;
+
+  bool running_{ true };  //!< Bool to stop the worker loop.
+  std::thread thread_;    //!< The thread which drops into work.
 
   mutable std::mutex request_lock_;  //!< Lock to guard modification of ongoing_requests_ map.
 
   //! The outstanding requests and their promised data.
   std::vector<PendingRequest> ongoing_requests_;
+};
 
-  mutable std::mutex broadcast_lock_;  //!< Lock to guard modification of the pending
+/**
+ * @brief DestinationLoopback class. This is just a thin wrapper around a weak pointer to a TransportLoopback instance.
+ */
+class DestinationLoopback : public Destination
+{
+public:
+  DestinationLoopback(TransportLoopback::WeakPtr loopback_dest);
+  operator std::string() const;
+  std::size_t hash_code() const;
+
+  TransportLoopback::WeakPtr dest_;
 };
 
 }  // namespace scalopus

@@ -397,7 +397,7 @@ bool TransportUnix::processMsg(const protocol::Msg& request, protocol::Msg& resp
   return false;
 }
 
-Destination::Ptr TransportUnix::getAddress() const
+Destination::Ptr TransportUnix::getAddress()
 {
   return std::make_shared<DestinationUnix>(::getpid());
 }

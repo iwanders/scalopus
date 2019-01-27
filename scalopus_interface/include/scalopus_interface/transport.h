@@ -95,7 +95,7 @@ public:
    * @brief Return a destination to connect to this transport.
    * @note If unsupported return nullptr.
    */
-  virtual Destination::Ptr getAddress() const;
+  virtual Destination::Ptr getAddress();
 
 protected:
   /**

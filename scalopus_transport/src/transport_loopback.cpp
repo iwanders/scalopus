@@ -29,6 +29,7 @@
 */
 #include "transport_loopback.h"
 #include <iostream>
+#include <sstream>
 
 namespace scalopus
 {
@@ -62,6 +63,7 @@ bool TransportLoopback::isConnected() const
 TransportLoopback::PendingResponse TransportLoopback::request(const std::string& remote_endpoint_name,
                                                               const Data& outgoing)
 {
+  // Just create the request and pass it into the ongoing requests list.
   auto promise = std::promise<Data>();
   auto response = std::make_shared<std::future<Data>>(promise.get_future());
 
@@ -81,6 +83,7 @@ void TransportLoopback::work()
 {
   while (running_)
   {
+    // First, server any requests that are pending.
     {
       std::lock_guard<decltype(request_lock_)> lock(request_lock_);
       for (auto& req : ongoing_requests_)
@@ -111,8 +114,10 @@ void TransportLoopback::work()
           promise.set_value(resp);
         }
       }
-      ongoing_requests_.clear();
+      ongoing_requests_.clear();  // We processed all requests, we can clear them.
     }
+
+    // Secondly, we server all the broadcasts
     {
       while (haveBroadcast())
       {
@@ -131,7 +136,7 @@ void TransportLoopback::work()
               Data resp2;
               if (getEndpoint(remote_endpoint_name)->handle(*client, resp, resp2))
               {
-                // We stop here...
+                // We stop here... This is slightly different than a real transport... but works for now.
                 throw std::runtime_error("The TransportLoopback does not handle responses on unsolicited data.");
               }
             }
@@ -143,30 +148,67 @@ void TransportLoopback::work()
   }
 }
 
+Destination::Ptr TransportLoopback::getAddress()
+{
+  // Just create a weak pointer from this isntance and store it into the destination.
+  return std::make_shared<DestinationLoopback>(TransportLoopback::WeakPtr(shared_from_this()));
+}
+
+DestinationLoopback::DestinationLoopback(TransportLoopback::WeakPtr loopback_dest) : dest_{ loopback_dest }
+{
+}
+
+DestinationLoopback::operator std::string() const
+{
+  std::stringstream ss;
+  ss << "<loopback:" << dest_.lock().get() << ">";
+  return ss.str();
+}
+
+std::size_t DestinationLoopback::hash_code() const
+{
+  return reinterpret_cast<std::size_t>(dest_.lock().get());
+}
 // Methods for the loopback factory
 std::vector<Destination::Ptr> TransportLoopbackFactory::discover()
 {
-  return {};
+  std::vector<Destination::Ptr> possible_destinations;
+  for (const auto& weak_server : servers_)
+  {
+    auto server = weak_server.lock();
+    if (server != nullptr)
+    {
+      auto addr = server->getAddress();
+      if (addr != nullptr)
+      {
+        possible_destinations.emplace_back(addr);
+      }
+    }
+  }
+  return possible_destinations;
 }
 
 Transport::Ptr TransportLoopbackFactory::serve()
 {
-  return std::make_shared<TransportLoopback>();
+  auto new_server = std::make_shared<TransportLoopback>();
+  servers_.push_back(new_server);
+  return new_server;
 }
 
 Transport::Ptr TransportLoopbackFactory::connect(const Destination::Ptr& destination)
 {
-  auto mock_server = std::dynamic_pointer_cast<TransportLoopback>(destination);
-  auto client = std::make_shared<TransportLoopback>(mock_server);
-  mock_server->addClient(client);
-  return client;
+  auto loopback_destination = std::dynamic_pointer_cast<DestinationLoopback>(destination);
+  if (loopback_destination != nullptr)
+  {
+    auto server = loopback_destination->dest_.lock();
+    if (server != nullptr)
+    {
+      auto client = std::make_shared<TransportLoopback>(server);
+      server->addClient(client);
+      return client;
+    }
+  }
+  return nullptr;
 }
 
-Transport::Ptr TransportLoopbackFactory::connect(const Transport::Ptr& destination)
-{
-  auto mock_server = std::dynamic_pointer_cast<TransportLoopback>(destination);
-  auto client = std::make_shared<TransportLoopback>(mock_server);
-  mock_server->addClient(client);
-  return client;
-}
 }  // namespace scalopus

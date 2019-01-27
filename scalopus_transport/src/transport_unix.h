@@ -78,7 +78,7 @@ public:
 
   bool isConnected() const;
 
-  Destination::Ptr getAddress() const;
+  Destination::Ptr getAddress();
 
 private:
   using PendingRequest = std::pair<std::promise<Data>, std::weak_ptr<std::future<Data>>>;

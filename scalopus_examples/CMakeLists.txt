@@ -28,3 +28,7 @@ target_link_libraries(introspect_endpoints Scalopus::scalopus_transport Scalopus
 add_executable(readme_example src/readme_example.cpp)
 target_compile_options(readme_example PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_link_libraries(readme_example Scalopus::scalopus_tracing_native)
+
+add_executable(example_embedded_catapult_server src/example_embedded_catapult_server.cpp)
+target_compile_options(example_embedded_catapult_server PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+target_link_libraries(example_embedded_catapult_server Scalopus::scalopus_catapult Scalopus::scalopus_tracing_native)

@@ -80,7 +80,7 @@ Endpoint::Ptr Transport::getEndpoint(const std::string& name) const
   return nullptr;
 }
 
-Destination::Ptr Transport::getAddress() const
+Destination::Ptr Transport::getAddress()
 {
   return nullptr;
 }

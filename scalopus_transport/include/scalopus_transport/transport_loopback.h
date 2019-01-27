@@ -36,6 +36,9 @@
 
 namespace scalopus
 {
+/**
+ * @brief Loopback transport factory, this keeps a list of all servers created to allow discovery.
+ */
 class TransportLoopbackFactory : public TransportFactory
 {
 public:
@@ -44,10 +47,8 @@ public:
   Transport::Ptr serve();
   Transport::Ptr connect(const Destination::Ptr& destination);
 
-  /**
-   * @brief This method allows creating a mocked client that's connected to the passed in server.
-   */
-  Transport::Ptr connect(const Transport::Ptr& destination);
+protected:
+  std::vector<std::weak_ptr<Transport>> servers_;
 };
 }  // namespace scalopus
 

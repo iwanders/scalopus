@@ -69,7 +69,7 @@ int main(int /* argc */, char** /* argv */)
   auto factory = std::make_shared<scalopus::TransportLoopbackFactory>();
   auto server = factory->serve();
   server->addEndpoint(server_endpoint);
-  auto client = factory->connect(server);
+  auto client = factory->connect(server->getAddress());
 
   // Add the endpoint to the client.
   auto client_endpoint = std::make_shared<scalopus::EndpointTraceMapping>();
