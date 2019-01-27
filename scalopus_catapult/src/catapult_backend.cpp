@@ -27,12 +27,13 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "scalopus_catapult/catapult_backend.h"
+#include "catapult_backend.h"
 
 namespace scalopus
 {
-CatapultBackend::CatapultBackend(const std::vector<TraceEventProvider::Ptr>& providers) : providers_(providers)
+void CatapultBackend::addProvider(TraceEventProvider::Ptr provider)
 {
+  providers_.push_back(std::move(provider));
 }
 
 std::shared_ptr<ss::Response> CatapultBackend::handle(const ss::Request& request)

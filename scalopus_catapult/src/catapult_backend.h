@@ -44,7 +44,7 @@
 #include <thread>
 
 #include <scalopus_interface/trace_event_provider.h>
-#include "scalopus_catapult/trace_session.h"
+#include "trace_session.h"
 
 namespace scalopus
 {
@@ -63,10 +63,9 @@ public:
   using ExecuteFunction = std::function<void(Runnable&&)>;
 
   /**
-   * @brief Constructor for the catapult backend.
-   * @param providers A vector of trace event providers to be used.
+   * @brief Add a provider, this should be done before the backend is utilised.
    */
-  CatapultBackend(const std::vector<TraceEventProvider::Ptr>& providers);
+  void addProvider(TraceEventProvider::Ptr provider);
 
   /**
    * @brief Set the executor function, this function can be passed a callable, this callable will subsequently be called

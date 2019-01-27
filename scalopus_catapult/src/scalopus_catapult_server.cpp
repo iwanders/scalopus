@@ -37,7 +37,6 @@
 
 #include <scalopus_transport/transport_unix.h>
 
-#include "scalopus_catapult/catapult_backend.h"
 #include "scalopus_catapult/catapult_server.h"
 #include "scalopus_catapult/endpoint_manager_poll.h"
 
@@ -91,19 +90,16 @@ int main(int /* argc */, char** /* argv */)
         return scalopus::Endpoint::Ptr{ nullptr };
       });
 
-  // Create the providers.
-  std::vector<scalopus::TraceEventProvider::Ptr> providers;
-  providers.push_back(std::make_shared<scalopus::LttngProvider>(path, manager));
-  providers.push_back(native_trace_provider);
+  // Create the server and add the providers
+  auto catapult_server = std::make_shared<scalopus::CatapultServer>();
+  catapult_server->addProvider(std::make_shared<scalopus::LttngProvider>(path, manager));
+  catapult_server->addProvider(native_trace_provider);
+  catapult_server->addProvider(std::make_shared<scalopus::GeneralProvider>(manager));
 
-  providers.push_back(std::make_shared<scalopus::GeneralProvider>(manager));
-
-  // Create the catapult backend.
-  auto backend = std::make_shared<scalopus::CatapultBackend>(providers);
-
-  // Create the server
-  auto catapult_server = std::make_shared<scalopus::CatapultServer>(backend);
+  // Use default logging at warn level.
   catapult_server->setDefaultLogger();
+
+  // Bind and start.
   catapult_server->start();
 
   std::cout << "[main] Everything started, falling into loop to detect transports. Use ctrl + c to quit." << std::endl;

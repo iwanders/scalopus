@@ -31,12 +31,19 @@
 #include <seasocks/IgnoringLogger.h>
 #include <seasocks/PrintfLogger.h>
 #include <seasocks/Server.h>
+#include "catapult_backend.h"
 
 namespace scalopus
 {
-CatapultServer::CatapultServer(CatapultBackend::Ptr backend) : backend_{ backend }
+CatapultServer::CatapultServer()
 {
+  backend_ = std::make_shared<scalopus::CatapultBackend>();
   logger_ = std::make_shared<ss::IgnoringLogger>();
+}
+
+void CatapultServer::addProvider(TraceEventProvider::Ptr provider)
+{
+  backend_->addProvider(std::move(provider));
 }
 
 void CatapultServer::setLogger(std::shared_ptr<ss::Logger> logger)
@@ -83,6 +90,7 @@ void CatapultServer::setMaxBuffersize(std::size_t max_buffer)
 
 CatapultServer::~CatapultServer()
 {
+  std::cout << "CLean up catapultserver" << std::endl;
   server_->terminate();
   thread_.join();
 }

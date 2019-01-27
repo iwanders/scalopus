@@ -30,14 +30,22 @@
 #ifndef SCALOPUS_CATAPULT_CATAPULT_SERVER_H
 #define SCALOPUS_CATAPULT_CATAPULT_SERVER_H
 
-#include <seasocks/PrintfLogger.h>
-#include <seasocks/Server.h>
-#include "scalopus_catapult/catapult_backend.h"
 #include "scalopus_catapult/endpoint_manager_poll.h"
+#include "scalopus_interface/trace_event_provider.h"
+
+// use these forward declarations to make sure that we don't need to expose Seasocks to externals.
+namespace seasocks
+{
+class Logger;
+class Server;
+}  // namespace seasocks
 
 namespace scalopus
 {
 namespace ss = seasocks;
+
+// forward declaration to keep the backend private.
+class CatapultBackend;
 
 /**
  * @brief The catapult server, combines the seasocks server, worker thread and backend in a convenient way.
@@ -50,7 +58,12 @@ public:
   /**
    * @brief Construct the catapult server using the provided backend.
    */
-  CatapultServer(CatapultBackend::Ptr backend);
+  CatapultServer();
+
+  /**
+   * @brief Add a provider, this should be done before the backend is utilised.
+   */
+  void addProvider(TraceEventProvider::Ptr provider);
 
   /**
    * @brief Set a logger to use.
@@ -77,7 +90,7 @@ public:
   ~CatapultServer();
 
 private:
-  CatapultBackend::Ptr backend_;
+  std::shared_ptr<CatapultBackend> backend_;
   std::shared_ptr<ss::Logger> logger_;
   std::shared_ptr<ss::Server> server_;
   std::thread thread_;
