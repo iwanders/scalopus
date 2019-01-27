@@ -43,7 +43,6 @@ void add_scalopus_general(py::module& m)
   endpoint_introspect.def(py::init<>());
   endpoint_introspect.def("supported", &EndpointIntrospect::supported);
 
-  /*
   py::class_<EndpointProcessInfo::ProcessInfo> endpoint_process_info_info(general, "ProcessInfo");
   endpoint_process_info_info.def_readwrite("name", &EndpointProcessInfo::ProcessInfo::name);
   endpoint_process_info_info.def_readwrite("threads", &EndpointProcessInfo::ProcessInfo::threads);
@@ -53,7 +52,7 @@ void add_scalopus_general(py::module& m)
   endpoint_process_info.def(py::init<>());
   endpoint_process_info.def("setProcessName", &EndpointProcessInfo::setProcessName);
   endpoint_process_info.def("processInfo", &EndpointProcessInfo::processInfo);
-  */
+
   general.def("setThreadName", [](const std::string& name) { ThreadNameTracker::getInstance().setCurrentName(name); });
 
   py::class_<EndpointManagerPoll, EndpointManagerPoll::Ptr, EndpointManager> endpoint_manager_poll(

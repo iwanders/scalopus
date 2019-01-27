@@ -45,6 +45,7 @@ public:
   std::string getName() const override;
   bool handle(Transport& transport, const Data& incoming, Data& outgoing) override;
   bool unsolicited(Transport& transport, const Data& incoming, Data& outgoing) override;
+  void setTransport(Transport* transport) override;
 };
 
 class PendingResponse

@@ -45,11 +45,25 @@ std::string PyEndpoint::getName() const
 
 bool PyEndpoint::handle(Transport& transport, const Data& incoming, Data& outgoing)
 {
-  outgoing.push_back(3);
-  std::cout << "Handle called " << std::endl;
-
-  py::gil_scoped_acquire acquire;
-  PYBIND11_OVERLOAD(bool, Endpoint, handle, transport, incoming, outgoing);
+  //  PYBIND11_OVERLOAD(bool, Endpoint, handle, transport, incoming, outgoing);
+  {
+    pybind11::gil_scoped_acquire gil;
+    pybind11::function overload = pybind11::get_overload(static_cast<const Endpoint*>(this), "handle");
+    if (overload)
+    {
+      auto obj = overload(transport, incoming);
+      if (py::isinstance<py::list>(obj))
+      {
+        outgoing = obj.cast<Data>();
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+  }
+  return Endpoint::handle(transport, incoming, outgoing);
 }
 
 bool PyEndpoint::unsolicited(Transport& transport, const Data& incoming, Data& outgoing)
@@ -57,9 +71,12 @@ bool PyEndpoint::unsolicited(Transport& transport, const Data& incoming, Data& o
   PYBIND11_OVERLOAD(bool, Endpoint, unsolicited, transport, incoming, outgoing);
 }
 
+void PyEndpoint::setTransport(Transport* transport)
+{
+  PYBIND11_OVERLOAD(void, Endpoint, setTransport, transport);
+}
 
-
-PendingResponse::PendingResponse(Transport::PendingResponse resp) : resp_{resp}
+PendingResponse::PendingResponse(Transport::PendingResponse resp) : resp_{ resp }
 {
 }
 
@@ -74,11 +91,11 @@ py::object PendingResponse::wait_for(int milliseconds)
     std::cout << "Succesfully waited for future" << std::endl;
     return py::cast<Data>(resp_->get());
   }
-    std::cout << "bummer " << std::endl;
+  std::cout << "bummer " << std::endl;
   return py::cast<py::none>(Py_None);
 }
 
-// Maybe convert to bytes using https://pybind11.readthedocs.io/en/master/advanced/cast/stl.html ? 
+// Maybe convert to bytes using https://pybind11.readthedocs.io/en/master/advanced/cast/stl.html ?
 void add_scalopus_interface(py::module& m)
 {
   py::class_<Destination, Destination::Ptr> destination(m, "Destination");
@@ -92,8 +109,7 @@ void add_scalopus_interface(py::module& m)
   transport_interface.def("addEndpoint", &Transport::addEndpoint);
   transport_interface.def("isConnected", &Transport::isConnected);
   transport_interface.def("broadcast", &Transport::broadcast);
-  transport_interface.def("request", [](Transport& transport, const std::string& name, const Data& outgoing)
-  {
+  transport_interface.def("request", [](Transport& transport, const std::string& name, const Data& outgoing) {
     return std::make_shared<PendingResponse>(transport.request(name, outgoing));
   });
 

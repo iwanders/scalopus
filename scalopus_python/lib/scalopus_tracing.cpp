@@ -42,7 +42,6 @@ namespace scalopus
 namespace py = pybind11;
 void add_scalopus_tracing(py::module& m)
 {
-/*
   py::module tracing = m.def_submodule("tracing", "The tracing specific components.");
   py::class_<EndpointTraceMapping, EndpointTraceMapping::Ptr, Endpoint> endpoint_trace_mapping(tracing,
                                                                                                "EndpointTraceMapping");
@@ -66,6 +65,5 @@ void add_scalopus_tracing(py::module& m)
 
   native.def("scope_entry", &native::scope_entry);
   native.def("scope_exit", &native::scope_exit);
-*/
 }
 }  // namespace scalopus

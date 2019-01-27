@@ -7,22 +7,15 @@ class MyEndpoint(scalopus.lib.Endpoint):
     def __init__(self):
         scalopus.lib.Endpoint.__init__(self)
 
-    def handle(self, transport, incoming, outgoing):
-        # outgoing = [1,2,3]
-        # outgoing.append(3)
-        outgoing.append(6)
-        # outgoing.append(3)
-        print("PyHandle is called")
-        print("PyHandle, transport: {}".format(repr(transport)))
-        print("PyHandle, incoming: {}".format(repr(incoming)))
-        print("PyHandle, outgoing: {}".format(repr(outgoing)))
-        return True
+    def handle(self, transport, incoming):
+        print("PyHandle")
+        return [66,2,3]
 
     def getName(self):
         return "MyEndpointName"
 
     def query_remote(self):
-        response = self.getTransport().request(self.getName(), [1,2,3])
+        response = self.getTransport().request(self.getName(), [1,3,3])
         result = response.wait_for(20)
         import time
         time.sleep(0.1)
