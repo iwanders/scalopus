@@ -60,6 +60,11 @@ public:
   // From TraceEventProvider.
   TraceEventSource::Ptr makeSource();
 
+  /**
+   * @brief Function to create a new instance of this class and assign the transport to it.
+   */
+  Endpoint::Ptr factory(const Transport::Ptr& transport);
+
 private:
   /**
    * @brief The receiving endpoint calls this method whenever it received unsolicited data.

@@ -82,13 +82,11 @@ int main(int /* argc */, char** /* argv */)
   auto native_trace_provider = std::make_shared<scalopus::NativeTraceProvider>(manager);
   manager->addEndpointFactory(
       scalopus::EndpointNativeTraceSender::name,
-      [provider = std::weak_ptr<scalopus::NativeTraceProvider>(native_trace_provider)](const auto& transport) {
-        auto ptr = provider.lock();
-        if (ptr)
+      [weak_provider = scalopus::NativeTraceProvider::WeakPtr(native_trace_provider)](const auto& transport) {
+        auto provider = weak_provider.lock();
+        if (provider != nullptr)
         {
-          auto endpoint = ptr->receiveEndpoint();
-          endpoint->setTransport(transport);
-          return endpoint;
+          return provider->factory(transport);
         }
         return scalopus::Endpoint::Ptr{ nullptr };
       });

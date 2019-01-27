@@ -90,4 +90,11 @@ void NativeTraceProvider::incoming(const Data& incoming)
   }
 }
 
+Endpoint::Ptr NativeTraceProvider::factory(const Transport::Ptr& transport)
+{
+  auto endpoint = receiveEndpoint();
+  endpoint->setTransport(transport);
+  return endpoint;
+}
+
 }  // namespace scalopus
