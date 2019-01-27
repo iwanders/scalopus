@@ -59,7 +59,7 @@ void EndpointManagerPoll::manage()
   {
     if (!transport.second->isConnected())
     {
-      log(std::stringstream("") << "[scalopus] Cleaning up transport to: " << transport.first);
+      log("[scalopus] Cleaning up transport to: " + std::to_string(transport.first));
       transports_.erase(transport.first);
       transport_endpoints_.erase(std::find_if(transport_endpoints_.begin(), transport_endpoints_.end(),
                                               [&](const auto& v) { return v.first == transport.second; }));
@@ -74,12 +74,12 @@ void EndpointManagerPoll::manage()
     {
       continue;  // already have a connection to this transport, ignore it.
     }
-    log(std::stringstream("") << "[scalopus] Creating transport to: " << destination);
+    log("[scalopus] Creating transport to: " + std::string(*destination));
     // Attempt to make a transport to this server.
     auto transport = factory_->connect(destination);
     if (!transport->isConnected())
     {
-      log(std::stringstream("") << "[scalopus] Client failed to connect to " << destination);
+      log("[scalopus] Client failed to connect to " + std::string(*destination));
       continue;
     }
     transports_[destination->hash_code()] = transport;
@@ -102,7 +102,7 @@ void EndpointManagerPoll::manage()
       }
       else
       {
-        log(std::stringstream("") << "[scalopus] remote supports endpoint we don't support: " << supported_endpoint);
+        log("[scalopus] remote supports endpoint we don't support: " + supported_endpoint);
       }
     }
   }
@@ -152,12 +152,6 @@ void EndpointManagerPoll::log(const std::string& msg)
     logger_(msg);
   }
 }
-void EndpointManagerPoll::log(const std::ostream& msg)
-{
-  // :(
-  log(static_cast<const std::stringstream&>(msg).str());
-}
-
 void EndpointManagerPoll::setLogger(LoggingFunction&& logger)
 {
   logger_ = std::move(logger);

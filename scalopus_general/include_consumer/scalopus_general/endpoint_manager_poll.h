@@ -119,7 +119,6 @@ private:
   std::map<std::string, EndpointFactory> endpoint_factories_;  //!< Map of factory functions to construct endpoints.
   TransportEndpoints transport_endpoints_;  //!< Map of endpoints, each endpoint holds a map of [name] = endpoint
 
-  void log(const std::ostream& msg);
   void log(const std::string& msg);  //!< Internal helper function that calls the logger function if set.
   LoggingFunction logger_;           //!< Function to be called on logging messages.
 

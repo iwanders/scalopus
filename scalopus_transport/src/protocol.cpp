@@ -162,33 +162,35 @@ bool send(int fd, const Msg& outgoing)
   uint32_t length_data = static_cast<uint32_t>(outgoing.data.size());
 
   // Send request id.
-  if (::write(fd, &outgoing.request_id, sizeof(outgoing.request_id)) !=
+  if (::send(fd, &outgoing.request_id, sizeof(outgoing.request_id), MSG_NOSIGNAL) !=
       static_cast<ssize_t>(sizeof(outgoing.request_id)))
   {
     return false;
   }
 
   // Send endpoint length
-  if (::write(fd, &length_endpoint_name, sizeof(length_endpoint_name)) !=
+  if (::send(fd, &length_endpoint_name, sizeof(length_endpoint_name), MSG_NOSIGNAL) !=
       static_cast<ssize_t>(sizeof(length_endpoint_name)))
   {
     return false;
   }
 
   // Send endpoint name.
-  if (::write(fd, outgoing.endpoint.data(), length_endpoint_name) != static_cast<ssize_t>(length_endpoint_name))
+  if (::send(fd, outgoing.endpoint.data(), length_endpoint_name, MSG_NOSIGNAL) !=
+      static_cast<ssize_t>(length_endpoint_name))
   {
     return false;
   }
 
   // Send data length
-  if (::write(fd, &length_data, sizeof(length_data)) != static_cast<ssize_t>(sizeof(length_data)))
+  if (::send(fd, &length_data, sizeof(length_data), MSG_NOSIGNAL) != static_cast<ssize_t>(sizeof(length_data)))
   {
     return false;
   }
 
   // Send data
-  if (::write(fd, outgoing.data.data(), outgoing.data.size()) != static_cast<ssize_t>(outgoing.data.size()))
+  if (::send(fd, outgoing.data.data(), outgoing.data.size(), MSG_NOSIGNAL) !=
+      static_cast<ssize_t>(outgoing.data.size()))
   {
     return false;
   }
