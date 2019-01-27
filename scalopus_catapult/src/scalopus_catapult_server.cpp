@@ -71,24 +71,13 @@ int main(int /* argc */, char** /* argv */)
   auto manager = std::make_shared<scalopus::EndpointManagerPoll>(std::make_shared<scalopus::TransportUnixFactory>());
 
   // Add scope tracing endpoint factory function.
-  manager->addEndpointFactory(scalopus::EndpointTraceMapping::name,
-                              [](const auto& transport) { return scalopus::EndpointTraceMapping::factory(transport); });
+  manager->addEndpointFactory<scalopus::EndpointTraceMapping>();
 
   // Add endpoint factory function for the process information.
-  manager->addEndpointFactory(scalopus::EndpointProcessInfo::name,
-                              [](const auto& transport) { return scalopus::EndpointProcessInfo::factory(transport); });
+  manager->addEndpointFactory<scalopus::EndpointProcessInfo>();
 
   auto native_trace_provider = std::make_shared<scalopus::NativeTraceProvider>(manager);
-  manager->addEndpointFactory(
-      scalopus::EndpointNativeTraceSender::name,
-      [weak_provider = scalopus::NativeTraceProvider::WeakPtr(native_trace_provider)](const auto& transport) {
-        auto provider = weak_provider.lock();
-        if (provider != nullptr)
-        {
-          return provider->factory(transport);
-        }
-        return scalopus::Endpoint::Ptr{ nullptr };
-      });
+  manager->addEndpointFactory(scalopus::EndpointNativeTraceSender::name, native_trace_provider);
 
   // Create the server and add the providers
   auto catapult_server = std::make_shared<scalopus::CatapultServer>();

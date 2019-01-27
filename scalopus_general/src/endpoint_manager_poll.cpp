@@ -28,9 +28,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_general/endpoint_manager_poll.h"
-#include "scalopus_general/endpoint_introspect.h"
 #include <algorithm>
 #include <iostream>
+#include "scalopus_general/endpoint_introspect.h"
 
 namespace scalopus
 {

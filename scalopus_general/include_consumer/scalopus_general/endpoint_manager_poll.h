@@ -31,6 +31,7 @@
 #define SCALOPUS_CATAPULT_ENDPOINT_MANANGER_POLL_H
 
 #include <scalopus_interface/endpoint_manager.h>
+#include <scalopus_interface/trace_event_provider.h>
 #include <scalopus_interface/transport_factory.h>
 #include <functional>
 #include <map>
@@ -69,6 +70,32 @@ public:
    * @brief Add an endpoint factory function to the manager.
    */
   void addEndpointFactory(const std::string& name, EndpointFactory&& factory_function);
+
+  /**
+   * @brief Helper function to add the factory function if the class has a static factory method.
+   */
+  template <typename T>
+  void addEndpointFactory(const std::string& name = T::name)
+  {
+    addEndpointFactory(name, [](const auto& transport) { return T::factory(transport); });
+  }
+
+  /**
+   * @brief Helper function to add the factory function if it is constructed of any type that has a non static factory
+   *        function. This creates a weak pointer.
+   */
+  template <typename T>
+  void addEndpointFactory(const std::string& name, const std::shared_ptr<T>& endpoint_provider)
+  {
+    addEndpointFactory(name, [weak_provider = std::weak_ptr<T>(endpoint_provider)](const auto& transport) {
+      auto provider = weak_provider.lock();
+      if (provider != nullptr)
+      {
+        return provider->factory(transport);
+      }
+      return scalopus::Endpoint::Ptr{ nullptr };
+    });
+  }
 
   /**
    * @brief Start polling with the requested interval.
