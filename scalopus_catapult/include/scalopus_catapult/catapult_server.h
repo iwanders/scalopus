@@ -54,6 +54,7 @@ class CatapultServer
 {
 public:
   using Ptr = std::shared_ptr<CatapultServer>;
+  using LoggingFunction = std::function<void(const std::string& output)>;
 
   /**
    * @brief Construct the catapult server using the provided backend.
@@ -66,14 +67,14 @@ public:
   void addProvider(TraceEventProvider::Ptr provider);
 
   /**
-   * @brief Set a logger to use.
+   * @brief Set a logger to use for seasocks.
    */
-  void setLogger(std::shared_ptr<ss::Logger> logger);
+  void setSeasocksLogger(std::shared_ptr<ss::Logger> logger);
 
   /**
    * @brief Same as calling setLogger(std::make_shared<ss::PrintfLogger>(ss::Logger::Level::Warning)).
    */
-  void setDefaultLogger();
+  void setSeasocksDefaultLogger();
 
   /**
    * @brief This is passed directly to seasocks' setClientBufferSize method. This is the limit that can be present in
@@ -87,14 +88,20 @@ public:
    */
   void start(std::size_t port = 9222);
 
+  /**
+   * @brief Function to set the logger to use for the backend and session output.
+   */
+  void setLogger(LoggingFunction&& logger);
+
   ~CatapultServer();
 
 private:
   std::shared_ptr<CatapultBackend> backend_;
-  std::shared_ptr<ss::Logger> logger_;
+  std::shared_ptr<ss::Logger> seasocks_logger_;
   std::shared_ptr<ss::Server> server_;
   std::thread thread_;
   std::size_t max_buffer_{ 128 * 1024 * 1024u };
+  LoggingFunction logger_;
 };
 
 }  // namespace scalopus

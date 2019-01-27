@@ -38,7 +38,8 @@ namespace scalopus
 CatapultServer::CatapultServer()
 {
   backend_ = std::make_shared<scalopus::CatapultBackend>();
-  logger_ = std::make_shared<ss::IgnoringLogger>();
+  seasocks_logger_ = std::make_shared<ss::IgnoringLogger>();
+  setLogger([](const std::string&) {});
 }
 
 void CatapultServer::addProvider(TraceEventProvider::Ptr provider)
@@ -46,20 +47,20 @@ void CatapultServer::addProvider(TraceEventProvider::Ptr provider)
   backend_->addProvider(std::move(provider));
 }
 
-void CatapultServer::setLogger(std::shared_ptr<ss::Logger> logger)
+void CatapultServer::setSeasocksLogger(std::shared_ptr<ss::Logger> logger)
 {
-  logger_ = std::move(logger);
+  seasocks_logger_ = std::move(logger);
 }
 
-void CatapultServer::setDefaultLogger()
+void CatapultServer::setSeasocksDefaultLogger()
 {
-  setLogger(std::make_shared<ss::PrintfLogger>(ss::Logger::Level::Warning));
+  setSeasocksLogger(std::make_shared<ss::PrintfLogger>(ss::Logger::Level::Warning));
 }
 
 void CatapultServer::start(std::size_t port)
 {
   // Create the server with the provided logger specification.
-  server_ = std::make_shared<ss::Server>(logger_);
+  server_ = std::make_shared<ss::Server>(seasocks_logger_);
 
   // Set the send buffer to to the specified value, this is merely the limit, it's not necissarily allocated or used.
   server_->setClientBufferSize(max_buffer_);
@@ -90,8 +91,14 @@ void CatapultServer::setMaxBuffersize(std::size_t max_buffer)
 
 CatapultServer::~CatapultServer()
 {
-  std::cout << "CLean up catapultserver" << std::endl;
   server_->terminate();
   thread_.join();
 }
+
+void CatapultServer::setLogger(LoggingFunction&& logger)
+{
+  logger_ = logger;
+  backend_->setLogger(logger_);
+}
+
 }  // namespace scalopus

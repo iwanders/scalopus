@@ -41,7 +41,7 @@ void add_scalopus_catapult(py::module& m)
   py::class_<CatapultServer, CatapultServer::Ptr> catapult_server(catapult, "CatapultServer");
   catapult_server.def(py::init<>());
   catapult_server.def("addProvider", &CatapultServer::addProvider);
-  catapult_server.def("setDefaultLogger", &CatapultServer::setDefaultLogger);
+  catapult_server.def("setSeasocksDefaultLogger", &CatapultServer::setSeasocksDefaultLogger);
   catapult_server.def("setMaxBuffersize", &CatapultServer::setMaxBuffersize);
   catapult_server.def("start", &CatapultServer::start);
 }

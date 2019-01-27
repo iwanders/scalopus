@@ -61,6 +61,7 @@ public:
   using WeakPtr = std::weak_ptr<CatapultBackend>;
   using Runnable = std::function<void()>;
   using ExecuteFunction = std::function<void(Runnable&&)>;
+  using LoggingFunction = std::function<void(const std::string& output)>;
 
   /**
    * @brief Add a provider, this should be done before the backend is utilised.
@@ -74,6 +75,11 @@ public:
    *        have to do so asynchronously via this function to ensure thread safety in seasocks.
    */
   void setExecutor(ExecuteFunction executor);
+
+  /**
+   * @brief Function to set the logger to use for the backend and session output.
+   */
+  void setLogger(LoggingFunction logger);
 
   // from PageHandler, this serves the http pages.
   std::shared_ptr<ss::Response> handle(const ss::Request& request) override;
@@ -89,6 +95,7 @@ private:
   std::map<ss::WebSocket*, TraceSession::Ptr> sessions_;  //! Map of sessions by websockets.
   std::vector<TraceEventProvider::Ptr> providers_;        //!< List of available data providers.
   ExecuteFunction executor_;  //!< Function that allows registering functions for execution on the server thread.
+  LoggingFunction logger_;    //!< Function to use for logging.
 
   /**
    * @brief Make a session for this new websocket.

@@ -93,7 +93,7 @@ void TraceSession::loop()
 
 void TraceSession::processMessage(const std::string& incoming_msg)
 {
-  std::cout << "[session " << this << "] <- " << incoming_msg << std::endl;
+  logger_("[session " + identifier() + "] <- " + incoming_msg);
   auto msg = json::parse(incoming_msg);
 
   if (msg["method"] == "Tracing.getCategories")
@@ -145,7 +145,7 @@ void TraceSession::processMessage(const std::string& incoming_msg)
 
 void TraceSession::chunkedTransmit(const std::vector<json>& events)
 {
-  std::cout << "[session " << this << "] -> events: " << events.size() << std::endl;
+  logger_("[session " + identifier() + "] -> events: " + std::to_string(events.size()));
   // So, now we send the client data in chunks, needs to be in chunks because the webserver buffer is 16 mb.
   size_t event_count = events.size();
   const size_t chunks_needed = ((event_count / CHUNK_SIZE) + 1);
@@ -162,7 +162,7 @@ void TraceSession::chunkedTransmit(const std::vector<json>& events)
 
 void TraceSession::outgoing(const std::string& msg)
 {
-  std::cout << "[session " << this << "] -> " << msg << std::endl;
+  logger_("[session " + identifier() + "] -> " + msg);
   response_(msg);
 }
 
@@ -181,6 +181,18 @@ std::string TraceSession::formatEvents(const std::vector<json>& entries)
     ss << entry.dump();
   }
   ss << "]}}";
+  return ss.str();
+}
+
+void TraceSession::setLogger(LoggingFunction logger)
+{
+  logger_ = std::move(logger);
+}
+
+std::string TraceSession::identifier() const
+{
+  std::stringstream ss;
+  ss << std::hex << this;
   return ss.str();
 }
 

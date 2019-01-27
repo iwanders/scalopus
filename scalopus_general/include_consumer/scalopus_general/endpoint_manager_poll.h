@@ -51,6 +51,7 @@ public:
   using EndpointFactory = std::function<std::shared_ptr<Endpoint>(const std::shared_ptr<Transport>& transport)>;
   using EndpointMap = std::map<std::string, Endpoint::Ptr>;
   using TransportEndpoints = std::map<Transport::Ptr, EndpointMap>;
+  using LoggingFunction = std::function<void(const std::string& output)>;
 
   EndpointManagerPoll(TransportFactory::Ptr factory);
   ~EndpointManagerPoll();
@@ -108,10 +109,19 @@ public:
    */
   void stopPolling();
 
+  /**
+   * @brief Assign the logger function.
+   */
+  void setLogger(LoggingFunction&& logger);
+
 private:
   mutable std::mutex mutex_;
   std::map<std::string, EndpointFactory> endpoint_factories_;  //!< Map of factory functions to construct endpoints.
   TransportEndpoints transport_endpoints_;  //!< Map of endpoints, each endpoint holds a map of [name] = endpoint
+
+  void log(const std::ostream& msg);
+  void log(const std::string& msg);  //!< Internal helper function that calls the logger function if set.
+  LoggingFunction logger_;           //!< Function to be called on logging messages.
 
   //! Map to keep track of which transport is already created.
   std::map<std::size_t, Transport::Ptr> transports_;

@@ -51,6 +51,7 @@ class TraceSession
   static const size_t CHUNK_SIZE = 1000;
 
 public:
+  using LoggingFunction = std::function<void(const std::string& output)>;
   using ResponseFunction = std::function<void(std::string)>;
   using Ptr = std::shared_ptr<TraceSession>;
 
@@ -70,6 +71,11 @@ public:
    */
   void incoming(const std::string& data);
 
+  /**
+   * @brief Function to set the logger to use for the backend and session output.
+   */
+  void setLogger(LoggingFunction logger);
+
   ~TraceSession();
 
 private:
@@ -79,6 +85,8 @@ private:
 
   mutable std::mutex incoming_mutex_;    //!< Mutex for list of incoming messages that are pending processing.
   std::list<std::string> incoming_msg_;  //!< List of incoming messages that will be processed by the worker thread.
+
+  LoggingFunction logger_;  //!< Function to output log messages with.
   /**
    * @brief Function to check whether there are messages pending in incoming.
    * @return true if there are messages pending in incoming.
@@ -124,6 +132,11 @@ private:
    * @param entries The entries to format.
    */
   static std::string formatEvents(const std::vector<json>& entries);
+
+  /**
+   * @brief Return an identifier for this session, for use in logging.
+   */
+  std::string identifier() const;
 };
 
 }  // namespace scalopus

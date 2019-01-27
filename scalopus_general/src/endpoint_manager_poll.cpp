@@ -30,6 +30,8 @@
 #include "scalopus_general/endpoint_manager_poll.h"
 #include <algorithm>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include "scalopus_general/endpoint_introspect.h"
 
 namespace scalopus
@@ -57,7 +59,7 @@ void EndpointManagerPoll::manage()
   {
     if (!transport.second->isConnected())
     {
-      std::cerr << "[scalopus] Cleaning up transport to: " << transport.first << std::endl;
+      log(std::stringstream("") << "[scalopus] Cleaning up transport to: " << transport.first);
       transports_.erase(transport.first);
       transport_endpoints_.erase(std::find_if(transport_endpoints_.begin(), transport_endpoints_.end(),
                                               [&](const auto& v) { return v.first == transport.second; }));
@@ -72,12 +74,12 @@ void EndpointManagerPoll::manage()
     {
       continue;  // already have a connection to this transport, ignore it.
     }
-    std::cerr << "[scalopus] Creating transport to: " << destination << std::endl;
+    log(std::stringstream("") << "[scalopus] Creating transport to: " << destination);
     // Attempt to make a transport to this server.
     auto transport = factory_->connect(destination);
     if (!transport->isConnected())
     {
-      std::cerr << "[scalopus] Client failed to connect to " << destination << std::endl;
+      log(std::stringstream("") << "[scalopus] Client failed to connect to " << destination);
       continue;
     }
     transports_[destination->hash_code()] = transport;
@@ -100,7 +102,7 @@ void EndpointManagerPoll::manage()
       }
       else
       {
-        std::cerr << "[scalopus] remote supports endpoint we don't support: " << supported_endpoint << std::endl;
+        log(std::stringstream("") << "[scalopus] remote supports endpoint we don't support: " << supported_endpoint);
       }
     }
   }
@@ -141,6 +143,24 @@ void EndpointManagerPoll::addEndpointFactory(const std::string& name, EndpointFa
 {
   std::lock_guard<std::mutex> lock(mutex_);
   endpoint_factories_[name] = std::move(factory_function);
+}
+
+void EndpointManagerPoll::log(const std::string& msg)
+{
+  if (logger_)
+  {
+    logger_(msg);
+  }
+}
+void EndpointManagerPoll::log(const std::ostream& msg)
+{
+  // :(
+  log(static_cast<const std::stringstream&>(msg).str());
+}
+
+void EndpointManagerPoll::setLogger(LoggingFunction&& logger)
+{
+  logger_ = std::move(logger);
 }
 
 }  // namespace scalopus

@@ -69,6 +69,8 @@ int main(int /* argc */, char** /* argv */)
 
   // Create the transport & endpoint manager.
   auto manager = std::make_shared<scalopus::EndpointManagerPoll>(std::make_shared<scalopus::TransportUnixFactory>());
+  auto logging_function = [](const std::string& msg) { std::cout << msg << std::endl; };
+  manager->setLogger(logging_function);
 
   // Add scope tracing endpoint factory function.
   manager->addEndpointFactory<scalopus::EndpointTraceMapping>();
@@ -84,9 +86,10 @@ int main(int /* argc */, char** /* argv */)
   catapult_server->addProvider(std::make_shared<scalopus::LttngProvider>(path, manager));
   catapult_server->addProvider(native_trace_provider);
   catapult_server->addProvider(std::make_shared<scalopus::GeneralProvider>(manager));
+  catapult_server->setLogger(logging_function);
 
   // Use default logging at warn level.
-  catapult_server->setDefaultLogger();
+  catapult_server->setSeasocksDefaultLogger();
 
   // Bind and start.
   catapult_server->start();

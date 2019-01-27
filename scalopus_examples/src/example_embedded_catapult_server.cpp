@@ -123,9 +123,14 @@ int main(int /* argc */, char** argv)
   catapult_server->addProvider(native_trace_provider);
   catapult_server->addProvider(std::make_shared<scalopus::GeneralProvider>(manager));
 
-  //  catapult_server->setDefaultLogger();   // don't provide logging output from the webserver.
-  catapult_server->start();
-  manager->manage();  // call manage once to discover the loopback client.
+  auto logging_function = [](const std::string& msg) { std::cout << msg << std::endl; };
+  logging_function("Logging can be enabled in the source, uncomment the lines below this one.");
+  //  manager->setLogger(logging_function);  // enable logging for transport discovery.
+  //  catapult_server->setLogger(logging_function);    // Enable logging on the catapult server & trace sessions.
+  //  catapult_server->setSeasocksDefaultLogger();  // Enable seasocks warnings.
+
+  manager->manage();         // call manage once to discover the loopback client.
+  catapult_server->start();  // start the seasocks server.
 
   TRACE_THREAD_NAME("main");
 

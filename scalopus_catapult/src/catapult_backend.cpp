@@ -76,13 +76,13 @@ std::shared_ptr<ss::Response> CatapultBackend::handle(const ss::Request& request
 
 void CatapultBackend::onConnect(ss::WebSocket* ws)
 {
-  std::cout << "Connection opened for " << ws << std::endl;
+  logger_("[CatapultBackend]: New connection opened: " + std::to_string(reinterpret_cast<std::size_t>(ws)));
   makeSession(ws);
 }
 
 void CatapultBackend::onData(ss::WebSocket* /* connection */, const uint8_t* /* data */, size_t /* length */)
 {
-  std::cout << "Binary data is not handled." << std::endl;
+  logger_("[CatapultBackend]: Binary data is not handled.");
 }
 
 void CatapultBackend::onData(ss::WebSocket* ws, const char* data)
@@ -91,7 +91,8 @@ void CatapultBackend::onData(ss::WebSocket* ws, const char* data)
 
   if (session == nullptr)
   {
-    std::cout << "No session could be found for this websocket." << std::endl;
+    logger_("[CatapultBackend]: No session could be found for this websocket." +
+            std::to_string(reinterpret_cast<std::size_t>(ws)));
     return;  // no session could be found, issue.
   }
   session->incoming(data);
@@ -149,6 +150,7 @@ void CatapultBackend::makeSession(ss::WebSocket* ws)
     };
     // Create the session.
     auto session = std::make_shared<TraceSession>(std::move(response_function));
+    session->setLogger(logger_);
 
     // Add all the sources to the session
     for (auto& provider : providers_)
@@ -162,6 +164,11 @@ void CatapultBackend::makeSession(ss::WebSocket* ws)
 void CatapultBackend::setExecutor(ExecuteFunction executor)
 {
   executor_ = executor;
+}
+
+void CatapultBackend::setLogger(LoggingFunction logger)
+{
+  logger_ = std::move(logger);
 }
 
 }  // namespace scalopus
