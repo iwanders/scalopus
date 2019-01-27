@@ -28,6 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_interface.h"
+#include <pybind11/chrono.h>
 #include <scalopus_interface/endpoint_manager.h>
 #include <scalopus_interface/trace_event_provider.h>
 #include <scalopus_interface/trace_event_source.h>
@@ -38,11 +39,16 @@ namespace py = pybind11;
 
 std::string PyEndpoint::getName() const
 {
-  PYBIND11_OVERLOAD_PURE(std::string, PyEndpoint, getName, );
+  py::gil_scoped_acquire acquire;
+  PYBIND11_OVERLOAD_PURE(std::string, Endpoint, getName, );
 }
 
 bool PyEndpoint::handle(Transport& transport, const Data& incoming, Data& outgoing)
 {
+  outgoing.push_back(3);
+  std::cout << "Handle called " << std::endl;
+
+  py::gil_scoped_acquire acquire;
   PYBIND11_OVERLOAD(bool, Endpoint, handle, transport, incoming, outgoing);
 }
 
@@ -51,24 +57,57 @@ bool PyEndpoint::unsolicited(Transport& transport, const Data& incoming, Data& o
   PYBIND11_OVERLOAD(bool, Endpoint, unsolicited, transport, incoming, outgoing);
 }
 
+
+
+PendingResponse::PendingResponse(Transport::PendingResponse resp) : resp_{resp}
+{
+}
+
+py::object PendingResponse::wait_for(int milliseconds)
+{
+  std::cout << "Blocking for " << milliseconds << " ms on future" << std::endl;
+  /* Release GIL before calling into (potentially long-running) C++ code */
+  py::gil_scoped_release release;
+
+  if (resp_->wait_for(std::chrono::milliseconds(milliseconds)) == std::future_status::ready)
+  {
+    std::cout << "Succesfully waited for future" << std::endl;
+    return py::cast<Data>(resp_->get());
+  }
+    std::cout << "bummer " << std::endl;
+  return py::cast<py::none>(Py_None);
+}
+
+// Maybe convert to bytes using https://pybind11.readthedocs.io/en/master/advanced/cast/stl.html ? 
 void add_scalopus_interface(py::module& m)
 {
   py::class_<Destination, Destination::Ptr> destination(m, "Destination");
   destination.def("__str__", &Destination::operator std::string);
   destination.def("hash_code", &Destination::hash_code);
 
+  py::class_<PendingResponse, PendingResponse::Ptr> pending_response(m, "PendingResponse");
+  pending_response.def("wait_for", &PendingResponse::wait_for);
+
   py::class_<Transport, Transport::Ptr> transport_interface(m, "Transport");
   transport_interface.def("addEndpoint", &Transport::addEndpoint);
   transport_interface.def("isConnected", &Transport::isConnected);
+  transport_interface.def("broadcast", &Transport::broadcast);
+  transport_interface.def("request", [](Transport& transport, const std::string& name, const Data& outgoing)
+  {
+    return std::make_shared<PendingResponse>(transport.request(name, outgoing));
+  });
 
-  py::class_<Endpoint, Endpoint::Ptr> endpoint(m, "Endpoint");
-  endpoint.def("getName", &Endpoint::getName);
+  //  py::class_<Endpoint, Endpoint::Ptr> endpoint(m, "Endpoint");
+  //  endpoint.def("getName", &Endpoint::getName);
+  //  endpoint.def("handle", &Endpoint::handle);
+  //  endpoint.def("unsolicited", &Endpoint::unsolicited);
 
-  py::class_<PyEndpoint, PyEndpoint::Ptr, Endpoint> py_endpoint(m, "PyEndpoint");
+  py::class_<Endpoint, PyEndpoint, Endpoint::Ptr> py_endpoint(m, "Endpoint");
   py_endpoint.def(py::init<>());
-  py_endpoint.def("getName", &PyEndpoint::getName);
-  py_endpoint.def("handle", &PyEndpoint::handle);
-  py_endpoint.def("unsolicited", &PyEndpoint::unsolicited);
+  py_endpoint.def("getName", &Endpoint::getName);
+  py_endpoint.def("handle", &Endpoint::handle);
+  py_endpoint.def("unsolicited", &Endpoint::unsolicited);
+  py_endpoint.def("getTransport", &Endpoint::getTransport);
 
   py::class_<TraceEventProvider, TraceEventProvider::Ptr> trace_event_provider(m, "TraceEventProvider");
   trace_event_provider.def("makeSource", &TraceEventProvider::makeSource);

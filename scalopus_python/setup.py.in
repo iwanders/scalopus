@@ -1,16 +1,18 @@
 
 from distutils.core import setup
-import setuptools  # noqa
+import setuptools
 
 import unittest
-def my_test_suite():
+def scalopus_python_tests():
     test_loader = unittest.TestLoader()
     test_suite = test_loader.discover('test', pattern='test_*.py')
     return test_suite
+
+# Run unit tests with 'python setup.py test'
 
 setup(name='scalopus',
       version='@PROJECT_VERSION@',
       #package_dir={ '': '@CMAKE_CURRENT_BINARY_DIR@' },
       #package_data={'scalopus': ['*.so']}, ??
-      test_suite='setup.my_test_suite',
+      test_suite='setup.scalopus_python_tests',
       packages=['scalopus'])

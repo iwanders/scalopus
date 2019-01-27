@@ -69,6 +69,11 @@ public:
   virtual void setTransport(Transport* transport);
 
   /**
+   * @brief Get the transport that's used in this instance.
+   */
+  Transport* getTransport() const;
+
+  /**
    * @brief Set the transport to be used by this endpoint.
    */
   void setTransport(const std::shared_ptr<Transport>& transport);

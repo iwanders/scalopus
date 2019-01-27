@@ -51,6 +51,7 @@ configure_file(
 )
 
 # The following does look a bit fragile... but it works for now.
+# It can find the scalopus_python_lib library because that's present in the working directory.
 add_custom_target(test_python_module_run
   COMMAND python${PYTHON_VERSION_MAJOR} setup.py test
   DEPENDS scalopus_python_lib

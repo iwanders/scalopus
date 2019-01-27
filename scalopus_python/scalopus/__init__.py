@@ -27,6 +27,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 try:
-    import scalopus_python_lib
+    import scalopus_python_lib as lib
 except ModuleNotFoundError as e:
     print("{}\nWas the shared object in your PYTHONPATH variable?".format(str(e)))

@@ -36,9 +36,6 @@ namespace scalopus
 {
 namespace py = pybind11;
 
-/**
- * @brief Trampoline class to build python endpoints.
- */
 class PyEndpoint : public Endpoint
 {
 public:
@@ -48,6 +45,16 @@ public:
   std::string getName() const override;
   bool handle(Transport& transport, const Data& incoming, Data& outgoing) override;
   bool unsolicited(Transport& transport, const Data& incoming, Data& outgoing) override;
+};
+
+class PendingResponse
+{
+public:
+  using Ptr = std::shared_ptr<PendingResponse>;
+  PendingResponse(Transport::PendingResponse resp);
+  py::object wait_for(int milliseconds);
+
+  Transport::PendingResponse resp_;
 };
 
 void add_scalopus_interface(py::module&);

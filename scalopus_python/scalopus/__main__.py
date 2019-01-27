@@ -29,18 +29,9 @@
 
 
 try:
-    import scalopus_python_lib as scalopus_lib
+    import scalopus_python_lib as lib
 except ModuleNotFoundError as e:
     print("{}\nWas the shared object in your PYTHONPATH variable?".format(str(e)))
-
-class MyEndpoint(scalopus_lib.PyEndpoint):
-    def __init__(self):
-        scalopus_lib.PyEndpoint.__init__(self)
-        print(dir(self))
-        pass
-    def getName(self):
-        print("getname called")
-        return "foo"
 
 foo = scalopus_lib.PyEndpoint()
 print(dir(foo))
