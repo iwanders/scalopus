@@ -37,11 +37,23 @@ else()
   message(WARNING "Not providing LTTng tracepoints in python module, they don't exist.")
 endif()
 
-
+# Copy the scalopus module.
 file(COPY scalopus DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# Copy the python unit tests
+file(COPY test DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# Write the setup file.
 configure_file(
   ${CMAKE_CURRENT_LIST_DIR}/setup.py.in
   ${CMAKE_CURRENT_BINARY_DIR}/setup.py
   @ONLY
 )
 
+# The following does look a bit fragile... but it works for now.
+add_custom_target(test_python_module_run
+  COMMAND python${PYTHON_VERSION_MAJOR} setup.py test
+  DEPENDS scalopus_python_lib
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+add_test(NAME python_test COMMAND make test_python_module_run
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
