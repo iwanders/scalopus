@@ -29,6 +29,7 @@
 */
 #include <pybind11/pybind11.h>
 
+#include "scalopus_catapult.h"
 #include "scalopus_general.h"
 #include "scalopus_interface.h"
 #include "scalopus_tracing.h"
@@ -41,4 +42,5 @@ PYBIND11_MODULE(scalopus_python_lib, m)
   add_scalopus_transport(m);
   add_scalopus_general(m);
   add_scalopus_tracing(m);
+  add_scalopus_catapult(m);
 }

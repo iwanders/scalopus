@@ -46,7 +46,7 @@ namespace scalopus
 class EndpointManagerPoll : public EndpointManager
 {
 public:
-  using Ptr = std::shared_ptr<EndpointManager>;
+  using Ptr = std::shared_ptr<EndpointManagerPoll>;
   using EndpointFactory = std::function<std::shared_ptr<Endpoint>(const std::shared_ptr<Transport>& transport)>;
   using EndpointMap = std::map<std::string, Endpoint::Ptr>;
   using TransportEndpoints = std::map<Transport::Ptr, EndpointMap>;

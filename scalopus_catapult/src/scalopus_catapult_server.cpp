@@ -27,6 +27,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include <scalopus_general/endpoint_manager_poll.h>
 #include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_general/general_provider.h>
 
@@ -38,7 +39,6 @@
 #include <scalopus_transport/transport_unix.h>
 
 #include "scalopus_catapult/catapult_server.h"
-#include "scalopus_catapult/endpoint_manager_poll.h"
 
 #include <chrono>
 #include <thread>

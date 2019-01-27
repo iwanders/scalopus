@@ -25,6 +25,7 @@ target_link_libraries(scalopus_general
 add_library(scalopus_general_consumer SHARED
   src/general_source.cpp
   src/general_provider.cpp
+  src/endpoint_manager_poll.cpp
 )
 target_compile_options(scalopus_general_consumer PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_include_directories(scalopus_general_consumer

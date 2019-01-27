@@ -7,11 +7,12 @@ else()
 endif()
 
 pybind11_add_module(scalopus_python_lib
-  lib/main.cpp
+  lib/module.cpp
   lib/scalopus_interface.cpp
   lib/scalopus_transport.cpp
   lib/scalopus_general.cpp
   lib/scalopus_tracing.cpp
+  lib/scalopus_catapult.cpp
   )
 target_link_libraries(scalopus_python_lib
   PRIVATE
@@ -20,6 +21,7 @@ target_link_libraries(scalopus_python_lib
     Scalopus::scalopus_scope_tracing
     Scalopus::scalopus_general_consumer
     Scalopus::scalopus_tracepoint_native
+    Scalopus::scalopus_catapult
 )
 
 if (SCALOPUS_TRACING_HAVE_BUILT_LTTNG)

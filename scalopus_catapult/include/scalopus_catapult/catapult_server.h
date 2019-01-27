@@ -30,8 +30,8 @@
 #ifndef SCALOPUS_CATAPULT_CATAPULT_SERVER_H
 #define SCALOPUS_CATAPULT_CATAPULT_SERVER_H
 
-#include "scalopus_catapult/endpoint_manager_poll.h"
-#include "scalopus_interface/trace_event_provider.h"
+#include <scalopus_general/endpoint_manager_poll.h>
+#include <scalopus_interface/trace_event_provider.h>
 
 // use these forward declarations to make sure that we don't need to expose Seasocks to externals.
 namespace seasocks
