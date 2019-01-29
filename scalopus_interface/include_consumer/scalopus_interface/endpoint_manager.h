@@ -64,6 +64,32 @@ public:
   virtual void addEndpointFactory(const std::string& name, EndpointFactory&& factory_function) = 0;
 
   /**
+   * @brief Helper function to add the factory function if the class has a static factory method.
+   */
+  template <typename T>
+  void addEndpointFactory(const std::string& name = T::name)
+  {
+    addEndpointFactory(name, [](const auto& transport) { return T::factory(transport); });
+  }
+
+  /**
+   * @brief Helper function to add the factory function if it is constructed of any type that has a non static factory
+   *        function. This creates a weak pointer.
+   */
+  template <typename T>
+  void addEndpointFactory(const std::string& name, const std::shared_ptr<T>& endpoint_provider)
+  {
+    addEndpointFactory(name, [weak_provider = std::weak_ptr<T>(endpoint_provider)](const auto& transport) {
+      auto provider = weak_provider.lock();
+      if (provider != nullptr)
+      {
+        return provider->factory(transport);
+      }
+      return scalopus::Endpoint::Ptr{ nullptr };
+    });
+  }
+
+  /**
    * @brief Helper function to find a specific endpoint in a map of functions.
    * @code auto endpoint_ptr = EndpointManager::findEndpoint<scalopus::EndpointProcessInfo>(endpoint_map);
    */
