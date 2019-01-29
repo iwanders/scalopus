@@ -37,30 +37,62 @@ namespace scalopus
 {
 namespace py = pybind11;
 
+
+bool pyToData(const py::object& obj, Data& outgoing)
+{
+  // to string, and then from string to bytes.
+  if (py::isinstance<py::str>(obj))
+  {
+    std::string my_result = obj.cast<std::string>();
+    outgoing = Data{my_result.begin(), my_result.end()};
+    return true;
+  }
+  // also try buffer, which is bytearray and bytes.
+  if (py::isinstance<py::buffer>(obj))
+  {
+    outgoing = obj.cast<Data>();
+    return true;
+  }
+  // If it is a list, it's probably a list of integers
+  if (py::isinstance<py::list>(obj))
+  {
+    outgoing = obj.cast<Data>();
+    return true;
+  }
+  return false;
+}
+
+Data pyToData(const py::object& obj)
+{
+  Data res;
+  if (!pyToData(obj, res))
+  {
+    throw py::value_error("Cannot convert provided object to Data");
+  }
+  return res;
+}
+
+py::object dataToPy(const Data& data)
+{
+  return py::bytes{std::string{data.begin(), data.end()}};
+}
+
 std::string PyEndpoint::getName() const
 {
-  py::gil_scoped_acquire acquire;
   PYBIND11_OVERLOAD_PURE(std::string, Endpoint, getName, );
 }
 
 bool PyEndpoint::handle(Transport& transport, const Data& incoming, Data& outgoing)
 {
-  //  PYBIND11_OVERLOAD(bool, Endpoint, handle, transport, incoming, outgoing);
   {
     pybind11::gil_scoped_acquire gil;
-    pybind11::function overload = pybind11::get_overload(static_cast<const Endpoint*>(this), "handle");
+    pybind11::function overload = pybind11::get_overload(this, "handle");
     if (overload)
     {
-      auto obj = overload(transport, incoming);
-      if (py::isinstance<py::list>(obj))
-      {
-        outgoing = obj.cast<Data>();
-        return true;
-      }
-      else
-      {
-        return false;
-      }
+      // from data to string and then to bytes.
+      py::bytes my_bytes{std::string{incoming.begin(), incoming.end()}};
+      auto obj = overload(transport, my_bytes);
+      return pyToData(obj, outgoing);
     }
   }
   return Endpoint::handle(transport, incoming, outgoing);
@@ -80,16 +112,15 @@ PendingResponse::PendingResponse(Transport::PendingResponse resp) : resp_{ resp 
 {
 }
 
-py::object PendingResponse::wait_for(int milliseconds)
+py::object PendingResponse::wait_for(double seconds)
 {
-  std::cout << "Blocking for " << milliseconds << " ms on future" << std::endl;
-  /* Release GIL before calling into (potentially long-running) C++ code */
-  py::gil_scoped_release release;
+  std::cout << "Blocking for " << seconds << " s on future" << std::endl;
 
-  if (resp_->wait_for(std::chrono::milliseconds(milliseconds)) == std::future_status::ready)
+  py::gil_scoped_release release;
+  if (resp_->wait_for(std::chrono::duration<double>(seconds)) == std::future_status::ready)
   {
     std::cout << "Succesfully waited for future" << std::endl;
-    return py::cast<Data>(resp_->get());
+    return dataToPy(resp_->get());
   }
   std::cout << "bummer " << std::endl;
   return py::cast<py::none>(Py_None);
@@ -109,8 +140,8 @@ void add_scalopus_interface(py::module& m)
   transport_interface.def("addEndpoint", &Transport::addEndpoint);
   transport_interface.def("isConnected", &Transport::isConnected);
   transport_interface.def("broadcast", &Transport::broadcast);
-  transport_interface.def("request", [](Transport& transport, const std::string& name, const Data& outgoing) {
-    return std::make_shared<PendingResponse>(transport.request(name, outgoing));
+  transport_interface.def("request", [](Transport& transport, const std::string& name, const py::object& outgoing) {
+    return std::make_shared<PendingResponse>(transport.request(name, pyToData(outgoing)));
   });
 
   //  py::class_<Endpoint, Endpoint::Ptr> endpoint(m, "Endpoint");

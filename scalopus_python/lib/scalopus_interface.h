@@ -36,6 +36,26 @@ namespace scalopus
 {
 namespace py = pybind11;
 
+/**
+ * @brief Custom function to data conversion. Since there is so many 'valid' ways in Python 2 and 3 to express bytes.
+ * Strings, bytearray, buffer, list of integers.
+ * @param obj The python object to convert.
+ * @param outgoing the Data to assign into
+ * @return True if data could be converted, false otherwise.
+ */
+bool pyToData(const py::object& obj, Data& outgoing);
+
+/**
+ * @brief Same as pyToData, but throws py::value_error if it fails.
+ */
+Data pyToData(const py::object& obj);
+
+/**
+ * @brief Convert the data into the 'best' Python bytes representation; py:bytes
+ */
+py::object dataToPy(const Data& data);
+
+
 class PyEndpoint : public Endpoint
 {
 public:
@@ -53,7 +73,7 @@ class PendingResponse
 public:
   using Ptr = std::shared_ptr<PendingResponse>;
   PendingResponse(Transport::PendingResponse resp);
-  py::object wait_for(int milliseconds);
+  py::object wait_for(double seconds);
 
   Transport::PendingResponse resp_;
 };
