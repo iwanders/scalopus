@@ -26,10 +26,37 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-try:
-    import scalopus_python_lib as lib
-except ImportError as e:
-    print("{}: Was the shared object in your PYTHONPATH variable?".format(str(e)))
-    raise e
 
-from .tracing import TraceContext, trace_function
+from . import lib
+import random
+from functools import wraps
+
+# Using this name here should allow swapping out the backend.
+scope_tracing_backend = lib.tracing.native
+
+class TraceContext(object):
+    def __init__(self, trace_name, trace_id=None):
+        self.trace_id = trace_id if trace_id is not None else random.randint(0, 2**32)
+        self.trace_name = trace_name
+        lib.tracing.setTraceName(self.trace_id, self.trace_name)
+
+    def enter(self):
+        self.__enter__()
+
+    def exit(self):
+        self.__exit__(None, None, None)
+
+    def __enter__(self):
+        scope_tracing_backend.scope_entry(self.trace_id)
+
+    def __exit__(self, context_type, context_value, context_traceback):
+        scope_tracing_backend.scope_exit(self.trace_id)
+
+
+def trace_function(f):
+    tracer = TraceContext(f.__name__)
+    @wraps(f)
+    def wrapper(*args, **kwds):
+        with tracer:
+            return f(*args, **kwds)
+    return wrapper
