@@ -31,14 +31,33 @@ from . import lib
 import random
 from functools import wraps
 
+
+# Make some shorthands for convenience.
+haveLttng = lib.tracing.haveLttng
+setTraceName = lib.tracing.setTraceName
+EndpointTraceMapping = lib.tracing.EndpointTraceMapping
+EndpointNativeTraceSender = lib.tracing.native.EndpointNativeTraceSender
+
+# Also for the tracing providers.
+native = lib.tracing.native
+lttng = None
+if haveLttng():
+    lttng = lib.tracing.lttng
+
+
 # Using this name here should allow swapping out the backend.
-scope_tracing_backend = lib.tracing.native
+tracing_backend = native
+
+def setBackend(new_backend):
+    global tracing_backend
+    tracing_backend = new_backend 
+
 
 class TraceContext(object):
     def __init__(self, trace_name, trace_id=None):
         self.trace_id = trace_id if trace_id is not None else random.randint(0, 2**32)
         self.trace_name = trace_name
-        lib.tracing.setTraceName(self.trace_id, self.trace_name)
+        setTraceName(self.trace_id, self.trace_name)
 
     def enter(self):
         self.__enter__()
@@ -47,16 +66,16 @@ class TraceContext(object):
         self.__exit__(None, None, None)
 
     def __enter__(self):
-        scope_tracing_backend.scope_entry(self.trace_id)
+        tracing_backend.scope_entry(self.trace_id)
 
     def __exit__(self, context_type, context_value, context_traceback):
-        scope_tracing_backend.scope_exit(self.trace_id)
+        tracing_backend.scope_exit(self.trace_id)
 
 
 def trace_function(f):
     tracer = TraceContext(f.__name__)
     @wraps(f)
-    def wrapper(*args, **kwds):
+    def wrapper(*args, **kwargs):
         with tracer:
-            return f(*args, **kwds)
+            return f(*args, **kwargs)
     return wrapper

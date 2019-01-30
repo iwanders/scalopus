@@ -82,13 +82,6 @@ int main(int /* argc */, char** argv)
 
   TRACE_THREAD_NAME("main");
 
-  scalopus::scope_entry(0);
-  scalopus::scope_exit(0);
-
-  scalopus::TraceRAII(2);
-
-  TRACE_PRETTY_FUNCTION();
-
   while (true)
   {
     a();

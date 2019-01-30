@@ -84,7 +84,6 @@ bool TransportUnix::serve()
     return false;
   }
 
-  std::cerr << "Server: " << server_fd_ << std::endl;
   connections_.insert(server_fd_);
 
   // If we get here, we are golden, we got a working unix domain socket and can start our worker thread.

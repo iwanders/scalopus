@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 # Copyright (c) 2018-2019, Ivor Wanders
 # All rights reserved.
@@ -26,13 +27,39 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-try:
-    import scalopus_python_lib as lib
-except ImportError as e:
-    print("{}: Was the shared object in your PYTHONPATH variable?".format(str(e)))
-    raise e
+import sys
+import time
 
-from . import tracing
-from . import general
-from . import transport
-from . import common
+import scalopus
+
+@scalopus.tracing.trace_function
+def fooBarBuz():
+    time.sleep(0.2)
+
+@scalopus.tracing.trace_function
+def c():
+    time.sleep(0.2)
+    print("  c")
+    fooBarBuz()
+    time.sleep(0.2)
+
+@scalopus.tracing.trace_function
+def b():
+    time.sleep(0.2)
+    print(" b")
+    c()
+    time.sleep(0.2)
+
+@scalopus.tracing.trace_function
+def a():
+    print("a")
+    time.sleep(0.2)
+    b()
+    time.sleep(0.2)
+
+if __name__ == "__main__":
+    exposer = scalopus.common.DefaultExposer(process_name=sys.argv[0])
+    scalopus.general.setThreadName("main")
+
+    while True:
+        a()

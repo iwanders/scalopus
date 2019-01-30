@@ -27,7 +27,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 import sys
 print("Running tests with Python: {}".format(sys.version))
 
@@ -37,22 +36,16 @@ import os
 import unittest
 import threading
 
-
-class TracingTester(unittest.TestCase):
+# This is the same as test_tracing, except that it uses the exposer.
+class TracingTesterWithExposer(unittest.TestCase):
     def __init__(self, *args):
         unittest.TestCase.__init__(self, *args)
-        self.factory = scalopus.lib.transport.TransportLoopbackFactory()
-        self.server = self.factory.serve()
-        self.server.addEndpoint(scalopus.general.EndpointIntrospect())
-        processinfo = scalopus.general.EndpointProcessInfo()
-        processinfo.setProcessName("MyPythonProcess")
-        self.server.addEndpoint(processinfo)
-        self.server.addEndpoint(scalopus.tracing.EndpointTraceMapping())
-        self.server.addEndpoint(scalopus.tracing.EndpointNativeTraceSender())
+        self.factory = scalopus.transport.TransportLoopbackFactory()
+        self.exposer = scalopus.common.DefaultExposer("MyPythonProcess", self.factory)
 
     def test_tracing(self):
         trace_point = scalopus.tracing.TraceContext("MyTraceContext", trace_id=1337)
-        scalopus.lib.general.setThreadName("MyTestThread")
+        scalopus.general.setThreadName("MyTestThread")
         for i in range(3):
             with trace_point:
                 time.sleep(0.1)

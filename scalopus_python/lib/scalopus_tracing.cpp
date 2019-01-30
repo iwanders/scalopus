@@ -57,6 +57,15 @@ void add_scalopus_tracing(py::module& m)
     ScopeTraceTracker::getInstance().insert(id, name);
   });
 
+  tracing.def("haveLttng", []()
+  {
+#ifdef SCALOPUS_TRACING_HAVE_LTTNG
+    return true;
+#else
+    return false;
+#endif
+  });
+
 #ifdef SCALOPUS_TRACING_HAVE_LTTNG
   py::module lttng = tracing.def_submodule("lttng", "The lttng specific components.");
   lttng.def("scope_entry", &lttng::scope_entry);

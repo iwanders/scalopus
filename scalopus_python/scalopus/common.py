@@ -26,13 +26,17 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-try:
-    import scalopus_python_lib as lib
-except ImportError as e:
-    print("{}: Was the shared object in your PYTHONPATH variable?".format(str(e)))
-    raise e
 
-from . import tracing
-from . import general
-from . import transport
-from . import common
+from . import tracing, general, transport
+import sys
+
+class DefaultExposer(object):
+    def __init__(self, process_name=sys.argv[0], transport_factory=transport.TransportUnixFactory()):
+        self.factory = transport_factory
+        self.server = self.factory.serve()
+        self.server.addEndpoint(general.EndpointIntrospect())
+        processinfo = general.EndpointProcessInfo()
+        processinfo.setProcessName(process_name)
+        self.server.addEndpoint(processinfo)
+        self.server.addEndpoint(tracing.EndpointTraceMapping())
+        self.server.addEndpoint(tracing.EndpointNativeTraceSender())
