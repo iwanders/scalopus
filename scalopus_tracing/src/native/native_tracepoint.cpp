@@ -56,7 +56,6 @@ uint64_t nativeGetChrono()
 void scope_entry(const unsigned int id)
 {
   thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
-  std::cout << "TracePointCollectorNative::getInstance(): " << &TracePointCollectorNative::getInstance() << std::endl;
   // @TODO Do something with overrun, count lost events?
   buffer.push(tracepoint_collector_types::ScopeTraceEvent{ nativeGetChrono(), id, TracePointCollectorNative::ENTRY });
 }
