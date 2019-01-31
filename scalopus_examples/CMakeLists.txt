@@ -7,6 +7,10 @@ add_executable(example_scope_tracepoints_native src/example_scope_tracepoints_na
 target_link_libraries(example_scope_tracepoints_native Scalopus::scalopus_tracing_native)
 target_compile_options(example_scope_tracepoints_native PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 
+add_executable(example_scope_tracepoints_nop src/example_scope_tracepoints_nop.cpp)
+target_link_libraries(example_scope_tracepoints_nop Scalopus::scalopus_tracing_nop)
+target_compile_options(example_scope_tracepoints_nop PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+
 if(TARGET Scalopus::scalopus_tracing_lttng)
   add_executable(example_scope_tracepoints src/example_scope_tracepoints.cpp)
   target_compile_options(example_scope_tracepoints PRIVATE ${SCALOPUS_COMPILE_OPTIONS})

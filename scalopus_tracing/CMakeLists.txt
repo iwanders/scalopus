@@ -107,7 +107,7 @@ target_link_libraries(scalopus_tracepoint_native
 )
 list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracepoint_native)
 
-add_library(scalopus_tracing_native 
+add_library(scalopus_tracing_native SHARED
   src/scope_trace_raii.cpp
   src/native/scope_tracepoint_native.cpp
 )
@@ -126,6 +126,41 @@ target_include_directories(scalopus_tracing_native
 )
 list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracing_native)
 
+add_library(scalopus_tracepoint_nop SHARED
+  src/nop/nop_tracepoint.cpp
+)
+target_compile_options(scalopus_tracepoint_nop PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+target_include_directories(scalopus_tracepoint_nop
+  PUBLIC 
+    $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:src/nop/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/nop/include>
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+add_library(Scalopus::scalopus_tracepoint_nop ALIAS scalopus_tracepoint_nop)
+
+list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracepoint_nop)
+
+add_library(scalopus_tracing_nop SHARED
+  src/scope_trace_raii.cpp
+  src/nop/scope_tracepoint_nop.cpp
+)
+add_library(Scalopus::scalopus_tracing_nop ALIAS scalopus_tracing_nop)
+target_link_libraries(scalopus_tracing_nop
+  PUBLIC
+    Scalopus::scalopus_tracepoint_nop
+    Scalopus::scalopus_scope_tracing
+)
+target_include_directories(scalopus_tracing_nop
+  PUBLIC 
+    $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracing_nop)
 
 
 add_library(scalopus_lttng_babeltrace SHARED

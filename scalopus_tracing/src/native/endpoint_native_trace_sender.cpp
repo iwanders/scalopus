@@ -70,6 +70,7 @@ void EndpointNativeTraceSender::work()
 {
   // The collector is a singleton, just retrieve it once.
   const auto& collector = TracePointCollectorNative::getInstance();
+  std::cout << "work: TracePointCollectorNative::getInstance(): " << &TracePointCollectorNative::getInstance() << std::endl;
   while (running_)
   {
     auto tid_buffers = collector.getMap();
