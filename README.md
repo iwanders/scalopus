@@ -54,6 +54,7 @@ The subcomponents of scalopus are clearly separated:
 - [scalopus_tracing](/scalopus_tracing) This provides means of tracing scopes and the `Provider` and `Source` to visualise them.
 - [scalopus_catapult](/scalopus_catapult) Provides the chrome devtools protocol endpoint webserver that allows consuming the traces.
 - [scalopus_examples](/scalopus_examples) This provides some examples on how to write instrumented source code.
+- [scalopus_python](/scalopus_python) This provides Python (2 or 3) bindings for scalopus and a module to make tracepoints easier to work with.
 
 ## Building
 
