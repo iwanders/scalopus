@@ -116,6 +116,9 @@ int main(int argc, char** argv)
   endpoint_process_info->setProcessName(argv[0]);
   server->addEndpoint(endpoint_process_info);
 
+  // The following endpoint is only necessary for the native tracepoints.
+  server->addEndpoint(std::make_shared<scalopus::EndpointNativeTraceSender>());
+
   TRACE_THREAD_NAME("main");
   TRACE_PRETTY_FUNCTION();
 

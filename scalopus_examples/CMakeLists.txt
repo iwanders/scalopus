@@ -1,38 +1,48 @@
 
-add_executable(dump_mappings src/dump_mappings.cpp)
-target_link_libraries(dump_mappings Scalopus::scalopus_scope_tracing)
-target_compile_options(dump_mappings PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
-
-add_executable(example_scope_tracepoints_native src/example_scope_tracepoints_native.cpp)
+# Examples defaulting to native tracepoints.
+add_executable(example_scope_tracepoints_native src/example_scope_tracepoints.cpp)
 target_link_libraries(example_scope_tracepoints_native Scalopus::scalopus_tracing_native)
 target_compile_options(example_scope_tracepoints_native PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 
-add_executable(example_scope_tracepoints_nop src/example_scope_tracepoints_nop.cpp)
+add_executable(example_scope_tracepoints_random_native src/example_scope_tracepoints_random.cpp)
+target_compile_options(example_scope_tracepoints_random_native PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+target_link_libraries(example_scope_tracepoints_random_native Scalopus::scalopus_tracing_native)
+
+# Examples defaulting to nop tracepoints.
+add_executable(example_scope_tracepoints_nop src/example_scope_tracepoints.cpp)
 target_link_libraries(example_scope_tracepoints_nop Scalopus::scalopus_tracing_nop)
 target_compile_options(example_scope_tracepoints_nop PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 
-if(TARGET Scalopus::scalopus_tracing_lttng)
-  add_executable(example_scope_tracepoints src/example_scope_tracepoints.cpp)
-  target_compile_options(example_scope_tracepoints PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
-  target_link_libraries(example_scope_tracepoints Scalopus::scalopus_tracing_lttng)
+add_executable(example_scope_tracepoints_random_nop src/example_scope_tracepoints_random.cpp)
+target_compile_options(example_scope_tracepoints_random_nop PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+target_link_libraries(example_scope_tracepoints_random_nop Scalopus::scalopus_tracing_nop)
 
-  add_executable(example_scope_tracepoints_random src/example_scope_tracepoints_random.cpp)
-  target_compile_options(example_scope_tracepoints_random PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
-  target_link_libraries(example_scope_tracepoints_random Scalopus::scalopus_tracing_lttng)
+# Examples defaulting to lttng tracepoints.
+if(TARGET Scalopus::scalopus_tracing_lttng)
+  add_executable(example_scope_tracepoints_lttng src/example_scope_tracepoints.cpp)
+  target_compile_options(example_scope_tracepoints_lttng PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+  target_link_libraries(example_scope_tracepoints_lttng Scalopus::scalopus_tracing_lttng)
+
+  add_executable(example_scope_tracepoints_random_lttng src/example_scope_tracepoints_random.cpp)
+  target_compile_options(example_scope_tracepoints_random_lttng PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+  target_link_libraries(example_scope_tracepoints_random_lttng Scalopus::scalopus_tracing_lttng)
 endif()
 
-add_executable(example_scope_tracepoints_random_native src/example_scope_tracepoints_random_native.cpp)
-target_compile_options(example_scope_tracepoints_random_native PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
-target_link_libraries(example_scope_tracepoints_random_native Scalopus::scalopus_tracing_native)
+# Two introspect utilities.
+add_executable(dump_mappings src/dump_mappings.cpp)
+target_link_libraries(dump_mappings Scalopus::scalopus_scope_tracing)
+target_compile_options(dump_mappings PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 
 add_executable(introspect_endpoints src/introspect_endpoints.cpp)
 target_compile_options(introspect_endpoints PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_link_libraries(introspect_endpoints Scalopus::scalopus_transport Scalopus::scalopus_consumer Scalopus::scalopus_general)
 
+# Example from the quickstart.
 add_executable(readme_example src/readme_example.cpp)
 target_compile_options(readme_example PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_link_libraries(readme_example Scalopus::scalopus_tracing_native)
 
+# Example which is kinda odd, it contains the catapult server in the same process using the loopback interface.
 add_executable(example_embedded_catapult_server src/example_embedded_catapult_server.cpp)
 target_compile_options(example_embedded_catapult_server PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_link_libraries(example_embedded_catapult_server Scalopus::scalopus_catapult Scalopus::scalopus_tracing_native)

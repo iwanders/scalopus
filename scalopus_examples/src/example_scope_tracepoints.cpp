@@ -27,7 +27,6 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 #include <chrono>
 #include <iostream>
 #include <sstream>
@@ -100,6 +99,9 @@ int main(int /* argc */, char** argv)
   auto endpoint_process_info = std::make_shared<scalopus::EndpointProcessInfo>();
   endpoint_process_info->setProcessName(argv[0]);
   server->addEndpoint(endpoint_process_info);
+
+  // The following endpoint is only necessary for the native tracepoints.
+  server->addEndpoint(std::make_shared<scalopus::EndpointNativeTraceSender>());
 
   TRACE_THREAD_NAME("main");
 
