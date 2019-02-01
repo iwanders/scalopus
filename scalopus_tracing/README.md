@@ -14,7 +14,7 @@ The tracepoint macro's themselves can be found in
 - `TRACE_TRACKED_RAII("name")` Places a [RAII][RAII] tracepoint in this scope, duration starts on custruction and ends
   when the tracepoint goes out of scope. Name of the duration is provided by the argument, trace id is based on line
   number and file.
-- `TRACE_PRETTY_FUNCTION()` Uses the value of `__PRETTY_FUNCTION__` as define by the preprocessor as name for the RAII
+- `TRACE_PRETTY_FUNCTION()` Uses the value of `__PRETTY_FUNCTION__` as defined by the preprocessor as name for the RAII
   tracepoint. Trace id is based on line number and file.
 - `TRACE_SCOPE_START("name")` Starts a duration and uses the provided name for it. The trace id is based on the file
   name and the provided name.
@@ -115,8 +115,8 @@ You can select which tracepoints your target uses by default by linking against 
 
 The [LTTng][lttng] tracepoints require `lttng-ust` and it's header files to be installed on the system. This component
 is built optionally when `lttng-ust` is detected. The tracepoint definition as LTTng requires it is found in
-[this](/scalopus_tracing/src/lttng/scope_tracepoint_lttng_definition.h) file, these are then [used](/home/ivor/Documents/Code/scalopus/repo/scalopus_tracing/src/lttng/lttng_tracepoint.cpp) inside the functions
-Scalopus requires from trace backends.
+[this](/scalopus_tracing/src/lttng/scope_tracepoint_lttng_definition.h) file, these are then
+[used](/scalopus_tracing/src/lttng/lttng_tracepoint.cpp) inside the functions Scalopus requires from trace backends.
 
 The LTTng tracepoints are very efficient and allow enabling and disabling tracepoints through LTTng's
 [tracing control][tracing_control], which allows disabling and enabling per process id for example. Basically they
