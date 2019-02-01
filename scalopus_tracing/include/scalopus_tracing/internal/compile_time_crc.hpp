@@ -33,7 +33,9 @@
 // polynomial: 0x104C11DB7, bit reverse algorithm:
 //  crcmod.Crc(0x104C11DB7, initCrc=0, xorOut=0xFFFFFFFF)
 
-namespace scalopus_crcdetail
+namespace scalopus
+{
+namespace crcdetail
 {
 static constexpr const uint32_t table[256] = {
   0x00000000U, 0x77073096U, 0xEE0E612CU, 0x990951BAU, 0x076DC419U, 0x706AF48FU, 0xE963A535U, 0x9E6495A3U, 0x0EDB8832U,
@@ -78,9 +80,10 @@ constexpr uint32_t compute(const char* data, uint32_t len, uint32_t crc = 0)
   crc = crc ^ 0xFFFFFFFFU;
   return crc;
 }
-}  // namespace scalopus_crcdetail
+}  // namespace crcdetail
+}  // namespace scalopus
 
 // Macro to be used, guarantees hash is computed at compile time.
-#define CRC32_STR(A) std::integral_constant<uint32_t, scalopus_crcdetail::compute(A, sizeof(A) - 1)>::value
+#define CRC32_STR(A) std::integral_constant<uint32_t, scalopus::crcdetail::compute(A, sizeof(A) - 1)>::value
 
 #endif  // SCALOPUS_COMPILE_TIME_CRC_H

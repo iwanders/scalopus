@@ -103,7 +103,7 @@ After building and succesfully being able to run the tests, use the following st
 [catapult_trace_viewer]: https://github.com/catapult-project/catapult/blob/master/tracing/README.md
 [catapult]: https://github.com/catapult-project/catapult
 [devtools_protocol]: https://chromedevtools.github.io/devtools-protocol/tot/Tracing
-[trace_event_format]: https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit
+[trace_event_format]: https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/
 [lttng]: https://lttng.org/
 [chrome_tracing]: chrome://inspect?tracing
 [cppcon_2016_quest_for_performance]: https://youtu.be/tD4xRNB0M_Q?t=468
