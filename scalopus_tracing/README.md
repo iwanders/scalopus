@@ -135,8 +135,32 @@ output plugin for live sessions.
 
 
 ### Native
+The native tracepoints use the transport system provided by Scalopus that was originally intended for just getting the
+trace mappings out. They currently use about 25% more cpu for the random callstacks example than the LTTng tracepoints
+do, so good enough for simple things and quick tests, but for real projects with lots of tracepoints it may not be the
+best choice. Additionally, they cannot be turned of or on and are basically always enabled.
+
+Under the hood it works as follows; Each thread will get a single consumer - single producer ringbuffer allocated for
+itself when a 
+[native tracepoint](/scalopus_tracing/src/native/native_tracepoint.cpp) is encountered. This ringbuffer is allocated by
+the [tracepoint collector](/scalopus_tracing/src/native/tracepoint_collector_native.cpp), so each thread has it's own
+ringbuffer and will be the only one writing to it. To get the tracepoints themselves out of the process the
+[trace sender](/scalopus_tracing/src/native/endpoint_native_trace_sender.cpp) is the single consumer for all the
+ringbuffers, it just reads any data from the ringbuffers and sends this through the transport using the broadcast
+to all connections.
 
 ### No Operation
+The no operation (nop) tracepoints don't do anything. This allows disabling tracepoints at compile time to swap them in
+at a later point using an `LD_PRELOAD` to load either the native or the LTTng tracepoints. Try from the build dir with:
+```bash
+LD_PRELOAD="$(pwd)/scalopus_tracing/libscalopus_tracing_lttng.so" ./scalopus_examples/example_scope_tracepoints_nop
+# or
+LD_PRELOAD="$(pwd)/scalopus_tracing/libscalopus_tracing_native.so" ./scalopus_examples/example_scope_tracepoints_nop  
+```
+This should make traces come in from the nop binary.
+
+
+
 
 
 [trace_event_format]: https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/
