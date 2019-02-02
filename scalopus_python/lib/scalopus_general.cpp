@@ -42,6 +42,8 @@ void add_scalopus_general(py::module& m)
   py::class_<EndpointIntrospect, EndpointIntrospect::Ptr, Endpoint> endpoint_introspect(general, "EndpointIntrospect");
   endpoint_introspect.def(py::init<>());
   endpoint_introspect.def("supported", &EndpointIntrospect::supported);
+  endpoint_introspect.def_property_readonly_static("name", [](py::object /* self */) { return EndpointIntrospect::name; });
+  endpoint_introspect.def("factory", &EndpointIntrospect::factory);
 
   py::class_<EndpointProcessInfo::ProcessInfo> endpoint_process_info_info(general, "ProcessInfo");
   endpoint_process_info_info.def_readwrite("name", &EndpointProcessInfo::ProcessInfo::name);
@@ -52,6 +54,8 @@ void add_scalopus_general(py::module& m)
   endpoint_process_info.def(py::init<>());
   endpoint_process_info.def("setProcessName", &EndpointProcessInfo::setProcessName);
   endpoint_process_info.def("processInfo", &EndpointProcessInfo::processInfo);
+  endpoint_process_info.def_property_readonly_static("name", [](py::object /* self */) { return EndpointProcessInfo::name; });
+  endpoint_process_info.def("factory", &EndpointProcessInfo::factory);
 
   general.def("setThreadName", [](const std::string& name) { ThreadNameTracker::getInstance().setCurrentName(name); });
 

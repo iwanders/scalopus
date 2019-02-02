@@ -51,6 +51,8 @@ void add_scalopus_tracing(py::module& m)
                                                                                                "EndpointTraceMapping");
   endpoint_trace_mapping.def(py::init<>());
   endpoint_trace_mapping.def("mapping", &EndpointTraceMapping::mapping);
+  endpoint_trace_mapping.def("factory", &EndpointTraceMapping::factory);
+  endpoint_trace_mapping.def_property_readonly_static("name", [](py::object /* self */) { return EndpointTraceMapping::name; });
 
   py::module native = tracing.def_submodule("native", "The native specific components.");
   py::class_<EndpointNativeTraceSender, EndpointNativeTraceSender::Ptr, Endpoint> endpoint_native_trace_sender(

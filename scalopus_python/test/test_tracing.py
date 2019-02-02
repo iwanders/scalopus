@@ -56,6 +56,8 @@ class TracingTester(unittest.TestCase):
         self.poller = scalopus.general.EndpointManagerPoll(self.factory)
         self.native_provider = scalopus.tracing.native.NativeTraceProvider(self.poller)
         self.poller.addEndpointFactory(scalopus.tracing.EndpointNativeTraceSender.name, self.native_provider.factory)
+        self.poller.addEndpointFactory(scalopus.tracing.EndpointTraceMapping.name, scalopus.tracing.EndpointTraceMapping.factory)
+        self.poller.addEndpointFactory(scalopus.general.EndpointProcessInfo.name, scalopus.general.EndpointProcessInfo.factory)
         self.poller.manage()  # do one round of discovery
         self.native_source = self.native_provider.makeSource()
         self.native_source.startInterval() # start the recording interval on the native source.
