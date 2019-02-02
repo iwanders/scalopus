@@ -130,14 +130,17 @@ void TransportLoopback::work()
           if (client != nullptr)
           {
             auto endpoint = client->getEndpoint(remote_endpoint_name);
-            Data resp;
-            if (endpoint->unsolicited(*client, outgoing, resp))
+            if (endpoint != nullptr)
             {
-              Data resp2;
-              if (getEndpoint(remote_endpoint_name)->handle(*client, resp, resp2))
+              Data resp;
+              if (endpoint->unsolicited(*client, outgoing, resp))
               {
-                // We stop here... This is slightly different than a real transport... but works for now.
-                throw std::runtime_error("The TransportLoopback does not handle responses on unsolicited data.");
+                Data resp2;
+                if (getEndpoint(remote_endpoint_name)->handle(*client, resp, resp2))
+                {
+                  // We stop here... This is slightly different than a real transport... but works for now.
+                  throw std::runtime_error("The TransportLoopback does not handle responses on unsolicited data.");
+                }
               }
             }
           }
