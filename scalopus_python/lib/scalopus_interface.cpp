@@ -164,6 +164,16 @@ void add_scalopus_interface(py::module& m)
   trace_event_source.def("stopInterval", &TraceEventSource::stopInterval);
   trace_event_source.def("work", &TraceEventSource::work);
   //  trace_event_source.def("finishInterval", &TraceEventSource::finishInterval);
+  trace_event_source.def("finishInterval", [](TraceEventSource& source)
+  {
+    auto res = source.finishInterval();
+    std::vector<std::string> python_res;
+    for (const auto events : res)
+    {
+      python_res.push_back(events.dump());
+    }
+    return python_res;
+  });
 
   py::class_<EndpointManager, EndpointManager::Ptr> endpoint_manager(m, "EndpointManager");
   endpoint_manager.def("endpoints", &EndpointManager::endpoints);

@@ -36,6 +36,7 @@ from functools import wraps
 setTraceName = tracing.setTraceName
 EndpointTraceMapping = tracing.EndpointTraceMapping
 EndpointNativeTraceSender = tracing.native.EndpointNativeTraceSender
+NativeTraceProvider = tracing.native.NativeTraceProvider
 
 # Also for the tracing providers.
 native = tracing.native

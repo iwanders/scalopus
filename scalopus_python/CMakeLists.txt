@@ -21,6 +21,8 @@ target_link_libraries(scalopus_python_lib
     Scalopus::scalopus_scope_tracing
     Scalopus::scalopus_general_consumer
     Scalopus::scalopus_tracepoint_native
+    Scalopus::scalopus_tracepoint_nop
+    Scalopus::scalopus_tracing_consumer
     Scalopus::scalopus_catapult
 )
 

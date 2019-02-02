@@ -37,6 +37,10 @@
 #include <scalopus_tracing/lttng_tracepoint.h>
 #endif
 
+#include <scalopus_tracing/nop_tracepoint.h>
+
+#include <scalopus_tracing/native_trace_provider.h>
+
 namespace scalopus
 {
 namespace py = pybind11;
@@ -51,6 +55,7 @@ void add_scalopus_tracing(py::module& m)
   py::module native = tracing.def_submodule("native", "The native specific components.");
   py::class_<EndpointNativeTraceSender, EndpointNativeTraceSender::Ptr, Endpoint> endpoint_native_trace_sender(
       native, "EndpointNativeTraceSender");
+  endpoint_native_trace_sender.def_property_readonly_static("name", [](py::object /* self */) { return EndpointNativeTraceSender::name; });
   endpoint_native_trace_sender.def(py::init<>());
 
   tracing.def("setTraceName", [](const unsigned int id, const std::string& name) {
@@ -65,5 +70,21 @@ void add_scalopus_tracing(py::module& m)
 
   native.def("scope_entry", &native::scope_entry);
   native.def("scope_exit", &native::scope_exit);
+
+  // Add the nop tracepoints for completeness.
+  py::module nop = tracing.def_submodule("nop", "The nop specific components.");
+  nop.def("scope_entry", &nop::scope_entry);
+  nop.def("scope_exit", &nop::scope_exit);
+
+  // Add the providers.
+
+  py::class_<NativeTraceProvider, NativeTraceProvider::Ptr, TraceEventProvider> native_trace_provider(
+      native, "NativeTraceProvider");
+  native_trace_provider.def(py::init<EndpointManager::Ptr>());
+  native_trace_provider.def("makeSource", &NativeTraceProvider::makeSource);
+  native_trace_provider.def("receiveEndpoint", &NativeTraceProvider::receiveEndpoint);
+  native_trace_provider.def("factory", &NativeTraceProvider::factory);
+
+  
 }
 }  // namespace scalopus

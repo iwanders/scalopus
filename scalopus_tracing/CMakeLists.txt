@@ -210,6 +210,7 @@ target_link_libraries(scalopus_tracing_consumer
     Scalopus::scalopus_lttng_babeltrace
     Scalopus::scalopus_consumer
 )
+set_property(TARGET scalopus_tracing_consumer PROPERTY POSITION_INDEPENDENT_CODE ON)
 list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracing_consumer)
 
 export(

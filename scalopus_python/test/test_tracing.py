@@ -41,7 +41,9 @@ import threading
 class TracingTester(unittest.TestCase):
     def __init__(self, *args):
         unittest.TestCase.__init__(self, *args)
-        self.factory = scalopus.lib.transport.TransportLoopbackFactory()
+        self.factory = scalopus.transport.TransportLoopbackFactory()
+
+        # set up the producer side
         self.server = self.factory.serve()
         self.server.addEndpoint(scalopus.general.EndpointIntrospect())
         processinfo = scalopus.general.EndpointProcessInfo()
@@ -49,6 +51,14 @@ class TracingTester(unittest.TestCase):
         self.server.addEndpoint(processinfo)
         self.server.addEndpoint(scalopus.tracing.EndpointTraceMapping())
         self.server.addEndpoint(scalopus.tracing.EndpointNativeTraceSender())
+
+        # set up the consumer side.
+        self.poller = scalopus.general.EndpointManagerPoll(self.factory)
+        self.native_provider = scalopus.tracing.native.NativeTraceProvider(self.poller)
+        self.poller.addEndpointFactory(scalopus.tracing.EndpointNativeTraceSender.name, self.native_provider.factory)
+        self.poller.manage()  # do one round of discovery
+        self.native_source = self.native_provider.makeSource()
+        self.native_source.startInterval() # start the recording interval on the native source.
 
     def test_tracing(self):
         trace_point = scalopus.tracing.TraceContext("MyTraceContext", trace_id=1337)
@@ -81,6 +91,11 @@ class TracingTester(unittest.TestCase):
         info = processinfo_client.processInfo()
         self.assertEqual(info.name, "MyPythonProcess")
         self.assertDictEqual({threading.get_ident(): "MyTestThread"}, info.threads)
+
+        # stop the interval and collect the data.
+        self.native_source.stopInterval()
+        data = self.native_source.finishInterval()
+        print(data)
 
 if __name__ == '__main__':
     unittest.main()
