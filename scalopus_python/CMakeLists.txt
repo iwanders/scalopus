@@ -13,6 +13,7 @@ pybind11_add_module(scalopus_python_lib
   lib/scalopus_general.cpp
   lib/scalopus_tracing.cpp
   lib/scalopus_catapult.cpp
+  lib/json_util.cpp
   )
 target_link_libraries(scalopus_python_lib
   PRIVATE
