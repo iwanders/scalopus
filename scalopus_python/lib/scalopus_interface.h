@@ -55,7 +55,6 @@ Data pyToData(const py::object& obj);
  */
 py::object dataToPy(const Data& data);
 
-
 class PyEndpoint : public Endpoint
 {
 public:

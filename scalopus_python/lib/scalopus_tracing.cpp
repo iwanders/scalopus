@@ -52,12 +52,14 @@ void add_scalopus_tracing(py::module& m)
   endpoint_trace_mapping.def(py::init<>());
   endpoint_trace_mapping.def("mapping", &EndpointTraceMapping::mapping);
   endpoint_trace_mapping.def("factory", &EndpointTraceMapping::factory);
-  endpoint_trace_mapping.def_property_readonly_static("name", [](py::object /* self */) { return EndpointTraceMapping::name; });
+  endpoint_trace_mapping.def_property_readonly_static("name",
+                                                      [](py::object /* self */) { return EndpointTraceMapping::name; });
 
   py::module native = tracing.def_submodule("native", "The native specific components.");
   py::class_<EndpointNativeTraceSender, EndpointNativeTraceSender::Ptr, Endpoint> endpoint_native_trace_sender(
       native, "EndpointNativeTraceSender");
-  endpoint_native_trace_sender.def_property_readonly_static("name", [](py::object /* self */) { return EndpointNativeTraceSender::name; });
+  endpoint_native_trace_sender.def_property_readonly_static(
+      "name", [](py::object /* self */) { return EndpointNativeTraceSender::name; });
   endpoint_native_trace_sender.def(py::init<>());
 
   tracing.def("setTraceName", [](const unsigned int id, const std::string& name) {
@@ -86,7 +88,5 @@ void add_scalopus_tracing(py::module& m)
   native_trace_provider.def("makeSource", &NativeTraceProvider::makeSource);
   native_trace_provider.def("receiveEndpoint", &NativeTraceProvider::receiveEndpoint);
   native_trace_provider.def("factory", &NativeTraceProvider::factory);
-
-  
 }
 }  // namespace scalopus

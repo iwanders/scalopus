@@ -37,14 +37,13 @@ namespace scalopus
 {
 namespace py = pybind11;
 
-
 bool pyToData(const py::object& obj, Data& outgoing)
 {
   // to string, and then from string to bytes.
   if (py::isinstance<py::str>(obj))
   {
     std::string my_result = obj.cast<std::string>();
-    outgoing = Data{my_result.begin(), my_result.end()};
+    outgoing = Data{ my_result.begin(), my_result.end() };
     return true;
   }
   // also try buffer, which is bytearray and bytes.
@@ -74,7 +73,7 @@ Data pyToData(const py::object& obj)
 
 py::object dataToPy(const Data& data)
 {
-  return py::bytes{std::string{data.begin(), data.end()}};
+  return py::bytes{ std::string{ data.begin(), data.end() } };
 }
 
 std::string PyEndpoint::getName() const
@@ -90,7 +89,7 @@ bool PyEndpoint::handle(Transport& transport, const Data& incoming, Data& outgoi
     if (overload)
     {
       // from data to string and then to bytes.
-      py::bytes my_bytes{std::string{incoming.begin(), incoming.end()}};
+      py::bytes my_bytes{ std::string{ incoming.begin(), incoming.end() } };
       auto obj = overload(transport, my_bytes);
       return pyToData(obj, outgoing);
     }
@@ -164,8 +163,7 @@ void add_scalopus_interface(py::module& m)
   trace_event_source.def("stopInterval", &TraceEventSource::stopInterval);
   trace_event_source.def("work", &TraceEventSource::work);
   //  trace_event_source.def("finishInterval", &TraceEventSource::finishInterval);
-  trace_event_source.def("finishInterval", [](TraceEventSource& source)
-  {
+  trace_event_source.def("finishInterval", [](TraceEventSource& source) {
     auto res = source.finishInterval();
     std::vector<std::string> python_res;
     for (const auto events : res)
