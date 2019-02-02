@@ -27,8 +27,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import lib
+from .lib import general
 
-EndpointIntrospect = lib.general.EndpointIntrospect
-EndpointProcessInfo = lib.general.EndpointProcessInfo
-setThreadName = lib.general.setThreadName
+EndpointIntrospect = general.EndpointIntrospect
+EndpointProcessInfo = general.EndpointProcessInfo
+setThreadName = general.setThreadName

@@ -26,7 +26,11 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+try:
+    import scalopus_python_lib as lib
+    from scalopus_python_lib import transport, tracing, general
+except ImportError as e:
+    print("{}: Was the shared object in your PYTHONPATH variable?".format(str(e)))
+    raise e
 
-from .lib import transport
-TransportLoopbackFactory = transport.TransportLoopbackFactory
-TransportUnixFactory = transport.TransportUnixFactory
+Endpoint = lib.Endpoint

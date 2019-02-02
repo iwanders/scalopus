@@ -27,23 +27,22 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import lib
+from .lib import tracing
 import random
 from functools import wraps
 
 
 # Make some shorthands for convenience.
-haveLttng = lib.tracing.haveLttng
-setTraceName = lib.tracing.setTraceName
-EndpointTraceMapping = lib.tracing.EndpointTraceMapping
-EndpointNativeTraceSender = lib.tracing.native.EndpointNativeTraceSender
+setTraceName = tracing.setTraceName
+EndpointTraceMapping = tracing.EndpointTraceMapping
+EndpointNativeTraceSender = tracing.native.EndpointNativeTraceSender
 
 # Also for the tracing providers.
-native = lib.tracing.native
-lttng = None
-if haveLttng():
-    lttng = lib.tracing.lttng
-
+native = tracing.native
+try:
+    lttng = tracing.lttng
+except ImportError as e:
+    have_lttng = False
 
 # Using this name here should allow swapping out the backend.
 tracing_backend = native
