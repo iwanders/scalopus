@@ -28,10 +28,12 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "json_util.h"
-#include <set>
-namespace scalopus
+#include <iostream>
+
+namespace pybind11_nlohmann_conversion
 {
 using json = nlohmann::json;
+namespace py = pybind11;
 
 py::object jsonToPy(const json& data)
 {
@@ -51,6 +53,8 @@ py::object jsonToPy(const json& data)
   // is_number_integer: int
   // is_number_float: double
   // is_string: string
+
+  //  std::cout << "jsonToPy: " << data.dump() << std::endl;
 
   if (data.is_null())
   {
@@ -119,14 +123,17 @@ json pyToJson(const py::object& data)
 
   // missing iterable
 
+  //  std::cout << "pyToJson: " << std::endl;
+  //  py::print(data);
+
   if (py::isinstance<py::str>(data))
   {
-    return json{data.cast<std::string>()};
+    return data.cast<std::string>();
   }
 
   if (py::isinstance<py::bytes>(data))
   {
-    return json{data.cast<std::vector<std::uint8_t>>()};
+    return data.cast<std::vector<std::uint8_t>>();
   }
 
   if (py::isinstance<py::none>(data))
@@ -136,17 +143,17 @@ json pyToJson(const py::object& data)
 
   if (py::isinstance<py::bool_>(data))
   {
-    return json{data.cast<bool>()};
+    return data.cast<bool>();
   }
 
   if (py::isinstance<py::int_>(data))
   {
-    return json{data.cast<std::int64_t>()};
+    return data.cast<std::int64_t>();
   }
 
   if (py::isinstance<py::float_>(data))
   {
-    return json{data.cast<double>()};
+    return data.cast<double>();
   }
   // missing weakref
   // missing slice
@@ -155,32 +162,34 @@ json pyToJson(const py::object& data)
   // tuple is handled like a sequence.
   if (py::isinstance<py::sequence>(data))
   {
-    std::vector<json> json_seq;
+    json json_seq;
     for (const auto& v : data.cast<py::sequence>())
     {
       json_seq.push_back(pyToJson(v.cast<py::object>()));
     }
-    return json{json_seq};
+    return json_seq;
   }
 
   if (py::isinstance<py::dict>(data))
   {
     py::dict our_dict = data.cast<py::dict>();
-    // use an intermediate <json, json> map, because assigning like json[json] = json is ambigious overload.
-    std::map<json, json> json_json_map;
     json our_json_map;
     for (const auto& k_v : our_dict)
     {
-      json_json_map[pyToJson(k_v.first.cast<py::object>())] = pyToJson(k_v.second.cast<py::object>());
+      if (!py::isinstance<py::str>(k_v.first))
+      {
+        // Keys in json MUST be string :( 
+        throw py::type_error("Keys of dictionaries must be for json conversion.");
+      }
+      our_json_map[k_v.first.cast<py::str>()] = pyToJson(k_v.second.cast<py::object>());
     }
-    our_json_map = json_json_map;
     return our_json_map;
   }
 
   // missing list: sequence should handle it.
   // missing args
   // missing kwargs
-  
+
   if (py::isinstance<py::set>(data))
   {
     std::set<json> json_set;
@@ -188,7 +197,7 @@ json pyToJson(const py::object& data)
     {
       json_set.insert(pyToJson(v.cast<py::object>()));
     }
-    return json{json_set};
+    return json_set;
   }
   // missing function
   // missing buffer
@@ -198,19 +207,19 @@ json pyToJson(const py::object& data)
   return json{};
 }
 
-}  // namespace scalopus
-
-namespace pybind11
+void add_pybind11_nlohmann_tests(py::module& m)
 {
-
-void from_json(const nlohmann::json& data, object& python_value)
-{
-  python_value = scalopus::jsonToPy(data);
+  py::module test_module = m.def_submodule("pybind11_nlohmann_test", "The tests for pybind11 nlohmann conversion.");
+  test_module.def("echo", [](const py::object& object)
+  {
+    json json_object = object;
+    return json_object.get<py::object>();
+  });
+  test_module.def("json_str", [](const py::object& object)
+  {
+    json json_object = object;
+    return json_object.dump();
+  });
 }
-void to_json(const object& data, nlohmann::json& json_value)
-{
-  json_value = scalopus::pyToJson(data);
-}
 
-//  void to_json(const object& data, nlohmann::json& json_value);
-}  // namespace pybind11
+}  // namespace pybind11_nlohmann_conversion

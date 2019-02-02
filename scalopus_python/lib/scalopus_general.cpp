@@ -64,20 +64,6 @@ void add_scalopus_general(py::module& m)
   py::class_<EndpointManagerPoll, EndpointManagerPoll::Ptr, EndpointManager> endpoint_manager_poll(
       general, "EndpointManagerPoll");
   endpoint_manager_poll.def(py::init<TransportFactory::Ptr>());
-  endpoint_manager_poll.def("endpoints", &EndpointManagerPoll::endpoints);
-
-  // @TODO(iwanders): Test this method.
-  endpoint_manager_poll.def("addEndpointFactory", [](EndpointManagerPoll& manager, std::string name, py::object fun) {
-    manager.addEndpointFactory(name, [fun](const Transport::Ptr& transport) {
-      py::object result_py = fun(transport);
-      Endpoint::Ptr endpoint = result_py.cast<Endpoint::Ptr>();
-      if (endpoint == nullptr)
-      {
-        throw py::value_error("Could not cast returned object to Endpoint.");
-      }
-      return endpoint;
-    });
-  });
   endpoint_manager_poll.def("startPolling", &EndpointManagerPoll::startPolling);
   endpoint_manager_poll.def("stopPolling", &EndpointManagerPoll::stopPolling);
   endpoint_manager_poll.def("manage", &EndpointManagerPoll::manage);

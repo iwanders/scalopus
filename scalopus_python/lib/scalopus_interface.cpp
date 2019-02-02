@@ -166,7 +166,17 @@ void add_scalopus_interface(py::module& m)
 
   py::class_<EndpointManager, EndpointManager::Ptr> endpoint_manager(m, "EndpointManager");
   endpoint_manager.def("endpoints", &EndpointManager::endpoints);
-  //  endpoint_manager.def("addEndpointFactory", &EndpointManager::addEndpointFactory);
+  endpoint_manager.def("addEndpointFactory", [](EndpointManager& manager, std::string name, py::object fun) {
+    manager.addEndpointFactory(name, [fun](const Transport::Ptr& transport) {
+      py::object result_py = fun(transport);
+      Endpoint::Ptr endpoint = result_py.cast<Endpoint::Ptr>();
+      if (endpoint == nullptr)
+      {
+        throw py::value_error("Could not cast returned object to Endpoint.");
+      }
+      return endpoint;
+    });
+  });
 
   py::class_<TransportFactory, TransportFactory::Ptr> transport_factory(m, "TransportFactory");
   transport_factory.def("discover", &TransportFactory::discover);

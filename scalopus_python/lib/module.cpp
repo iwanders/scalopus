@@ -29,6 +29,7 @@
 */
 #include <pybind11/pybind11.h>
 
+#include "json_util.h"
 #include "scalopus_catapult.h"
 #include "scalopus_general.h"
 #include "scalopus_interface.h"
@@ -43,4 +44,5 @@ PYBIND11_MODULE(scalopus_python_lib, m)
   add_scalopus_general(m);
   add_scalopus_tracing(m);
   add_scalopus_catapult(m);
+  pybind11_nlohmann_conversion::add_pybind11_nlohmann_tests(m);
 }

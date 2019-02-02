@@ -29,30 +29,51 @@
 */
 #pragma once
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <nlohmann/json.hpp>
-#include <iostream>
 
-namespace scalopus
+/**
+ * @brief Namespace to hold the real worker functions.
+ */
+namespace pybind11_nlohmann_conversion
 {
-namespace py = pybind11;
-using json = nlohmann::json;
 /**
  * @brief Convert a json variable into a python object.
  */
-py::object jsonToPy(const nlohmann::json& data);
+pybind11::object jsonToPy(const nlohmann::json& data);
 
 /**
  * @brief Convert a python object into a json variable.
  */
-json pyToJson(const py::object& data);
-}  // namespace scalopus
+nlohmann::json pyToJson(const pybind11::object& data);
 
+/**
+ * @brief Function to add some test methods to a Python module.
+ */
+void add_pybind11_nlohmann_tests(pybind11::module&);
+}  // namespace pybind11_nlohmann_conversion
+
+// Bindings for the json library, this prevents recursion you get when using to_json and from_json.
+namespace nlohmann
+{
+template <>
+struct adl_serializer<pybind11::object>
+{
+  static void to_json(json& j, const pybind11::object& opt)
+  {
+    j = pybind11_nlohmann_conversion::pyToJson(opt);
+  }
+
+  static void from_json(const json& j, pybind11::object& opt)
+  {
+    opt = pybind11_nlohmann_conversion::jsonToPy(j);
+  }
+};
+}  // namespace nlohmann
+
+// Bindings for pybind, this allows implicit conversion to and from nlohmann::json.
 namespace pybind11
 {
-void from_json(const nlohmann::json& data, object& python_value);
-void to_json(const object& data, nlohmann::json& json_value);
-
-// Bindings for the pybind11.
 namespace detail
 {
 template <>
@@ -62,25 +83,28 @@ public:
   PYBIND11_TYPE_CASTER(nlohmann::json, _("json"));
 
   /**
-   * Conversion part 1 (Python->C++):
+   * @brief Conversion from pybind11 types to nlohmann:json type.
    */
   bool load(handle src, bool)
   {
     // Cast it to an object, which works for data containers.
     if (!isinstance<object>(src))
-        return false;
+    {
+      return false;
+    }
     object s = reinterpret_borrow<object>(src);
-    // Then, value is a member attribute from the PYBIND11_TYPE_CASTER, we write into that the ooutput of pyToJson
-    value = scalopus::pyToJson(s);
+    // Then, value is a member attribute from the PYBIND11_TYPE_CASTER, we write into that the output of pyToJson
+    value = s;  // Use json library for conversion.
     return true;
   }
 
   /**
-   * Conversion part 2 (C++ -> Python)
+   * @brief Conversion from nlohmann::json to pybind11 object type.
    */
   static handle cast(nlohmann::json src, return_value_policy /* policy */, handle /* parent */)
   {
-    object thing = scalopus::jsonToPy(src);
+    object thing;
+    src.get_to(thing);  // use json library for conversion.
     return thing.release();
   }
 };
