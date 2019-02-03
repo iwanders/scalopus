@@ -32,6 +32,11 @@ import time
 import os
 import unittest
 import threading
+try:
+    from thread import get_ident as thread_ident
+except ImportError:
+    from threading import get_ident as thread_ident
+
 import weakref
 
 class TracingTester(unittest.TestCase):
@@ -92,7 +97,7 @@ class TracingTester(unittest.TestCase):
         client.addEndpoint(processinfo_client)
         info = processinfo_client.processInfo()
         self.assertEqual(info.name, "MyPythonProcess")
-        self.assertDictEqual({threading.get_ident(): "MyTestThread"}, info.threads)
+        self.assertDictEqual({thread_ident(): "MyTestThread"}, info.threads)
 
         # stop the interval and collect the data.
         self.native_source.stopInterval()
@@ -101,7 +106,7 @@ class TracingTester(unittest.TestCase):
         self.assertEqual(len(data), 6)
         previous_time = None
         for i, entry in enumerate(data):
-            self.assertEqual(entry["tid"], threading.get_ident())
+            self.assertEqual(entry["tid"], thread_ident())
             self.assertEqual(entry["pid"], pid)
             self.assertEqual(entry["cat"], "PERF")
             # every even entry should be openening.

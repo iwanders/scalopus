@@ -11,7 +11,7 @@ used preferably, minimal knowledge or interaction with LTTng is necessary to use
 _experimental_ way is also provided to test scope tracing without having to install LTTng.
 
 The trace viewer used is available in all recent Chrome and Chromium browsers and can be opened by typing 
-[chrome://inspect?tracing][chrome_tracing] in the address bar. This is normally used to display traces from Android
+[`chrome://inspect?tracing`][chrome_tracing] in the address bar. This is normally used to display traces from Android
 or from within the browser itself. However, the trace viewer can also load traces from a remote target using the
 [Devtools Protocol][devtools_protocol]'s tracing domain. The specification for the trace events of that domain can be
 found in the [Trace Event Format][trace_event_format] documentation. Major benefit of using this interface is that
@@ -66,7 +66,7 @@ the traces from lttng the `babeltrace` package is required:
 apt-get install liblttng-ust-dev babeltrace
 ```
 
-The Python bindings, are built if Pybind11 is found. By default the Python3 bindings are built if Python3 is present. This requires the `distutils` and `setuptools` modules to be present and `libpython3-dev` package must be installed to provide the necessary header files. The Python 2 bindings require `libpython-dev` to be installed.
+The Python bindings are built if Pybind11 is found. By default the Python3 bindings are built if Python3 is present. This requires the `distutils` and `setuptools` modules to be present and `libpython3-dev` package must be installed to provide the necessary header files. The Python 2 bindings require `libpython-dev` to be installed.
 
 ```bash
 apt-get install python3-distutils python3-setuptools libpython3-dev libpython-dev

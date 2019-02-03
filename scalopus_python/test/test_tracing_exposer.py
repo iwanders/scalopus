@@ -35,6 +35,11 @@ import time
 import os
 import unittest
 import threading
+try:
+    from thread import get_ident as thread_ident
+except ImportError:
+    from threading import get_ident as thread_ident
+
 
 # This is the same as test_tracing, except that it uses the exposer.
 class TracingTesterWithExposer(unittest.TestCase):
@@ -72,7 +77,7 @@ class TracingTesterWithExposer(unittest.TestCase):
         client.addEndpoint(processinfo_client)
         info = processinfo_client.processInfo()
         self.assertEqual(info.name, "MyPythonProcess")
-        self.assertDictEqual({threading.get_ident(): "MyTestThread"}, info.threads)
+        self.assertDictEqual({thread_ident(): "MyTestThread"}, info.threads)
 
 if __name__ == '__main__':
     unittest.main()
