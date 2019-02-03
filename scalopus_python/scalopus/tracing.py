@@ -41,8 +41,9 @@ NativeTraceProvider = tracing.native.NativeTraceProvider
 # Also for the tracing providers.
 native = tracing.native
 try:
+    have_lttng = True
     lttng = tracing.lttng
-except ImportError as e:
+except AttributeError as e:
     have_lttng = False
 
 # Using this name here should allow swapping out the backend.
