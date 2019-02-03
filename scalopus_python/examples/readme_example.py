@@ -64,6 +64,9 @@ if __name__ == "__main__":
     scalopus.general.setThreadName("main")
 
     while True:
-        with tracing.trace_sections.quux:
+        with tracing.trace_section.my_relevant_scope:
+            time.sleep(0.1)
+            a()
+        with tracing.trace_section("My Section"):
             time.sleep(0.1)
             a()

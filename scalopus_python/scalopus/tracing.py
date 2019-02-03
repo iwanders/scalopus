@@ -72,6 +72,9 @@ class TraceContextHelper(object):
         setattr(self, name, ctx)
         return ctx
 
+    def __call__(self, name):
+        return self.__getattr__(name)
+
 
 class TraceContext(object):
     def __init__(self, name, trace_id=None):
@@ -91,7 +94,7 @@ class TraceContext(object):
     def __exit__(self, context_type, context_value, context_traceback):
         tracing_backend.scope_exit(self.trace_id)
 
-trace_sections = TraceContextHelper()
+trace_section = TraceContextHelper()
 
 def trace_function(f):
     tracer = TraceContext(f.__name__)
