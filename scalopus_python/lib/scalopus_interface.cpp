@@ -136,7 +136,7 @@ void add_scalopus_interface(py::module& m)
   pending_response.def("wait_for", &PendingResponse::wait_for);
 
   py::class_<Transport, Transport::Ptr> transport_interface(m, "Transport");
-  transport_interface.def("addEndpoint", &Transport::addEndpoint);
+  transport_interface.def("addEndpoint", &Transport::addEndpoint, py::keep_alive<1, 2>());
   transport_interface.def("isConnected", &Transport::isConnected);
   transport_interface.def("broadcast", &Transport::broadcast);
   transport_interface.def("request", [](Transport& transport, const std::string& name, const py::object& outgoing) {
@@ -153,7 +153,7 @@ void add_scalopus_interface(py::module& m)
   py_endpoint.def("getName", &Endpoint::getName);
   py_endpoint.def("handle", &Endpoint::handle);
   py_endpoint.def("unsolicited", &Endpoint::unsolicited);
-  py_endpoint.def("getTransport", &Endpoint::getTransport);
+  py_endpoint.def("getTransport", &Endpoint::getTransport, py::return_value_policy::reference);
 
   py::class_<TraceEventProvider, TraceEventProvider::Ptr> trace_event_provider(m, "TraceEventProvider");
   trace_event_provider.def("makeSource", &TraceEventProvider::makeSource);
@@ -165,10 +165,15 @@ void add_scalopus_interface(py::module& m)
   trace_event_source.def("finishInterval", &TraceEventSource::finishInterval);  // implicit conversion from json =)
 
   py::class_<EndpointManager, EndpointManager::Ptr> endpoint_manager(m, "EndpointManager");
-  endpoint_manager.def("endpoints", &EndpointManager::endpoints);
+  endpoint_manager.def("endpoints", &EndpointManager::endpoints, py::return_value_policy::copy);
   endpoint_manager.def("addEndpointFactory", [](EndpointManager& manager, std::string name, py::object fun) {
     manager.addEndpointFactory(name, [fun](const Transport::Ptr& transport) {
       py::object result_py = fun(transport);
+      if (py::isinstance<py::none>(result_py))
+      {
+        // python side returned none... provider went weak.
+        return Endpoint::Ptr{};
+      }
       Endpoint::Ptr endpoint = result_py.cast<Endpoint::Ptr>();
       if (endpoint == nullptr)
       {
@@ -181,7 +186,7 @@ void add_scalopus_interface(py::module& m)
   py::class_<TransportFactory, TransportFactory::Ptr> transport_factory(m, "TransportFactory");
   transport_factory.def("discover", &TransportFactory::discover);
   transport_factory.def("serve", &TransportFactory::serve);
-  transport_factory.def("connect", &TransportFactory::connect);
+  transport_factory.def("connect", &TransportFactory::connect, py::return_value_policy::copy);
 }
 
 }  // namespace scalopus

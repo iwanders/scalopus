@@ -178,7 +178,7 @@ json pyToJson(const py::object& data)
     {
       if (!py::isinstance<py::str>(k_v.first))
       {
-        // Keys in json MUST be string :( 
+        // Keys in json MUST be string :(
         throw py::type_error("Keys of dictionaries must be for json conversion.");
       }
       our_json_map[k_v.first.cast<py::str>()] = pyToJson(k_v.second.cast<py::object>());
@@ -210,13 +210,11 @@ json pyToJson(const py::object& data)
 void add_pybind11_nlohmann_tests(py::module& m)
 {
   py::module test_module = m.def_submodule("pybind11_nlohmann_test", "The tests for pybind11 nlohmann conversion.");
-  test_module.def("echo", [](const py::object& object)
-  {
+  test_module.def("echo", [](const py::object& object) {
     json json_object = object;
     return json_object.get<py::object>();
   });
-  test_module.def("json_str", [](const py::object& object)
-  {
+  test_module.def("json_str", [](const py::object& object) {
     json json_object = object;
     return json_object.dump();
   });

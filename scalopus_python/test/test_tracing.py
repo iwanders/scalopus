@@ -27,20 +27,30 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-import sys
-print("Running tests with Python: {}".format(sys.version))
-
 import scalopus
 import time
 import os
 import unittest
 import threading
+import weakref
 
+def weakproviderfactory(provider):
+    weak_provider = weakref.ref(provider)
+    def factory(transport):
+        strong_provider = weak_provider()
+        if (strong_provider):
+            return strong_provider.factory(transport)
+        else:
+            return None
+    return factory
 
 class TracingTester(unittest.TestCase):
-    def __init__(self, *args):
-        unittest.TestCase.__init__(self, *args)
+    @staticmethod
+    def pollManagerLog(value):
+        print(value)
+
+    def setUp(self):
+        # print(self.factory)
         self.factory = scalopus.transport.TransportLoopbackFactory()
 
         # set up the producer side
@@ -55,12 +65,13 @@ class TracingTester(unittest.TestCase):
         # set up the consumer side.
         self.poller = scalopus.general.EndpointManagerPoll(self.factory)
         self.native_provider = scalopus.tracing.native.NativeTraceProvider(self.poller)
-        self.poller.addEndpointFactory(scalopus.tracing.EndpointNativeTraceSender.name, self.native_provider.factory)
+        self.poller.addEndpointFactory(scalopus.tracing.EndpointNativeTraceSender.name, weakproviderfactory(self.native_provider))
         self.poller.addEndpointFactory(scalopus.tracing.EndpointTraceMapping.name, scalopus.tracing.EndpointTraceMapping.factory)
         self.poller.addEndpointFactory(scalopus.general.EndpointProcessInfo.name, scalopus.general.EndpointProcessInfo.factory)
         self.poller.manage()  # do one round of discovery
         self.native_source = self.native_provider.makeSource()
         self.native_source.startInterval() # start the recording interval on the native source.
+        time.sleep(1.0)
 
     def test_tracing(self):
         trace_point = scalopus.tracing.TraceContext("MyTraceContext", trace_id=1337)
@@ -69,6 +80,8 @@ class TracingTester(unittest.TestCase):
             with trace_point:
                 time.sleep(0.1)
             time.sleep(0.1)
+
+        time.sleep(1.0)
 
         # add an extra manual mapping.
         scalopus.tracing.setTraceName(10, "Ten")
@@ -98,6 +111,22 @@ class TracingTester(unittest.TestCase):
         self.native_source.stopInterval()
         data = self.native_source.finishInterval()
         print(data)
+        self.assertEqual(len(data), 6)
+        previous_time = None
+        for i, entry in enumerate(data):
+            self.assertEqual(entry["tid"], threading.get_ident())
+            self.assertEqual(entry["pid"], pid)
+            self.assertEqual(entry["cat"], "PERF")
+            # every even entry should be openening.
+            self.assertEqual(entry["ph"], "B" if (i % 2 == 0) else "E")
+            if (previous_time is None):
+                previous_time = entry["ts"]
+            else:
+                # should be 100 ms apart, approximately.
+                buffer = 0.25
+                self.assertGreater(entry["ts"], previous_time + 0.1 * (1.0 - buffer) *1e6)
+                self.assertLess(entry["ts"], previous_time + 0.1 * (1.0 + buffer) *1e6)
+                previous_time = entry["ts"]
 
 if __name__ == '__main__':
     unittest.main()

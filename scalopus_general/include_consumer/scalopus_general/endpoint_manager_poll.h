@@ -88,7 +88,7 @@ public:
   /**
    * @brief Assign the logger function.
    */
-  void setLogger(LoggingFunction&& logger);
+  void setLogger(LoggingFunction logger);
 
 private:
   mutable std::mutex mutex_;

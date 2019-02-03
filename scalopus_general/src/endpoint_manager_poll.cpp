@@ -96,9 +96,16 @@ void EndpointManagerPoll::manage()
       {
         // we support this endpoint, construct it and add it to the list.
         auto new_endpoint = endpoint_factories_[supported_endpoint](transport);
-        transport_endpoints_[transport][supported_endpoint] = new_endpoint;
-        // Also register the new endpoint with the transport in case it needs to listen to broadcast messages.
-        transport->addEndpoint(new_endpoint);
+        if (new_endpoint != nullptr)
+        {
+          transport_endpoints_[transport][supported_endpoint] = new_endpoint;
+          // Also register the new endpoint with the transport in case it needs to listen to broadcast messages.
+          transport->addEndpoint(new_endpoint);
+        }
+        else
+        {
+          log("[scalopus] Factory for " + std::string{ supported_endpoint } + " returned nullptr");
+        }
       }
       else
       {
@@ -152,9 +159,9 @@ void EndpointManagerPoll::log(const std::string& msg)
     logger_(msg);
   }
 }
-void EndpointManagerPoll::setLogger(LoggingFunction&& logger)
+void EndpointManagerPoll::setLogger(LoggingFunction logger)
 {
-  logger_ = std::move(logger);
+  logger_ = logger;
 }
 
 }  // namespace scalopus

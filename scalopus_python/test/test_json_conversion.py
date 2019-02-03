@@ -40,8 +40,6 @@ except AttributeError as e:
     sys.exit(0)
 
 class JsonConversionTester(unittest.TestCase):
-    def __init__(self, *args):
-        unittest.TestCase.__init__(self, *args)
 
     def printEntries(self, result, input):
         print("---")

@@ -38,8 +38,7 @@ import threading
 
 # This is the same as test_tracing, except that it uses the exposer.
 class TracingTesterWithExposer(unittest.TestCase):
-    def __init__(self, *args):
-        unittest.TestCase.__init__(self, *args)
+    def setUp(self):
         self.factory = scalopus.transport.TransportLoopbackFactory()
         self.exposer = scalopus.common.DefaultExposer("MyPythonProcess", self.factory)
 
