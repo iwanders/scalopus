@@ -30,7 +30,7 @@
 
 /**
  * This example can create random callstacks at arbritrary rate and number of threads.
- * ./scalopus_examples/example_scope_tracepoints_random [time_base (usec) [thread_count]]
+ * ./scalopus_examples/random_callstacks_native [time_base (usec) [thread_count]]
  * Start with a time base of 10000, that's the default and puts each scope transition at least 10 ms apart.
  * Default thread count is 1.
  *
@@ -68,14 +68,14 @@ void random_callstack(unsigned int level, size_t time_base)
     std::this_thread::sleep_for(std::chrono::microseconds(1 * time_base));
 
     // Random chance to go deeper (2/3)
-    if (randint(0, 2) && (level <= 10))
+    if (randint(0, 2) && (level <= 9))
     {
       random_callstack(level + 1, time_base);
     }
   }
 
   // 1/3 chance of growing again.
-  if ((randint(0, 2) == 0) && (level <= 10))
+  if ((randint(0, 2) == 0) && (level <= 9))
   {
     random_callstack(level, time_base);
   }
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
   TRACE_THREAD_NAME("main");
 
   // Set some artificial names for the scopes.
-  for (size_t i = 0; i < 10; i++)
+  for (size_t i = 0; i < 11; i++)
   {
     std::stringstream scope_name;
     scope_name << "level 0x" << std::hex << i;
