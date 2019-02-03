@@ -48,6 +48,7 @@ file(COPY test DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Copy the python examples
 file(COPY examples DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY native_libs.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Write the setup file.
 configure_file(

@@ -27,10 +27,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 try:
-    import scalopus_python_lib as lib
-    from scalopus_python_lib import transport, tracing, general
+    from . import scalopus_python_lib as lib
 except ImportError as e:
     print("{}: Was the shared object in your PYTHONPATH variable?".format(str(e)))
     raise e
 
 Endpoint = lib.Endpoint
+tracing = lib.tracing
+general = lib.general
+transport = lib.transport
