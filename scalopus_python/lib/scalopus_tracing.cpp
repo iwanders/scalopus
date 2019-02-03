@@ -41,12 +41,20 @@
 
 #include <scalopus_tracing/native_trace_provider.h>
 
+static std::size_t uniqueTraceId()
+{
+  static std::atomic_size_t counter{ 0 };
+  return counter++;
+}
+
 namespace scalopus
 {
 namespace py = pybind11;
 void add_scalopus_tracing(py::module& m)
 {
   py::module tracing = m.def_submodule("tracing", "The tracing specific components.");
+  tracing.def("uniqueTraceId", &uniqueTraceId);
+
   py::class_<EndpointTraceMapping, EndpointTraceMapping::Ptr, Endpoint> endpoint_trace_mapping(tracing,
                                                                                                "EndpointTraceMapping");
   endpoint_trace_mapping.def(py::init<>());

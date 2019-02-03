@@ -37,6 +37,7 @@ setTraceName = tracing.setTraceName
 EndpointTraceMapping = tracing.EndpointTraceMapping
 EndpointNativeTraceSender = tracing.native.EndpointNativeTraceSender
 NativeTraceProvider = tracing.native.NativeTraceProvider
+uniqueTraceId = tracing.uniqueTraceId
 
 # Also for the tracing providers.
 native = tracing.native
@@ -53,16 +54,6 @@ def setBackend(new_backend):
     global tracing_backend
     tracing_backend = new_backend 
 
-
-trace_id_cur = 0
-
-def new_trace_id():
-    global trace_id_cur
-    result = trace_id_cur
-    trace_id_cur += 1
-    return result
-
-
 class TraceContextHelper(object):
     def __init__(self, prefix=''):
         self.prefix = prefix
@@ -78,7 +69,7 @@ class TraceContextHelper(object):
 
 class TraceContext(object):
     def __init__(self, name, trace_id=None):
-        self.trace_id = trace_id if trace_id is not None else new_trace_id()
+        self.trace_id = trace_id if trace_id is not None else uniqueTraceId()
         self.name = name
         setTraceName(self.trace_id, self.name)
 
