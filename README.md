@@ -73,6 +73,11 @@ The Python bindings are built if Pybind11 is found. By default the Python3 bindi
 apt-get install python3-distutils python3-setuptools libpython3-dev libpython-dev
 ```
 
+By default deflate support is enabled in Seasocks, this requires `zlib1g-dev`:
+```bash
+apt-get install zlib1g-dev
+```
+
 Then, building should be as simple as:
 ```bash
 # Clone repo, recursively to ensure git submodules are cloned as well.
@@ -81,8 +86,11 @@ git clone --recurse-submodules https://github.com/iwanders/scalopus
 mkdir build; cd build
 cmake ../scalopus/
 make -j8
-# run tests with:
+# run tests, this also runs the Python bindings' tests:
 ctest .
+# to install the Python bindings:
+cd scalopus_python
+python3 setup.py install # or python2 setup.py install, depending on which one was built.
 ```
 
 ## Quickstart

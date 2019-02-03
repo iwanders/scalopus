@@ -33,17 +33,20 @@ import unittest
 class MyEndpoint(scalopus.interface.Endpoint):
     def __init__(self):
         scalopus.interface.Endpoint.__init__(self)
-        self.reset()
+        self.clear_incoming()
 
-    def reset(self):
+    def clear_incoming(self):
         self.incoming = None
 
     def handle(self, transport, incoming):
         print("MyEndpoint::handle: {}".format(repr(incoming)))
         self.incoming = incoming
+        # return string, bytearray or list of integers containing the response
+        # to be sent. If no response is to be sent, return None.
         return incoming
 
     def getName(self):
+        # This function MUST be implemented.
         return "MyEndpointName"
 
     def query_remote(self, request_data, wait_for=0.2):
@@ -81,25 +84,25 @@ class PythonEndpoint(unittest.TestCase):
         self.assertEqual(remote_endpoints, ["MyEndpointName", "introspect"])
 
         # Try to add the endpoint on the client side, and use the query method.
-        my_server_endpoint.reset()
+        my_server_endpoint.clear_incoming()
         result = my_client_endpoint.query_remote(bytearray([1,2,3]))
         self.assertEqual(bytearray([1,2,3]), result)
         self.assertEqual(bytearray([1,2,3]), my_server_endpoint.incoming)
 
         # check if we can handle nullbytes.
-        my_server_endpoint.reset()
+        my_server_endpoint.clear_incoming()
         result = my_client_endpoint.query_remote([0xFF, 0, 5])
         self.assertEqual(result, bytearray([0xFF, 0, 5]))
         self.assertEqual(bytearray([0xFF, 0, 5]), my_server_endpoint.incoming)
 
         # Also check strings
-        my_server_endpoint.reset()
+        my_server_endpoint.clear_incoming()
         result = my_client_endpoint.query_remote(b"foobar")
         self.assertEqual(result, b"foobar")
         self.assertEqual(b"foobar", my_server_endpoint.incoming)
 
         # Incorrect type must throw, not crash.
-        my_server_endpoint.reset()
+        my_server_endpoint.clear_incoming()
         def will_throw():
             result = my_client_endpoint.query_remote(3)
         self.assertRaises(ValueError, will_throw)
