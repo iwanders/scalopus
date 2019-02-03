@@ -4,7 +4,7 @@ The general package provides several generic endpoints or functions. Additionall
 used by other packages.
 - `EndpointIntrospect`: Allows querying which endpoints are available.
 - `EndpointProcessInfo`: Provides information about thread names and the process' name.
-- `EndpointManagerPoll`: In `scalopus_general_consumer`: A polling implementation of the `EndpointManager` as defined
+- `EndpointManagerPoll`: A polling implementation of the `EndpointManager` as defined
   in the interface package.
 - `GeneralProvider`: The `TraceEventProvider` that annotates the threads and gives the process the provided name.
 
@@ -18,7 +18,7 @@ The [EndpointProcessInfo](/scalopus_general/include/scalopus_general/endpoint_pr
 and thread names.
 
 Thread names are tracked by a singleton. The `TRACE_THREAD_NAME("name")` macro is provided in
-[scope_tracing.h](/scalopus_tracing/include/scalopus_general/thread_naming.h). It uses the same method from the tracked
+[scope_tracing.h](/scalopus_general/include/scalopus_general/thread_naming.h). It uses the same method from the tracked
 trace points to ensure the mapping is only stored once. The provided string does not need to be constant at compile
 time, so it can be used as follows:
 ```cpp
@@ -52,8 +52,9 @@ name as speicified, a map of its thread names and the process id.
 ## GeneralProvider and GeneralSource
 The [`GeneralProvider`](/scalopus_general/include_consumer/scalopus_general/general_provider.h)  and 
 [`GeneralSource`](/scalopus_general/include_consumer/scalopus_general/general_source.h) are the providers for the
-thread names and process names. They merely obtain the process information using `EndpointProcessInfo` and then create
-the appropriate trace event format events that contain the necessary metadata. 
+thread names and process names they are part of the `scalopus_general_consumer` target. They merely obtain the process
+information using `EndpointProcessInfo` and then create the appropriate trace event format events that contain the
+necessary metadata. 
 
 ## EndpointManagerPoll
 The [`EndpointManagerPoll`](/scalopus_general/include_consumer/scalopus_general/endpoint_manager_poll.h) class is part
