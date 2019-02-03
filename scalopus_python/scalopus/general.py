@@ -33,3 +33,20 @@ EndpointIntrospect = general.EndpointIntrospect
 EndpointProcessInfo = general.EndpointProcessInfo
 setThreadName = general.setThreadName
 EndpointManagerPoll = general.EndpointManagerPoll
+
+"""
+  If you have a provider that exposes a factory method to create the
+  appropriate endpoint, you may need to break the circular reference
+  this can be done by passing your provider instance into this
+  function to ensure we capture a weak reference to the provider in
+  the factory function.
+"""
+def WeakProviderEndpointFactory(provider):
+    weak_provider = weakref.ref(provider)
+    def factory(transport):
+        strong_provider = weak_provider()
+        if (strong_provider):
+            return strong_provider.factory(transport)
+        else:
+            return None
+    return factory

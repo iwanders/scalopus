@@ -49,7 +49,12 @@ void ScopeTracingProvider::updateMapping()
   EndpointTraceMapping::ProcessTraceMap mapping;
 
   // Get the current transports and their endpoints from the manager.
-  auto endpoints_by_transport = manager_->endpoints();
+  auto manager = manager_.lock();
+  if (manager == nullptr)
+  {
+    return;
+  }
+  auto endpoints_by_transport = manager->endpoints();
   for (const auto& transport_endpoints : endpoints_by_transport)
   {
     // Try to find the scope tracing endpoint from this transports' endpoints and obtain its data.

@@ -47,6 +47,7 @@ class EndpointManager
 {
 public:
   using Ptr = std::shared_ptr<EndpointManager>;
+  using WeakPtr = std::weak_ptr<EndpointManager>;
   using EndpointFactory = std::function<std::shared_ptr<Endpoint>(const std::shared_ptr<Transport>& transport)>;
   using EndpointMap = std::map<std::string, Endpoint::Ptr>;
   using TransportEndpoints = std::map<Transport::Ptr, EndpointMap>;
@@ -59,7 +60,8 @@ public:
   virtual TransportEndpoints endpoints() const = 0;
 
   /**
-   * @brief Add an endpoint factory function to the manager.
+   * @brief Add an endpoint factory function to the manager. If your function uses a provider, be sure to break the
+   *        circular reference either in your function by capturing a weak pointer or in your factory function.
    */
   virtual void addEndpointFactory(const std::string& name, EndpointFactory&& factory_function) = 0;
 
@@ -74,7 +76,7 @@ public:
 
   /**
    * @brief Helper function to add the factory function if it is constructed of any type that has a non static factory
-   *        function. This creates a weak pointer.
+   *        function. This creates a weak pointer to break the chain of pointers.
    */
   template <typename T>
   void addEndpointFactory(const std::string& name, const std::shared_ptr<T>& endpoint_provider)

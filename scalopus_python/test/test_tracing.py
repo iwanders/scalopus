@@ -34,16 +34,6 @@ import unittest
 import threading
 import weakref
 
-def weakproviderfactory(provider):
-    weak_provider = weakref.ref(provider)
-    def factory(transport):
-        strong_provider = weak_provider()
-        if (strong_provider):
-            return strong_provider.factory(transport)
-        else:
-            return None
-    return factory
-
 class TracingTester(unittest.TestCase):
     @staticmethod
     def pollManagerLog(value):
@@ -65,13 +55,12 @@ class TracingTester(unittest.TestCase):
         # set up the consumer side.
         self.poller = scalopus.general.EndpointManagerPoll(self.factory)
         self.native_provider = scalopus.tracing.native.NativeTraceProvider(self.poller)
-        self.poller.addEndpointFactory(scalopus.tracing.EndpointNativeTraceSender.name, weakproviderfactory(self.native_provider))
+        self.poller.addEndpointFactory(scalopus.tracing.EndpointNativeTraceSender.name, self.native_provider.factory)
         self.poller.addEndpointFactory(scalopus.tracing.EndpointTraceMapping.name, scalopus.tracing.EndpointTraceMapping.factory)
         self.poller.addEndpointFactory(scalopus.general.EndpointProcessInfo.name, scalopus.general.EndpointProcessInfo.factory)
         self.poller.manage()  # do one round of discovery
         self.native_source = self.native_provider.makeSource()
         self.native_source.startInterval() # start the recording interval on the native source.
-        time.sleep(1.0)
 
     def test_tracing(self):
         trace_point = scalopus.tracing.TraceContext("MyTraceContext", trace_id=1337)
@@ -80,8 +69,6 @@ class TracingTester(unittest.TestCase):
             with trace_point:
                 time.sleep(0.1)
             time.sleep(0.1)
-
-        time.sleep(1.0)
 
         # add an extra manual mapping.
         scalopus.tracing.setTraceName(10, "Ten")

@@ -70,7 +70,7 @@ public:
   static std::string getScopeName(const ProcessTraceMap& mapping, const unsigned int pid, const unsigned int trace_id);
 
 private:
-  EndpointManager::Ptr manager_;  //!< Manager for connections.
+  EndpointManager::WeakPtr manager_;  //!< Manager for connections.
 
   std::mutex mapping_mutex_;  //!< Mutex for the mapping.
   ProcessTraceMap mapping_;   //!< The currently known mappings.
