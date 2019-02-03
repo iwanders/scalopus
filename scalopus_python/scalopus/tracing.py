@@ -75,9 +75,9 @@ class TraceContextHelper(object):
 
 class TraceContext(object):
     def __init__(self, name, trace_id=None):
-        self.id = trace_id if trace_id is not None else new_trace_id()
+        self.trace_id = trace_id if trace_id is not None else new_trace_id()
         self.name = name
-        setTraceName(self.id, self.name)
+        setTraceName(self.trace_id, self.name)
 
     def enter(self):
         self.__enter__()
