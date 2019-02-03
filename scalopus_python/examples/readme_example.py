@@ -31,26 +31,28 @@ import sys
 import time
 
 import scalopus
+import scalopus.tracing as tracing
 
-@scalopus.tracing.trace_function
+
+@tracing.trace_function
 def fooBarBuz():
     time.sleep(0.2)
 
-@scalopus.tracing.trace_function
+@tracing.trace_function
 def c():
     time.sleep(0.2)
     print("  c")
     fooBarBuz()
     time.sleep(0.2)
 
-@scalopus.tracing.trace_function
+@tracing.trace_function
 def b():
     time.sleep(0.2)
     print(" b")
     c()
     time.sleep(0.2)
 
-@scalopus.tracing.trace_function
+@tracing.trace_function
 def a():
     print("a")
     time.sleep(0.2)
@@ -62,6 +64,6 @@ if __name__ == "__main__":
     scalopus.general.setThreadName("main")
 
     while True:
-        with scalopus.tracing.trace_sections.quux:
+        with tracing.trace_sections.quux:
             time.sleep(0.1)
             a()
