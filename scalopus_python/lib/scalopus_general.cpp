@@ -57,7 +57,7 @@ void add_scalopus_general(py::module& m)
   endpoint_process_info.def("processInfo", &EndpointProcessInfo::processInfo);
   endpoint_process_info.def_property_readonly_static("name",
                                                      [](py::object /* self */) { return EndpointProcessInfo::name; });
-  endpoint_process_info.def("factory", &EndpointProcessInfo::factory);
+  endpoint_process_info.def_static("factory", &EndpointProcessInfo::factory);
 
   general.def("setThreadName", [](const std::string& name) { ThreadNameTracker::getInstance().setCurrentName(name); });
 

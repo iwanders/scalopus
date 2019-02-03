@@ -51,7 +51,7 @@ void add_scalopus_tracing(py::module& m)
                                                                                                "EndpointTraceMapping");
   endpoint_trace_mapping.def(py::init<>());
   endpoint_trace_mapping.def("mapping", &EndpointTraceMapping::mapping);
-  endpoint_trace_mapping.def("factory", &EndpointTraceMapping::factory);
+  endpoint_trace_mapping.def_static("factory", &EndpointTraceMapping::factory);
   endpoint_trace_mapping.def_property_readonly_static("name",
                                                       [](py::object /* self */) { return EndpointTraceMapping::name; });
 

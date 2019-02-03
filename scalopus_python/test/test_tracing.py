@@ -66,6 +66,7 @@ class TracingTester(unittest.TestCase):
         self.poller.manage()  # do one round of discovery
         self.native_source = self.native_provider.makeSource()
         self.native_source.startInterval() # start the recording interval on the native source.
+        time.sleep(0.1)
 
     def test_tracing(self):
         trace_point = scalopus.tracing.TraceContext("MyTraceContext", trace_id=1337)
