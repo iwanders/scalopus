@@ -66,6 +66,12 @@ the traces from lttng the `babeltrace` package is required:
 apt-get install liblttng-ust-dev babeltrace
 ```
 
+The Python bindings, are built if Pybind11 is found. By default the Python3 bindings are built if Python3 is present. This requires the `distutils` and `setuptools` modules to be present and `libpython3-dev` package must be installed to provide the necessary header files. The Python 2 bindings require `libpython-dev` to be installed.
+
+```bash
+apt-get install python3-distutils python3-setuptools libpython3-dev libpython-dev
+```
+
 Then, building should be as simple as:
 ```bash
 # Clone repo, recursively to ensure git submodules are cloned as well.
@@ -81,7 +87,7 @@ ctest .
 ## Quickstart
 After building and succesfully being able to run the tests, use the following steps to view some tracepoints:
 1. Run `./scalopus_examples/example_scope_tracepoints_random_native` to start a process that produces tracepoints.
-2. Run `./scalopus_catapult/catapult_server`, this should output something like:
+2. Run `./scalopus_catapult/scalopus_catapult_server`, this should output something like:
 ```
 [main] Using port: 9222, 9222 is default, it is default remote debugging port
 [main] Using path: ""  (empty defaults to lttng view scalopus_target_session)
@@ -89,7 +95,7 @@ After building and succesfully being able to run the tests, use the following st
 [BabeltraceParser] Reached end of file, quiting parser function.
 [scalopus] Creating transport to: <unix:8343>
 ```
-3. Go go [chrome://inspect?tracing][chrome_tracing] (copy the link, clicking doesn't work), next to `Target (Scalopus Devtools Target)` click trace. You should now be in the tracing viewer and see `This about:tracing is connected to a remote device...` at the top. Click record, record, wait a bit and press stop.
+3. Go go [`chrome://inspect?tracing`][chrome_tracing] (copy the link, clicking doesn't work), next to `Target (Scalopus Devtools Target)` click trace. You should now be in the tracing viewer and see `This about:tracing is connected to a remote device...` at the top. Click record, record, wait a bit and press stop.
 4. Profit.
 
 ## Legal
