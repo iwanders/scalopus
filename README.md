@@ -6,9 +6,10 @@ slide from the cppcon 2016 "Rainbow Six Siege: Quest for Performance" presentati
 
 The main focus is on obtaining traces for each scope / stack frame of interest, this provides good information about
 where time is spent in the program. It requires instrumenting the source code of the program under inspection with
-tracepoints to indicate which scopes need to be tracked. To get the tracepoints out of the program [LTTng][lttng] is
-used preferably, minimal knowledge or interaction with LTTng is necessary to use Scalopus. An alternative, 
-_experimental_ way is also provided to test scope tracing without having to install LTTng.
+tracepoints to indicate which scopes need to be tracked. To get the tracepoints out of the program there are two options
+[LTTng][lttng] can be used, minimal knowledge or interaction with LTTng is necessary to use Scalopus. Tracepoints can
+also be transfered over Scalopus' native transports, this elminates the need for LTTng, but is less performant.
+The system can also be used from Python (both versions) through the Python bindings and the `scalopus` python module.
 
 The trace viewer used is available in all recent Chrome and Chromium browsers and can be opened by typing 
 [`chrome://inspect?tracing`][chrome_tracing] in the address bar. This is normally used to display traces from Android
