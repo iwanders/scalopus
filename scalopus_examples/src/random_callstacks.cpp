@@ -27,27 +27,27 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 /**
  * This example can create random callstacks at arbritrary rate and number of threads.
  * ./scalopus_examples/example_scope_tracepoints_random [time_base (usec) [thread_count]]
  * Start with a time base of 10000, that's the default and puts each scope transition at least 10 ms apart.
  * Default thread count is 1.
+ *
+ * This example does not show best practices, look in the readme example for those. This merely allows for producing
+ * a vast amount of artificial tracepoints.
  */
 
-#include <atomic>
-#include <chrono>
-#include <cstdlib>
 #include <iostream>
 #include <random>
 #include <sstream>
-#include <string>
-#include <thread>
 
 #include <signal.h>
 
 #include <scalopus_tracing/tracing.h>
 #include <scalopus_transport/transport_unix.h>
 
+// Helper function to create random integer between two values.
 int randint(int min, int max)
 {
   static std::mt19937 gen;
@@ -55,25 +55,32 @@ int randint(int min, int max)
   return dis(gen);
 }
 
+// Function that is recursively called to create the callstack.
 void random_callstack(unsigned int level, size_t time_base)
 {
+  // Sleep a bit to ensure scope borders don't completely align.
   std::this_thread::sleep_for(std::chrono::microseconds(2 * time_base));
   {
+    // Manually create the RAII tracepoint using the trace id set to level.
     scalopus::TraceRAII tracepoint{ level };
+
+    // Sleep a bit.
     std::this_thread::sleep_for(std::chrono::microseconds(1 * time_base));
+
+    // Random chance to go deeper (2/3)
     if (randint(0, 2) && (level <= 10))
     {
       random_callstack(level + 1, time_base);
     }
-    else
-    {
-    }
   }
-  // Slim chance of growing again.
+
+  // 1/3 chance of growing again.
   if ((randint(0, 2) == 0) && (level <= 10))
   {
     random_callstack(level, time_base);
   }
+
+  // Sleep before returning, again to make borders not align.
   std::this_thread::sleep_for(std::chrono::microseconds(2 * time_base));
 }
 
@@ -120,7 +127,14 @@ int main(int argc, char** argv)
   server->addEndpoint(std::make_shared<scalopus::EndpointNativeTraceSender>());
 
   TRACE_THREAD_NAME("main");
-  TRACE_PRETTY_FUNCTION();
+
+  // Set some artificial names for the scopes.
+  for (size_t i = 0; i < 10; i++)
+  {
+    std::stringstream scope_name;
+    scope_name << "level 0x" << std::hex << i;
+    scalopus::ScopeTraceTracker::getInstance().insert(i, scope_name.str());
+  }
 
   // Create the threads
   std::vector<std::thread> active_threads;

@@ -33,20 +33,14 @@
 #include <string>
 #include <thread>
 
+// The producer side.
 #include <scalopus_tracing/tracing.h>
-#include <scalopus_transport/transport_unix.h>
+#include <scalopus_transport/transport_loopback.h>
 
-void test_two_raiis_in_same_scope()
-{
-  // Verify that two RAII tracepoints in the same scope works.
-  TRACE_PRETTY_FUNCTION();
-  TRACE_PRETTY_FUNCTION();
-}
-void test_two_named_in_same_scope()
-{
-  TRACE_TRACKED_RAII("Tracepoint 1");
-  TRACE_TRACKED_RAII("Tracepoint 2");
-}
+// The catapult server side.
+#include <scalopus_catapult/catapult_server.h>
+#include <scalopus_general/general_provider.h>
+#include <scalopus_tracing/native_trace_provider.h>
 
 void c()
 {
@@ -74,50 +68,43 @@ void a()
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
-void sync()
-{
-  std::mutex mutex_to_be_locked;
-  std::condition_variable cv;
-  std::unique_lock<decltype(mutex_to_be_locked)> lock(mutex_to_be_locked);
-  auto now = std::chrono::system_clock::now();
-  auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
-  std::uint64_t epoch = std::chrono::duration_cast<std::chrono::milliseconds>(now_ms.time_since_epoch()).count();
-  std::cout << "Going to block until: " << (epoch - (epoch % 2000) + 2500) << std::endl;
-  cv.wait_until(lock, now + std::chrono::milliseconds(-(epoch % 2000) + 2500));
-  {
-    TRACE_TRACKED_RAII("post wait_until");
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  }
-}
-
 int main(int /* argc */, char** argv)
 {
-  auto factory = std::make_shared<scalopus::TransportUnixFactory>();
+  // Client side to produce the tracepoints.
+  auto factory = std::make_shared<scalopus::TransportLoopbackFactory>();
   const auto server = factory->serve();
-  server->addEndpoint(std::make_unique<scalopus::EndpointTraceMapping>());
-  server->addEndpoint(std::make_unique<scalopus::EndpointIntrospect>());
+  server->addEndpoint(std::make_shared<scalopus::EndpointTraceMapping>());
+  server->addEndpoint(std::make_shared<scalopus::EndpointIntrospect>());
+  server->addEndpoint(std::make_shared<scalopus::EndpointNativeTraceSender>());
   auto endpoint_process_info = std::make_shared<scalopus::EndpointProcessInfo>();
   endpoint_process_info->setProcessName(argv[0]);
   server->addEndpoint(endpoint_process_info);
 
-  // The following endpoint is only necessary for the native tracepoints.
-  server->addEndpoint(std::make_shared<scalopus::EndpointNativeTraceSender>());
+  // Catapult server side.
+  auto manager = std::make_shared<scalopus::EndpointManagerPoll>(factory);
+  manager->addEndpointFactory<scalopus::EndpointTraceMapping>();
+  manager->addEndpointFactory<scalopus::EndpointProcessInfo>();
+  auto native_trace_provider = std::make_shared<scalopus::NativeTraceProvider>(manager);
+  manager->addEndpointFactory(scalopus::EndpointNativeTraceSender::name, native_trace_provider);
+
+  auto catapult_server = std::make_shared<scalopus::CatapultServer>();
+  catapult_server->addProvider(native_trace_provider);
+  catapult_server->addProvider(std::make_shared<scalopus::GeneralProvider>(manager));
+
+  auto logging_function = [](const std::string& msg) { std::cout << msg << std::endl; };
+  logging_function("Logging can be enabled in the source, uncomment the lines below this one.");
+  //  manager->setLogger(logging_function);  // enable logging for transport discovery.
+  //  catapult_server->setLogger(logging_function);    // Enable logging on the catapult server & trace sessions.
+  //  catapult_server->setSeasocksDefaultLogger();  // Enable seasocks warnings.
+
+  manager->manage();         // call manage once to discover the loopback client.
+  catapult_server->start();  // start the seasocks server.
 
   TRACE_THREAD_NAME("main");
-
-  scalopus::scope_entry(0);
-  scalopus::scope_exit(0);
-
-  scalopus::TraceRAII(2);
-
-  TRACE_PRETTY_FUNCTION();
-  test_two_raiis_in_same_scope();
-  test_two_named_in_same_scope();
 
   while (true)
   {
     a();
-    sync();
   }
 
   return 0;

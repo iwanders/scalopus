@@ -2,7 +2,8 @@
 
 As described in the main readme, scope tracepoints are identified by a single 32 bit integer. The mapping between the
 integer and the provided string is maintained in a singleton, the `ScopeTraceTracker`. This mapping is exposed through
-the `EndpointTraceMapping` endpoint.
+the `EndpointTraceMapping` endpoint. An example of how to use the trace macros is shown in
+[readme_example.cpp](/scalopus_examples/src/readme_example.cpp).
 
 ## Provided tracepoints
 The currently supported tracepoints are scope entry and exit tracepoints. These are converted to duration events in the

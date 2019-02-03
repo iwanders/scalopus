@@ -29,8 +29,6 @@
 */
 #include <chrono>
 #include <iostream>
-#include <sstream>
-#include <string>
 #include <thread>
 
 #include <scalopus_tracing/tracing.h>
@@ -38,13 +36,13 @@
 
 void fooBarBuz()
 {
-  TRACE_PRETTY_FUNCTION();
+  TRACE_PRETTY_FUNCTION();  // RAII tracepoint using __PRETTY_FUNCTION__
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
 void c()
 {
-  TRACE_PRETTY_FUNCTION();
+  TRACE_TRACKED_RAII("void c()");  // RAII tracepoint, name will be "in c()"
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   std::cout << "  c" << std::endl;
   fooBarBuz();
@@ -53,11 +51,15 @@ void c()
 
 void b()
 {
-  TRACE_PRETTY_FUNCTION();
+  // Or handle the start and stop events yourself.
+  // Strings at the start and end need to be compile time constant, identical and in the same file.
+  // It is recommended to use the RAII tracepoints.
+  TRACE_SCOPE_START("void b()");
   std::cout << " b" << std::endl;
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   c();
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  TRACE_SCOPE_END("void b()");
 }
 
 void a()
@@ -75,16 +77,22 @@ int main(int /* argc */, char** argv)
   const auto server = factory->serve();
   server->addEndpoint(std::make_unique<scalopus::EndpointTraceMapping>());
   server->addEndpoint(std::make_unique<scalopus::EndpointIntrospect>());
+  // Native sender is not needed for LTTng or NOP tracepoints, but it must be present if the native tracepoints are
+  // ever to be used.
   server->addEndpoint(std::make_shared<scalopus::EndpointNativeTraceSender>());
   auto endpoint_process_info = std::make_shared<scalopus::EndpointProcessInfo>();
+
+  // Set the process name here:
   endpoint_process_info->setProcessName(argv[0]);
   server->addEndpoint(endpoint_process_info);
 
+  // Set the thread name.
   TRACE_THREAD_NAME("main");
 
   while (true)
   {
     a();
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
   }
 
   return 0;
