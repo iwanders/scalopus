@@ -1,1 +1,0 @@
-../scalopus_python_lib.cpython-36m-x86_64-linux-gnu.so

@@ -40,6 +40,11 @@ else()
   message(WARNING "Not providing LTTng tracepoints in python module, they don't exist.")
 endif()
 
+get_target_property(setup_scalopus_python_lib_suffix scalopus_python_lib SUFFIX)
+get_target_property(setup_scalopus_python_lib_prefix scalopus_python_lib PREFIX)
+#message(WARNING "setup_scalopus_python_lib_suffix: ${setup_scalopus_python_lib_suffix}")
+#message(WARNING "setup_scalopus_python_lib_prefix: ${setup_scalopus_python_lib_prefix}")
+
 # Copy the scalopus module.
 file(COPY scalopus DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -48,12 +53,16 @@ file(COPY test DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Copy the python examples
 file(COPY examples DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY native_libs.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Write the setup file.
 configure_file(
   ${CMAKE_CURRENT_LIST_DIR}/setup.py.in
   ${CMAKE_CURRENT_BINARY_DIR}/setup.py
+  @ONLY
+)
+configure_file(
+  ${CMAKE_CURRENT_LIST_DIR}/native_libs.txt.in
+  ${CMAKE_CURRENT_BINARY_DIR}/native_libs.txt
   @ONLY
 )
 

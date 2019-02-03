@@ -12,7 +12,7 @@ def scalopus_python_tests():
 
 setup(name='scalopus',
       version='@PROJECT_VERSION@',
-      package_dir={ '.': '@CMAKE_CURRENT_BINARY_DIR@'},
-      package_data={'.': ["*.so"], '.':["native_libs.txt"]},# ??
+      package_dir={'scalopus':'@CMAKE_CURRENT_BINARY_DIR@/scalopus/'},
+      package_data={'scalopus':["../scalopus_python_lib@setup_scalopus_python_lib_suffix@"]},
       test_suite='setup.scalopus_python_tests',
       packages=['scalopus'])
