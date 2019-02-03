@@ -128,14 +128,15 @@ py::object PendingResponse::wait_for(double seconds)
 // Maybe convert to bytes using https://pybind11.readthedocs.io/en/master/advanced/cast/stl.html ?
 void add_scalopus_interface(py::module& m)
 {
-  py::class_<Destination, Destination::Ptr> destination(m, "Destination");
+  py::module interface = m.def_submodule("interface", "The interface components.");
+  py::class_<Destination, Destination::Ptr> destination(interface, "Destination");
   destination.def("__str__", &Destination::operator std::string);
   destination.def("hash_code", &Destination::hash_code);
 
-  py::class_<PendingResponse, PendingResponse::Ptr> pending_response(m, "PendingResponse");
+  py::class_<PendingResponse, PendingResponse::Ptr> pending_response(interface, "PendingResponse");
   pending_response.def("wait_for", &PendingResponse::wait_for);
 
-  py::class_<Transport, Transport::Ptr> transport_interface(m, "Transport");
+  py::class_<Transport, Transport::Ptr> transport_interface(interface, "Transport");
   transport_interface.def("addEndpoint", &Transport::addEndpoint, py::keep_alive<1, 2>());
   transport_interface.def("isConnected", &Transport::isConnected);
   transport_interface.def("broadcast", &Transport::broadcast);
@@ -148,7 +149,7 @@ void add_scalopus_interface(py::module& m)
   //  endpoint.def("handle", &Endpoint::handle);
   //  endpoint.def("unsolicited", &Endpoint::unsolicited);
 
-  py::class_<Endpoint, PyEndpoint, Endpoint::Ptr> py_endpoint(m, "Endpoint");
+  py::class_<Endpoint, PyEndpoint, Endpoint::Ptr> py_endpoint(interface, "Endpoint");
   py_endpoint.def(py::init<>());
   py_endpoint.def("getName", &Endpoint::getName);
   py_endpoint.def("handle", &Endpoint::handle);
@@ -158,13 +159,13 @@ void add_scalopus_interface(py::module& m)
   py::class_<TraceEventProvider, TraceEventProvider::Ptr> trace_event_provider(m, "TraceEventProvider");
   trace_event_provider.def("makeSource", &TraceEventProvider::makeSource);
 
-  py::class_<TraceEventSource, TraceEventSource::Ptr> trace_event_source(m, "TraceEventSource");
+  py::class_<TraceEventSource, TraceEventSource::Ptr> trace_event_source(interface, "TraceEventSource");
   trace_event_source.def("startInterval", &TraceEventSource::startInterval);
   trace_event_source.def("stopInterval", &TraceEventSource::stopInterval);
   trace_event_source.def("work", &TraceEventSource::work);
   trace_event_source.def("finishInterval", &TraceEventSource::finishInterval);  // implicit conversion from json =)
 
-  py::class_<EndpointManager, EndpointManager::Ptr> endpoint_manager(m, "EndpointManager");
+  py::class_<EndpointManager, EndpointManager::Ptr> endpoint_manager(interface, "EndpointManager");
   endpoint_manager.def("endpoints", &EndpointManager::endpoints, py::return_value_policy::copy);
   endpoint_manager.def("addEndpointFactory", [](EndpointManager& manager, std::string name, py::object fun) {
     manager.addEndpointFactory(name, [fun](const Transport::Ptr& transport) {
@@ -183,7 +184,7 @@ void add_scalopus_interface(py::module& m)
     });
   });
 
-  py::class_<TransportFactory, TransportFactory::Ptr> transport_factory(m, "TransportFactory");
+  py::class_<TransportFactory, TransportFactory::Ptr> transport_factory(interface, "TransportFactory");
   transport_factory.def("discover", &TransportFactory::discover);
   transport_factory.def("serve", &TransportFactory::serve);
   transport_factory.def("connect", &TransportFactory::connect, py::return_value_policy::copy);

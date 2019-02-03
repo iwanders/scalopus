@@ -30,9 +30,9 @@
 import scalopus
 import unittest
 
-class MyEndpoint(scalopus.lib.Endpoint):
+class MyEndpoint(scalopus.interface.Endpoint):
     def __init__(self):
-        scalopus.lib.Endpoint.__init__(self)
+        scalopus.interface.Endpoint.__init__(self)
         self.reset()
 
     def reset(self):

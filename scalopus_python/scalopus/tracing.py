@@ -51,24 +51,56 @@ except AttributeError as e:
 tracing_backend = native
 
 def setBackend(new_backend):
+    """Sets the backend to use by all tracepoints.
+
+    :param new_backend: The backend to use for trace points.
+    :type new_backend: Tracing backend (tracing.native, tracing.lttng or tracing.nop).
+    """
     global tracing_backend
     tracing_backend = new_backend 
 
 class TraceContextHelper(object):
+    """This is a helper to allow quick lookups of already created trace context managers.
+    """
     def __init__(self, prefix=''):
+        """Create the trace context helper.
+
+        :param prefix: This prefix is prepended to the names given to the sections.
+        :type prefix: str
+        """
         self.prefix = prefix
 
     def __getattr__(self, name):
+        """Get the trace context if it exists, otherwise create it.
+
+        :param name: The name of the trace context to retrieve or create.
+        :type name: str
+        """
         ctx = TraceContext(self.prefix + name)
         setattr(self, name, ctx)
         return ctx
 
     def __call__(self, name):
-        return self.__getattr__(name)
+        """Create 
 
+        :param name: The name of the trace context to retrieve or create.
+        :type name: str
+        """
+        return getattr(self, name)
+
+trace_section = TraceContextHelper()
 
 class TraceContext(object):
+    """This provides a traced context, tracing the duration of a with statements.
+    """
     def __init__(self, name, trace_id=None):
+        """Sets the name and optionally the trace id to be used for this context.
+
+        :param name: Sets the name that will be associated to the trace id.
+        :type name: str
+        :param trace_id: The trace id to use.
+        :type trace_id: int
+        """
         self.trace_id = trace_id if trace_id is not None else uniqueTraceId()
         self.name = name
         setTraceName(self.trace_id, self.name)
@@ -80,14 +112,19 @@ class TraceContext(object):
         self.__exit__(None, None, None)
 
     def __enter__(self):
+        """Enter the with statement, this emits the entry tracepoint.
+        """
         tracing_backend.scope_entry(self.trace_id)
 
     def __exit__(self, context_type, context_value, context_traceback):
+        """Exit the with statement, this emits the exit tracepoint.
+        """
         tracing_backend.scope_exit(self.trace_id)
 
-trace_section = TraceContextHelper()
-
 def trace_function(f):
+    """Decorator to trace the entire function execution. Name used for the
+       tracepoint is the function name.
+    """
     tracer = TraceContext(f.__name__)
     @wraps(f)
     def wrapper(*args, **kwargs):
