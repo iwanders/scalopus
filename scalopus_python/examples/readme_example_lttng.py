@@ -32,7 +32,7 @@ import time
 
 import scalopus
 
-if not scalopus.tracing.haveLttng():
+if not scalopus.tracing.have_lttng:
     print("Could not set lttng as backend, lttng support is not built.")
     sys.exit(1)
 # Swap backend to lttng.
