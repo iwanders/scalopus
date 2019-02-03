@@ -62,4 +62,6 @@ if __name__ == "__main__":
     scalopus.general.setThreadName("main")
 
     while True:
-        a()
+        with scalopus.tracing.trace_sections.quux:
+            time.sleep(0.1)
+            a()

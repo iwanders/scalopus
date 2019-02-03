@@ -54,11 +54,30 @@ def setBackend(new_backend):
     tracing_backend = new_backend 
 
 
+trace_id_cur = 0
+
+def new_trace_id():
+    global trace_id_cur
+    result = trace_id_cur
+    trace_id_cur += 1
+    return result
+
+
+class TraceContextHelper(object):
+    def __init__(self, prefix=''):
+        self.prefix = prefix
+
+    def __getattr__(self, name):
+        ctx = TraceContext(self.prefix + name)
+        setattr(self, name, ctx)
+        return ctx
+
+
 class TraceContext(object):
-    def __init__(self, trace_name, trace_id=None):
-        self.trace_id = trace_id if trace_id is not None else random.randint(0, 2**32)
-        self.trace_name = trace_name
-        setTraceName(self.trace_id, self.trace_name)
+    def __init__(self, name, trace_id=None):
+        self.id = trace_id if trace_id is not None else new_trace_id()
+        self.name = name
+        setTraceName(self.id, self.name)
 
     def enter(self):
         self.__enter__()
@@ -72,6 +91,7 @@ class TraceContext(object):
     def __exit__(self, context_type, context_value, context_traceback):
         tracing_backend.scope_exit(self.trace_id)
 
+trace_sections = TraceContextHelper()
 
 def trace_function(f):
     tracer = TraceContext(f.__name__)
