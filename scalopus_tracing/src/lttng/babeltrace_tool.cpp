@@ -43,12 +43,13 @@ void BabeltraceTool::init(std::string path)
     return;  // need to halt first, just call it a day, don't want to get dangling workers / threads / viewers.
   }
 
-  if (path.empty())
+  const bool is_session_name = path.find("/") == std::string::npos;  // it is a session name if no / is found.
+  if (is_session_name)
   {
     // lttng view call, eliminates need for hostname:$ lttng view test_session -e "babeltrace --input-format=lttng-live"
     process_ = std::make_shared<subprocess::popen>(
         "lttng",
-        std::vector<std::string>{ "view", "scalopus_target_session", "-e",
+        std::vector<std::string>{ "view", path, "-e",
                                   "babeltrace --clock-seconds --clock-gmt --no-delta --input-format=lttng-live" });
   }
   else

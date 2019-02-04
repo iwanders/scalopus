@@ -27,15 +27,11 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus_general/endpoint_manager_poll.h>
-#include <scalopus_general/endpoint_process_info.h>
-#include <scalopus_general/general_provider.h>
 
+#include <scalopus_general/general_provider.h>
 #include <scalopus_tracing/endpoint_native_trace_sender.h>
-#include <scalopus_tracing/endpoint_trace_mapping.h>
 #include <scalopus_tracing/lttng_provider.h>
 #include <scalopus_tracing/native_trace_provider.h>
-
 #include <scalopus_transport/transport_unix.h>
 
 #include "scalopus_catapult/catapult_server.h"
@@ -53,18 +49,43 @@ void sigint_handler(int /* s */)
   running = false;
 }
 
-int main(int /* argc */, char** /* argv */)
+int main(int argc, char** argv)
 {
   // hook control+c for graceful quitting
   ::signal(SIGINT, &sigint_handler);
 
-  // retrieve the port number to bind the webserver on
   int port = 9222;  // 9222 is default chrom(e/ium) remote debugging port.
+  std::string path = "scalopus_target_session";  // empty path defaults to 'lttng view'
+  if (argc >= 2)
+  {
+    // retrieve the port number to bind the webserver on
+    port = std::atoi(argv[1]);
+  }
+  // Retrieve the path to run babeltrace on.
+  if (argc >= 3)
+  {
+    path = std::string(argv[2]);
+  }
+  if (port == 0)  // failed to parse the port, like --help... :)
+  {
+    std::cerr << "" << argv[0] << " [port [lttng_session_or_babeltrace_path]]" << std::endl;
+    std::cerr << std::endl;
+    std::cerr << " port:" << std::endl;
+    std::cerr << "      the port on which the catapult backend will bind. Defaults to 9222." << std::endl << std::endl;
+    std::cerr << " lttng_session_or_babeltrace_path:" << std::endl;
+    std::cerr << "      If no \"/\" is present in the string, this is used as the lttng" << std::endl ;
+    std::cerr << "      session, the default is \"scalopus_target_session\". If a \"/\"" << std::endl;
+    std::cerr << "      is present in the path it is used as the full babeltrace path." << std::endl;
+    std::cerr << "      This means the hostname and protocol must be specified, this" << std::endl;
+    std::cerr << "      allows connecting to sessions other than on localhost. Using" << std::endl;
+    std::cerr << "      \"net://localhost/host/$HOSTNAME/scalopus_target_session\" has " << std::endl;
+    std::cerr << "      the same result as setting \"scalopus_target_session\"." << std::endl;
+    exit(1);
+  }
+
   std::cout << "[main] Using port: " << port << ", 9222 is default, it is default remote debugging port" << std::endl;
 
-  // Retrieve the path to run babeltrace on.
-  std::string path = "";  // empty path defaults to 'lttng view'
-  std::cout << "[main] Using path: \"" << path << "\"  (empty defaults to lttng view scalopus_target_session)"
+  std::cout << "[main] Using path: \"" << path << "\"  (defaults to lttng view scalopus_target_session)"
             << std::endl;
 
   // Create the transport & endpoint manager.
