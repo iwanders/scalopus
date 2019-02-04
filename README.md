@@ -37,10 +37,15 @@ void c()
 }
 // some more here
 ```
-Visualised in [`chrome://inspect?tracing`][chrome_tracing] through Scalopus:
-
+Start the binary with tracepoints, start `scalopus_catapult_server`, open [`chrome://inspect?tracing`][chrome_tracing], 
+click record twice, wait a bit, click stop and see:
 ![Readme example catapult output](/doc/readme_example_crop.png "Readme example catapult output")
 
+View locally by opening [`chrome://tracing`](chrome://tracing) and loading
+[trace_readme_example.json.gz](/doc/trace_readme_example.json.gz)
+
+The [scalopus_examples](/scalopus_examples) readme shows another, larger example that shows multiple processes and
+threads.
 
 ## Scope tracing
 For a brief explanation what we mean by tracing a scope, watch one minute of [this][cppcon_2016_quest_for_performance]

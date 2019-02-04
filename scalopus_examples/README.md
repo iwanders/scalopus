@@ -24,6 +24,12 @@ This example is built for all three tracing backends. Resulting in the following
   - `random_callstacks_lttng`
   - `random_callstacks_nop`
 
+The output from this example looks like:
+![Random callstack example catapult output](/doc/random_callstacks_crop.png "Random callstack example catapult output")
+
+View locally by opening  [`chrome://tracing`](chrome://tracing) and loading
+[trace_random_callstacks.json.gz](/doc/trace_random_callstacks.json.gz).
+
 ## `embedded_catapult_server.cpp`
 This shows how one could embed the catapult server in the process that produces the tracepoints. This example is only
 built using the `native` tracing backend, because that's the only one that makes sense for such a usecase. I don't
