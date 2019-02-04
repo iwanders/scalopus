@@ -9,7 +9,7 @@ where time is spent in the program. It requires instrumenting the source code of
 tracepoints to indicate which scopes need to be tracked. To get the tracepoints out of the program there are two options
 [LTTng][lttng] can be used, minimal knowledge or interaction with LTTng is necessary to use Scalopus. Tracepoints can
 also be transfered over Scalopus' native transports, this elminates the need for LTTng, but is less performant.
-The system can also be used from Python (both versions) through the Python bindings and the `scalopus` python module.
+The system can also be used from Python (both versions) through the Python bindings and the `scalopus` Python module.
 
 The trace viewer used is available in all recent Chrome and Chromium browsers and can be opened by typing 
 [`chrome://inspect?tracing`][chrome_tracing] in the address bar. This is normally used to display traces from Android
@@ -17,6 +17,30 @@ or from within the browser itself. However, the trace viewer can also load trace
 [Devtools Protocol][devtools_protocol]'s tracing domain. The specification for the trace events of that domain can be
 found in the [Trace Event Format][trace_event_format] documentation. Major benefit of using this interface is that
 almost everyone has it already installed and can consume and view traces.
+
+## TL;DR
+Place trace points in C++ or Python Code, C++ example:
+
+```cpp
+void fooBarBuz()
+{
+  TRACE_PRETTY_FUNCTION();  // RAII tracepoint using __PRETTY_FUNCTION__
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+}
+void c()
+{
+  TRACE_TRACKED_RAII("void c()");  // RAII tracepoint, name will be "void c()"
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  std::cout << "  c" << std::endl;
+  fooBarBuz();
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+}
+// some more here
+```
+Visualised in [`chrome://inspect?tracing`][chrome_tracing] through Scalopus:
+
+![Readme example catapult output](/doc/readme_example_crop.png "Readme example catapult output")
+
 
 ## Scope tracing
 For a brief explanation what we mean by tracing a scope, watch one minute of [this][cppcon_2016_quest_for_performance]
@@ -95,7 +119,7 @@ python3 setup.py install # or python2 setup.py install, depending on which one w
 
 ## Quickstart
 After building and succesfully being able to run the tests, use the following steps to view some tracepoints:
-1. Run `./scalopus_examples/example_scope_tracepoints_random_native` to start a process that produces tracepoints.
+1. Run `./scalopus_examples/readme_example` to start a process that produces tracepoints.
 2. Run `./scalopus_catapult/scalopus_catapult_server`, this should output something like:
 ```
 [main] Using port: 9222, 9222 is default, it is default remote debugging port
