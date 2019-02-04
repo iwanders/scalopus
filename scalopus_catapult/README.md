@@ -54,3 +54,4 @@ babeltrace --clock-seconds --clock-gmt --no-delta --input-format=lttng-live lttn
 [devtools_protocol]: https://chromedevtools.github.io/devtools-protocol/tot/Tracing
 [seasocks]: https://github.com/mattgodbolt/seasocks/
 [lttng_view]: https://lttng.org/man/1/lttng-view/v2.10/
+[chrome_tracing]: chrome://inspect?tracing
