@@ -12,7 +12,7 @@ The currently supported tracepoints are scope entry and exit tracepoints. These 
 The tracepoint macro's themselves can be found in
 [scope_tracing.h](/scalopus_tracing/include/scalopus_tracing/scope_tracing.h), the following are available:
 
-- `TRACE_TRACKED_RAII("name")` Places a [RAII][RAII] tracepoint in this scope, duration starts on custruction and ends
+- `TRACE_SCOPE_RAII("name")` Places a [RAII][RAII] tracepoint in this scope, duration starts on custruction and ends
   when the tracepoint goes out of scope. Name of the duration is provided by the argument, trace id is based on line
   number and file.
 - `TRACE_PRETTY_FUNCTION()` Uses the value of `__PRETTY_FUNCTION__` as defined by the preprocessor as name for the RAII
@@ -30,7 +30,7 @@ void my_function()
   TRACE_PRETTY_FUNCTION(); // name will be 'void my_function()'
   {
     std::lock_guard<std::mutex> lock(some_mutex_);
-    TRACE_TRACKED_RAII("The mutex is locked");  // Constructed after we've acquired the mutex.
+    TRACE_SCOPE_RAII("The mutex is locked");  // Constructed after we've acquired the mutex.
     work();  // takes long.
   }  // the RAII tracepoint goes out of scope.
 
@@ -44,7 +44,7 @@ void my_function()
   // But in such a case it's preferable to use the RAII tracepoint:
   int x = 0;
   {
-    TRACE_TRACKED_RAII("foo and bar");  // names can be reused, the trace_id is all that needs to be unique.
+    TRACE_SCOPE_RAII("foo and bar");  // names can be reused, the trace_id is all that needs to be unique.
     foo();
     x = bar();
   }

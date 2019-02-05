@@ -51,7 +51,7 @@
 
 // Macro to create a tracked RAII tracepoint. The tracepoint itself will store only the ID, but the singleton trace
 // tracker stores the ID -> name relation provided.
-#define TRACE_TRACKED_RAII_ID(name, id)                                                                                \
+#define TRACE_SCOPE_RAII_ID(name, id)                                                                                \
   TRACE_TRACKED_MAPPING_REGISTER_ONCE(name, id, SCALOPUS_MAKE_UNIQUE(scalopus_trace_id_))                              \
   scalopus::TraceRAII SCALOPUS_MAKE_UNIQUE(scalopus_trace_id_)(id);                                                    \
   do                                                                                                                   \

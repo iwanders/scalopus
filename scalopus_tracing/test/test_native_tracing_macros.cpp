@@ -37,8 +37,8 @@ int main(int /* argc */, char** /* argv */)
   TRACE_PRETTY_FUNCTION();
   TRACE_PRETTY_FUNCTION();
 
-  TRACE_TRACKED_RAII("main");
-  TRACE_TRACKED_RAII("main");
+  TRACE_SCOPE_RAII("main");
+  TRACE_SCOPE_RAII("main");
 
   TRACE_SCOPE_START("zz");
   TRACE_SCOPE_START("zz");
@@ -50,8 +50,8 @@ int main(int /* argc */, char** /* argv */)
     TRACE_PRETTY_FUNCTION();
     TRACE_PRETTY_FUNCTION();
 
-    TRACE_TRACKED_RAII("main");
-    TRACE_TRACKED_RAII("main");
+    TRACE_SCOPE_RAII("main");
+    TRACE_SCOPE_RAII("main");
 
     TRACE_SCOPE_START("zz");
     TRACE_SCOPE_START("zz");

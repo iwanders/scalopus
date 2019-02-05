@@ -29,7 +29,7 @@ void fooBarBuz()
 }
 void c()
 {
-  TRACE_TRACKED_RAII("void c()");  // RAII tracepoint, name will be "void c()"
+  TRACE_SCOPE_RAII("void c()");  // RAII tracepoint, name will be "void c()"
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   std::cout << "  c" << std::endl;
   fooBarBuz();
