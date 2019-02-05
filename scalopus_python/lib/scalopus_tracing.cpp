@@ -93,7 +93,6 @@ void add_scalopus_tracing(py::module& m)
   py::class_<NativeTraceProvider, NativeTraceProvider::Ptr, TraceEventProvider> native_trace_provider(
       native, "NativeTraceProvider");
   native_trace_provider.def(py::init<EndpointManager::Ptr>());
-  native_trace_provider.def("makeSource", &NativeTraceProvider::makeSource);
   native_trace_provider.def("receiveEndpoint", &NativeTraceProvider::receiveEndpoint);
   native_trace_provider.def("factory", &NativeTraceProvider::factory);
 }

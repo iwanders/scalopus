@@ -32,6 +32,7 @@ from .lib import general
 EndpointIntrospect = general.EndpointIntrospect
 EndpointProcessInfo = general.EndpointProcessInfo
 EndpointManagerPoll = general.EndpointManagerPoll
+GeneralProvider = general.GeneralProvider
 
 setThreadName = general.setThreadName
 

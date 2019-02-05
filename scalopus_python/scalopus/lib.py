@@ -36,3 +36,4 @@ interface = lib.interface
 tracing = lib.tracing
 general = lib.general
 transport = lib.transport
+catapult = lib.catapult

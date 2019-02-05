@@ -91,8 +91,11 @@ void CatapultServer::setMaxBuffersize(std::size_t max_buffer)
 
 CatapultServer::~CatapultServer()
 {
-  server_->terminate();
-  thread_.join();
+  if (server_ != nullptr)
+  {
+    server_->terminate();
+    thread_.join();
+  }
 }
 
 void CatapultServer::setLogger(LoggingFunction&& logger)

@@ -43,6 +43,6 @@ void add_scalopus_catapult(py::module& m)
   catapult_server.def("addProvider", &CatapultServer::addProvider);
   catapult_server.def("setSeasocksDefaultLogger", &CatapultServer::setSeasocksDefaultLogger);
   catapult_server.def("setMaxBuffersize", &CatapultServer::setMaxBuffersize);
-  catapult_server.def("start", &CatapultServer::start);
+  catapult_server.def("start", [](CatapultServer& server, int port) { server.start(port); }, py::arg("port") = 9222);
 }
 }  // namespace scalopus

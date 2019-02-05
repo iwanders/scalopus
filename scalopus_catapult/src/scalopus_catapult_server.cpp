@@ -54,7 +54,7 @@ int main(int argc, char** argv)
   // hook control+c for graceful quitting
   ::signal(SIGINT, &sigint_handler);
 
-  int port = 9222;  // 9222 is default chrom(e/ium) remote debugging port.
+  int port = 9222;                               // 9222 is default chrom(e/ium) remote debugging port.
   std::string path = "scalopus_target_session";  // empty path defaults to 'lttng view'
   if (argc >= 2)
   {
@@ -73,7 +73,7 @@ int main(int argc, char** argv)
     std::cerr << " port:" << std::endl;
     std::cerr << "      the port on which the catapult backend will bind. Defaults to 9222." << std::endl << std::endl;
     std::cerr << " lttng_session_or_babeltrace_path:" << std::endl;
-    std::cerr << "      If no \"/\" is present in the string, this is used as the lttng" << std::endl ;
+    std::cerr << "      If no \"/\" is present in the string, this is used as the lttng" << std::endl;
     std::cerr << "      session, the default is \"scalopus_target_session\". If a \"/\"" << std::endl;
     std::cerr << "      is present in the path it is used as the full babeltrace path." << std::endl;
     std::cerr << "      This means the hostname and protocol must be specified, this" << std::endl;
@@ -85,8 +85,7 @@ int main(int argc, char** argv)
 
   std::cout << "[main] Using port: " << port << ", 9222 is default, it is default remote debugging port" << std::endl;
 
-  std::cout << "[main] Using path: \"" << path << "\"  (defaults to lttng view scalopus_target_session)"
-            << std::endl;
+  std::cout << "[main] Using path: \"" << path << "\"  (defaults to lttng view scalopus_target_session)" << std::endl;
 
   // Create the transport & endpoint manager.
   auto manager = std::make_shared<scalopus::EndpointManagerPoll>(std::make_shared<scalopus::TransportUnixFactory>());
