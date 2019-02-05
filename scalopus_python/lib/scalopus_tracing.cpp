@@ -35,6 +35,7 @@
 
 #ifdef SCALOPUS_TRACING_HAVE_LTTNG
 #include <scalopus_tracing/lttng_tracepoint.h>
+#include <scalopus_tracing/lttng_provider.h>
 #endif
 
 #include <scalopus_tracing/nop_tracepoint.h>
@@ -78,6 +79,9 @@ void add_scalopus_tracing(py::module& m)
   py::module lttng = tracing.def_submodule("lttng", "The lttng specific components.");
   lttng.def("scope_entry", &lttng::scope_entry);
   lttng.def("scope_exit", &lttng::scope_exit);
+
+  py::class_<LttngProvider, LttngProvider::Ptr, TraceEventProvider> lttng_provider(lttng, "LttngProvider");
+  lttng_provider.def(py::init<std::string, EndpointManager::Ptr>());
 #endif
 
   native.def("scope_entry", &native::scope_entry);

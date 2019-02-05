@@ -169,6 +169,7 @@ void add_scalopus_interface(py::module& m)
   endpoint_manager.def("endpoints", &EndpointManager::endpoints, py::return_value_policy::copy);
   endpoint_manager.def("addEndpointFactory", [](EndpointManager& manager, std::string name, py::object fun) {
     manager.addEndpointFactory(name, [fun](const Transport::Ptr& transport) {
+      pybind11::gil_scoped_acquire gil;
       py::object result_py = fun(transport);
       if (py::isinstance<py::none>(result_py))
       {
