@@ -5,6 +5,9 @@ add_library(scalopus_general SHARED
 )
 target_compile_options(scalopus_general PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 
+# need shared_timed_mutex, which is C++14, this is a feature that requires C++14, and only cmake version 3.1
+target_compile_features(scalopus_general PUBLIC cxx_relaxed_constexpr)
+
 target_include_directories(scalopus_general
   PUBLIC 
     $<INSTALL_INTERFACE:include>

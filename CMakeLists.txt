@@ -28,15 +28,14 @@ include(thirdparty/CMakeLists.txt)
 
 
 # Set properties for the remainder of the builds
-# TODO: Change into target_feature commands.
-set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CLANG_ONLY_COMPILE_FLAGS "-Wconversion;")
   message(STATUS "Compiler is clang, adding options: ${CLANG_ONLY_COMPILE_FLAGS}")
+  # disable mismatched tags until https://github.com/nlohmann/json/issues/1401
+  set(CLANG_ONLY_COMPILE_FLAGS "${CLANG_ONLY_COMPILE_FLAGS};-Wno-mismatched-tags")
 endif()
 set(SCALOPUS_COMPILE_OPTIONS "-Werror;-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-Wpedantic;${CLANG_ONLY_COMPILE_FLAGS}")
 

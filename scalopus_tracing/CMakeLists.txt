@@ -17,6 +17,7 @@ target_include_directories(scalopus_scope_tracing
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 target_compile_options(scalopus_scope_tracing PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+target_compile_features(scalopus_scope_tracing PUBLIC cxx_relaxed_constexpr)
 add_library(Scalopus::scalopus_scope_tracing ALIAS scalopus_scope_tracing)
 
 target_link_libraries(scalopus_scope_tracing
