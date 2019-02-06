@@ -100,11 +100,11 @@ int main(int argc, char** argv)
   size_t thread_count = 1;
   if (argc >= 2)  // got a time base.
   {
-    time_base = std::atoi(argv[1]);
+    time_base = static_cast<size_t>(std::atoi(argv[1]));
   }
   if (argc >= 3)  // got a thread count as well
   {
-    thread_count = std::atoi(argv[2]);
+    thread_count = static_cast<size_t>(std::atoi(argv[2]));
   }
   if (time_base == 0)  // failed to parse time base, like --help... :)
   {
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
   TRACE_THREAD_NAME("main");
 
   // Set some artificial names for the scopes.
-  for (size_t i = 0; i < 11; i++)
+  for (uint32_t i = 0; i < 11; i++)
   {
     std::stringstream scope_name;
     scope_name << "level 0x" << std::hex << i;

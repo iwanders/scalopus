@@ -50,9 +50,9 @@ EndpointProcessInfo::EndpointProcessInfo()
   info_.pid = ::getpid();
 }
 
-void EndpointProcessInfo::setProcessName(const std::string& name)
+void EndpointProcessInfo::setProcessName(const std::string& process_name)
 {
-  info_.name = name;
+  info_.name = process_name;
 }
 
 bool EndpointProcessInfo::handle(Transport& /* server */, const Data& request, Data& response)

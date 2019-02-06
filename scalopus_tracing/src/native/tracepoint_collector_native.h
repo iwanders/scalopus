@@ -68,8 +68,9 @@ private:
   std::size_t ringbuffer_size_{ 10000 };
 
 public:
-  constexpr static const uint8_t ENTRY = 1;
-  constexpr static const uint8_t EXIT = 2;
+  static const uint8_t ENTRY;  // If initialised here and made constexpr clang drops it during linking :(
+  static const uint8_t EXIT;
+
   /**
    * @brief Static method through which the singleton instance can be retrieved.
    * @return Returns the singleton instance of the object.

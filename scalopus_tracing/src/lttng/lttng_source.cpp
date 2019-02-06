@@ -99,14 +99,14 @@ std::vector<json> LttngSource::convertEvents()
       entry["pid"] = event.pid();
 
       // try to look up the mapping for this pid
-      unsigned long long id = 0;
+      std::uint32_t id = 0;
       if (event.eventData().find("id") != event.eventData().end())
       {
-        id = event.eventData().at("id");
+        id = static_cast<std::uint32_t>(event.eventData().at("id"));
       }
 
       // Populate the name
-      entry["name"] = provider_->getScopeName(mapping, event.pid(), id);
+      entry["name"] = provider_->getScopeName(mapping, static_cast<int>(event.pid()), id);
 
       if (event.name() == "entry")
       {

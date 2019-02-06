@@ -48,7 +48,7 @@ namespace scalopus
  */
 class TraceSession
 {
-  static const size_t CHUNK_SIZE = 1000;
+  const size_t CHUNK_SIZE = 1000;
 
 public:
   using LoggingFunction = std::function<void(const std::string& output)>;

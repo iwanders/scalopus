@@ -92,8 +92,7 @@ std::vector<json> NativeTraceSource::finishInterval()
   {
     // First, we parse the bson we got and convert it to events.
     const json parsed = json::from_bson(*dptr);
-    unsigned int pid{ 0 };
-    parsed.at("pid").get_to(pid);
+    int pid = parsed.at("pid").get<int>();
     tracepoint_collector_types::ThreadedEvents events;
     parsed.at("events").get_to(events);
 
@@ -114,16 +113,13 @@ std::vector<json> NativeTraceSource::finishInterval()
         entry["tid"] = tid;
         entry["pid"] = pid;
         entry["name"] = provider->getScopeName(mapping, pid, trace_id);
-        switch (type)
+        if (type == TracePointCollectorNative::ENTRY)
         {
-          case TracePointCollectorNative::ENTRY:
-            entry["ph"] = "B";
-            break;
-          case TracePointCollectorNative::EXIT:
-            entry["ph"] = "E";
-            break;
-          default:
-            break;
+          entry["ph"] = "B";
+        }
+        else if (type == TracePointCollectorNative::EXIT)
+        {
+          entry["ph"] = "E";
         }
         res.push_back(entry);
       }

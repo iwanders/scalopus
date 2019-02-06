@@ -32,6 +32,9 @@
 #include <iostream>
 namespace scalopus
 {
+const uint8_t TracePointCollectorNative::ENTRY = 1;
+const uint8_t TracePointCollectorNative::EXIT = 2;
+
 TracePointCollectorNative& TracePointCollectorNative::getInstance()
 {
   static TracePointCollectorNative instance;

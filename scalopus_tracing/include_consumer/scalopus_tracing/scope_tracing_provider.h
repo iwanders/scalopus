@@ -67,7 +67,7 @@ public:
    * @param pid The process id this trace id is associated with.
    * @param trace_id The id of the tracepoint encountered.
    */
-  static std::string getScopeName(const ProcessTraceMap& mapping, const unsigned int pid, const unsigned int trace_id);
+  static std::string getScopeName(const ProcessTraceMap& mapping, const int pid, const unsigned int trace_id);
 
 private:
   EndpointManager::WeakPtr manager_;  //!< Manager for connections.

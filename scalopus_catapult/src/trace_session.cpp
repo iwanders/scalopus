@@ -153,8 +153,9 @@ void TraceSession::chunkedTransmit(const std::vector<json>& events)
   {
     size_t start_position = i * CHUNK_SIZE;
     std::vector<json> sliced{
-      std::next(events.begin(), start_position),
-      std::next(events.begin(), start_position + std::min<size_t>(CHUNK_SIZE, events.size() - start_position))
+      std::next(events.begin(), static_cast<long>(start_position)),
+      std::next(events.begin(),
+                static_cast<long>(start_position + std::min<size_t>(CHUNK_SIZE, events.size() - start_position)))
     };
     response_(formatEvents(sliced));
   }

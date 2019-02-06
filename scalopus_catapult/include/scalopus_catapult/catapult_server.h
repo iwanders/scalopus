@@ -86,7 +86,7 @@ public:
    * @brief Start the server and create the worker thread.
    * @note This MUST be the last method called.
    */
-  void start(std::size_t port = 9222);
+  void start(const int port = 9222);
 
   /**
    * @brief Function to set the logger to use for the backend and session output.

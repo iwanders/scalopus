@@ -50,7 +50,7 @@ public:
   {
     std::string name;                              //!< Name of this process.
     std::map<unsigned long, std::string> threads;  //!< Names of the threads in this process.
-    unsigned long pid;                             //!< Process id.
+    int pid;                                       //!< Process id.
   };
 
   /**
@@ -62,7 +62,7 @@ public:
   /**
    * @brief Provide a name to use for this process.
    */
-  void setProcessName(const std::string& name);
+  void setProcessName(const std::string& process_name);
 
   //  ------   Client ------
   /**

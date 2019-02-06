@@ -43,7 +43,7 @@ class GeneralProvider : public TraceEventProvider, public std::enable_shared_fro
 {
 public:
   using Ptr = std::shared_ptr<GeneralProvider>;
-  using ProcessInfoMap = std::map<unsigned int, EndpointProcessInfo::ProcessInfo>;
+  using ProcessInfoMap = std::map<int, EndpointProcessInfo::ProcessInfo>;
 
   /**
    * @brief Create the general provider.

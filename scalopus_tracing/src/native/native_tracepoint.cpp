@@ -47,7 +47,7 @@ static uint64_t nativeGetTime()
 }
 */
 
-static uint64_t nativeGetChrono()
+static int64_t nativeGetChrono()
 {
   using Clock = std::chrono::high_resolution_clock;
   auto now_ns = std::chrono::time_point_cast<std::chrono::nanoseconds>(Clock::now());

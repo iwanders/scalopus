@@ -429,7 +429,7 @@ std::vector<Destination::Ptr> TransportUnixFactory::discover()
 
 Transport::Ptr TransportUnixFactory::serve()
 {
-  auto t = std::make_unique<TransportUnix>();
+  auto t = std::make_shared<TransportUnix>();
   if (t->serve())
   {
     return t;
@@ -444,7 +444,7 @@ Transport::Ptr TransportUnixFactory::connect(const Destination::Ptr& destination
   {
     return nullptr;
   }
-  auto t = std::make_unique<TransportUnix>();
+  auto t = std::make_shared<TransportUnix>();
   if (t->connect(dest->pid_))
   {
     return t;

@@ -78,7 +78,7 @@ void ScopeTracingProvider::updateMapping()
   }
 }
 
-std::string ScopeTracingProvider::getScopeName(const ProcessTraceMap& mapping, const unsigned int pid,
+std::string ScopeTracingProvider::getScopeName(const ProcessTraceMap& mapping, const int pid,
                                                const unsigned int trace_id)
 {
   auto pid_info = mapping.find(pid);

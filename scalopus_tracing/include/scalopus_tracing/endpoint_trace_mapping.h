@@ -45,7 +45,7 @@ public:
   using Ptr = std::shared_ptr<EndpointTraceMapping>;
   constexpr static const char* name = "scope_tracing";
   using TraceIdMap = std::map<unsigned int /* trace_id */, std::string /* name */>;
-  using ProcessTraceMap = std::map<unsigned int /* pid */, TraceIdMap /* trace_map */>;
+  using ProcessTraceMap = std::map<int /* pid */, TraceIdMap /* trace_map */>;
 
   /**
    * @brief This function should be called from the client side, it communicates with the endpoint at the connected

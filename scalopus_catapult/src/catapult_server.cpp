@@ -57,7 +57,7 @@ void CatapultServer::setSeasocksDefaultLogger()
   setSeasocksLogger(std::make_shared<ss::PrintfLogger>(ss::Logger::Level::Warning));
 }
 
-void CatapultServer::start(std::size_t port)
+void CatapultServer::start(const int port)
 {
   // Create the server with the provided logger specification.
   server_ = std::make_shared<ss::Server>(seasocks_logger_);

@@ -27,12 +27,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import tracing
-from . import general
-from . import transport
-from . import common
-from . import interface
-from . import lib
+from . import tracing, general, transport, common, interface, lib
 
 import sys
 import argparse

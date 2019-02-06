@@ -34,8 +34,8 @@
 #include <scalopus_tracing/tracing.h>
 
 #ifdef SCALOPUS_TRACING_HAVE_LTTNG
-#include <scalopus_tracing/lttng_tracepoint.h>
 #include <scalopus_tracing/lttng_provider.h>
+#include <scalopus_tracing/lttng_tracepoint.h>
 #endif
 
 #include <scalopus_tracing/nop_tracepoint.h>
