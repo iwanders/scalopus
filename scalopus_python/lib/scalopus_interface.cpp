@@ -32,6 +32,9 @@
 #include <scalopus_interface/endpoint_manager.h>
 #include <scalopus_interface/trace_event_provider.h>
 #include <scalopus_interface/trace_event_source.h>
+#include "json_util.h"
+#include "pybind_fix.h"
+
 
 namespace scalopus
 {
@@ -99,7 +102,18 @@ bool PyEndpoint::handle(Transport& transport, const Data& incoming, Data& outgoi
 
 bool PyEndpoint::unsolicited(Transport& transport, const Data& incoming, Data& outgoing)
 {
-  PYBIND11_OVERLOAD(bool, Endpoint, unsolicited, transport, incoming, outgoing);
+  {
+    pybind11::gil_scoped_acquire gil;
+    pybind11::function overload = pybind11::get_overload(this, "unsolicited");
+    if (overload)
+    {
+      // from data to string and then to bytes.
+      py::bytes my_bytes{ std::string{ incoming.begin(), incoming.end() } };
+      auto obj = overload(transport, my_bytes);
+      return pyToData(obj, outgoing);
+    }
+  }
+  return Endpoint::unsolicited(transport, incoming, outgoing);
 }
 
 void PyEndpoint::setTransport(Transport* transport)
@@ -125,6 +139,50 @@ py::object PendingResponse::wait_for(double seconds)
   return py::cast<py::none>(Py_None);
 }
 
+TraceEventSource::Ptr PyTraceEventProvider::makeSource()
+{
+  std::cout << "PyTraceEventProvider: " << this << std::endl;
+  PYBIND11_OVERLOAD_PURE(TraceEventSource::Ptr, TraceEventProvider, makeSource, );
+}
+
+void PyTraceEventSource::startInterval()
+{
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+  PYBIND11_OVERLOAD(void, TraceEventSource, startInterval, );
+}
+
+void PyTraceEventSource::stopInterval()
+{
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+  {
+
+    pybind11::gil_scoped_acquire gil;
+    pybind11::function overload = pybind11::get_overload(this, "finishInterval");
+    std::cout << "overload: " << bool{overload} << std::endl;
+    std::cout << "this: " << this << std::endl;
+  }
+  PYBIND11_OVERLOAD(void, TraceEventSource, stopInterval, );
+}
+
+std::vector<json> PyTraceEventSource::finishInterval()
+{
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+  // The body here should be:
+  // PYBIND11_OVERLOAD(std::vector<json>, TraceEventSource, finishInterval,);
+  // but that causes a incomplete type on resolving the 'is_copy_constructable' template.
+  // So we do it by hand here.
+
+  pybind11::gil_scoped_acquire gil;
+  pybind11::function overload = pybind11::get_overload(this, "finishInterval");
+  if (overload)
+  {
+    auto obj = overload();
+    json returned_value = obj;
+    return returned_value.get<std::vector<json>>();
+  }
+  return {};
+}
+
 // Maybe convert to bytes using https://pybind11.readthedocs.io/en/master/advanced/cast/stl.html ?
 void add_scalopus_interface(py::module& m)
 {
@@ -144,11 +202,6 @@ void add_scalopus_interface(py::module& m)
     return std::make_shared<PendingResponse>(transport.request(name, pyToData(outgoing)));
   });
 
-  //  py::class_<Endpoint, Endpoint::Ptr> endpoint(m, "Endpoint");
-  //  endpoint.def("getName", &Endpoint::getName);
-  //  endpoint.def("handle", &Endpoint::handle);
-  //  endpoint.def("unsolicited", &Endpoint::unsolicited);
-
   py::class_<Endpoint, PyEndpoint, Endpoint::Ptr> py_endpoint(interface, "Endpoint");
   py_endpoint.def(py::init<>());
   py_endpoint.def("getName", &Endpoint::getName);
@@ -156,13 +209,17 @@ void add_scalopus_interface(py::module& m)
   py_endpoint.def("unsolicited", &Endpoint::unsolicited);
   py_endpoint.def("getTransport", &Endpoint::getTransport, py::return_value_policy::reference);
 
-  py::class_<TraceEventProvider, TraceEventProvider::Ptr> trace_event_provider(m, "TraceEventProvider");
+  py::class_<TraceEventProvider, PyTraceEventProvider, TraceEventProvider::Ptr> trace_event_provider(
+      interface, "TraceEventProvider");
+  trace_event_provider.def(py::init<>());
   trace_event_provider.def("makeSource", &TraceEventProvider::makeSource);
 
-  py::class_<TraceEventSource, TraceEventSource::Ptr> trace_event_source(interface, "TraceEventSource");
+  py::class_<TraceEventSource, PyTraceEventSource, TraceEventSource::Ptr> trace_event_source(interface,
+                                                                                             "TraceEventSource");
+  trace_event_source.def(py::init<>());
   trace_event_source.def("startInterval", &TraceEventSource::startInterval);
   trace_event_source.def("stopInterval", &TraceEventSource::stopInterval);
-  trace_event_source.def("work", &TraceEventSource::work);
+  //  trace_event_source.def("work", &TraceEventSource::work);
   trace_event_source.def("finishInterval", &TraceEventSource::finishInterval);  // implicit conversion from json =)
 
   py::class_<EndpointManager, EndpointManager::Ptr> endpoint_manager(interface, "EndpointManager");

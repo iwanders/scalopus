@@ -37,8 +37,6 @@ try:
 except ImportError:
     from threading import get_ident as thread_ident
 
-import weakref
-
 class TracingTester(unittest.TestCase):
     @staticmethod
     def pollManagerLog(value):

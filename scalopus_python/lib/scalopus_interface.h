@@ -31,11 +31,13 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <scalopus_interface/endpoint_manager.h>
+#include <scalopus_interface/trace_event_provider.h>
 #include "json_util.h"
 
 namespace scalopus
 {
 namespace py = pybind11;
+using json = nlohmann::json;
 /**
  * @brief Custom function to data conversion. Since there is so many 'valid' ways in Python 2 and 3 to express bytes.
  * Strings, bytearray, buffer, list of integers.
@@ -65,6 +67,25 @@ public:
   bool handle(Transport& transport, const Data& incoming, Data& outgoing) override;
   bool unsolicited(Transport& transport, const Data& incoming, Data& outgoing) override;
   void setTransport(Transport* transport) override;
+};
+
+class PyTraceEventProvider : public TraceEventProvider
+{
+public:
+  using Ptr = std::shared_ptr<PyTraceEventProvider>;
+  using TraceEventProvider::TraceEventProvider;  // Inherit constructors
+  TraceEventSource::Ptr makeSource() override;
+};
+
+class PyTraceEventSource : public TraceEventSource
+{
+public:
+  using Ptr = std::shared_ptr<PyTraceEventSource>;
+  using TraceEventSource::TraceEventSource;  // Inherit constructors
+
+  void startInterval() override;
+  void stopInterval() override;
+  std::vector<json> finishInterval() override;
 };
 
 class PendingResponse

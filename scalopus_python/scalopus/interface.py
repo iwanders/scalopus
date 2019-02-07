@@ -28,7 +28,14 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from . import lib
+"""
+https://pybind11.readthedocs.io/en/master/advanced/classes.html#overriding-virtuals
 
+Note that a direct __init__ constructor should be called, and super() should
+not be used. For simple cases of linear inheritance, super() may work, but
+once you begin mixing Python and C++ multiple inheritance, things will fall
+apart due to differences between Python’s MRO and C++’s mechanisms.
+"""
 class Endpoint(lib.interface.Endpoint):
     """Endpoint base class for Python endpoints.
     """
@@ -36,7 +43,7 @@ class Endpoint(lib.interface.Endpoint):
         """This function must be called at all times by subclasses.
         """
         lib.interface.Endpoint.__init__(self)
-        
+
     def handle(self, transport, incoming):
         """Function to handle requests coming from the transport.
 
@@ -47,6 +54,7 @@ class Endpoint(lib.interface.Endpoint):
             :return: Response data if a response is to be sent.
             :rtype: None, list of integers, string or bytearray.
         """
+        pass
 
     def getName(self):
         """Function that returns the name of the endpoint.
@@ -55,3 +63,54 @@ class Endpoint(lib.interface.Endpoint):
             :rtype: str
         """
         raise NotImplemented("getName must be implemented by the subclass.")
+
+class TraceEventSource(lib.interface.TraceEventSource):
+    """TraceEventSource base class for Python providers.
+    """
+    def __init__(self):
+        """This function must be called at all times by subclasses.
+        """
+        lib.interface.TraceEventSource.__init__(self)
+
+    def startInterval(self):
+        """Function to start the recording interval.
+            :return: None
+            :rtype: None
+        """
+        pass
+
+    def stopInterval(self):
+        """Function to stop the recording interval.
+            :return: None
+            :rtype: None
+        """
+        pass
+
+    def finishInterval(self):
+        """Function to finish the recording interval and provide results.
+            :return: List of dictionaries representing the events captured
+                     between start and stop interval. In valid
+                     Trace Event Format events.
+            :rtype: list of dictionaries.
+        """
+        return [{"tid": 4755,"pid": "a.out","cat": "PERF","ph": "B","name": "scope0","ts": 1549504377576676.0}]
+        
+    def __del__(self):
+        print("Delete is called on: {}".format(id(self)))
+
+
+class TraceEventProvider(lib.interface.TraceEventProvider):
+    """TraceEventProvider base class for Python providers.
+    """
+    def __init__(self):
+        """This function must be called at all times by subclasses.
+        """
+        lib.interface.TraceEventProvider.__init__(self)
+    
+    def makeSource(self):
+        """Function that creates a new source for this provider.
+       
+            :return: New instance of the trace event source.
+            :rtype: TraceEventSource
+        """
+        raise NotImplemented("makeSource must be implemented by the subclass.")
