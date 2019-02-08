@@ -77,12 +77,22 @@ class JsonConversionTester(unittest.TestCase):
         self.printEntries(result_list, input_list)
         self.assertEqual(result_list, input_list)
 
+        input_list = []
+        result_list = pybind11_nlohmann_test.echo(input_list)
+        self.printEntries(result_list, input_list)
+        self.assertEqual(result_list, input_list)
+
         input_string = "abc"
         result_string = pybind11_nlohmann_test.echo(input_string)
         self.printEntries(result_string, input_string)
         self.assertEqual(result_string, input_string)
 
         input_dict = {"a": 3, "b": 7, "c": [1,2,3]}
+        result_dict = pybind11_nlohmann_test.echo(input_dict)
+        self.printEntries(result_dict, input_dict)
+        self.assertEqual(result_dict, input_dict)
+
+        input_dict = dict()
         result_dict = pybind11_nlohmann_test.echo(input_dict)
         self.printEntries(result_dict, input_dict)
         self.assertEqual(result_dict, input_dict)

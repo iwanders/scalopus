@@ -162,7 +162,7 @@ json pyToJson(const py::object& data)
   // tuple is handled like a sequence.
   if (py::isinstance<py::sequence>(data))
   {
-    json json_seq;
+    json json_seq = json::array();
     for (const auto& v : data.cast<py::sequence>())
     {
       json_seq.push_back(pyToJson(v.cast<py::object>()));
@@ -173,7 +173,7 @@ json pyToJson(const py::object& data)
   if (py::isinstance<py::dict>(data))
   {
     py::dict our_dict = data.cast<py::dict>();
-    json our_json_map;
+    json our_json_map = json::object();
     for (const auto& k_v : our_dict)
     {
       if (!py::isinstance<py::str>(k_v.first))
