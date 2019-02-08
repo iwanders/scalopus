@@ -147,21 +147,15 @@ TraceEventSource::Ptr PyTraceEventProvider::makeSource()
     {
       auto o = overload();
       auto v = pybind11::detail::cast_safe<TraceEventSource::Ptr>(std::move(o));
-      std::cout << "v: " << v.get() << std::endl;
       auto dumb = o.ptr();
-      std::cout << "Dumb python object: " << dumb << std::endl;
       auto shim = std::shared_ptr<WrappedPythonSource>(new WrappedPythonSource, [dumb](auto ptr)
       {
+        pybind11::gil_scoped_acquire gil;
         auto z = dumb;
-        Py_CLEAR(z);  // segfault here, in cleaning up the python subtype.
-        // CC=clang-7  CXX=clang++-7 cmake -DPYTHON_EXECUTABLE=$(which python3.6-dbg) -DCMAKE_BUILD_TYPE=Debug ../repo/ && VERBOSE=1 make -j8 && ctest .
-
+        Py_CLEAR(z);
       });
       std::cout << "shim: " << shim.get() << std::endl;
       shim->real_ = v;
-      //  std::cout << "v: " << v.use_count() << std::endl;
-      //  o.cast<PyTraceEventSource::Ptr>()->obj_ = o.ptr();
-      //  std::cout << "Current ref count: " << o.ref_count() << std::endl;
       Py_INCREF(o.ptr());
       return shim;
     }
