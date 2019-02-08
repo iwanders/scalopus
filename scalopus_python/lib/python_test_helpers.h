@@ -27,23 +27,10 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#pragma once
 #include <pybind11/pybind11.h>
-
-#include "json_util.h"
-#include "python_test_helpers.h"
-#include "scalopus_catapult.h"
-#include "scalopus_general.h"
-#include "scalopus_interface.h"
-#include "scalopus_tracing.h"
-#include "scalopus_transport.h"
-
-PYBIND11_MODULE(scalopus_python_lib, m)
+namespace scalopus
 {
-  using namespace scalopus;
-  add_scalopus_interface(m);
-  add_scalopus_transport(m);
-  add_scalopus_general(m);
-  add_scalopus_tracing(m);
-  add_scalopus_catapult(m);
-  add_python_test_helpers(m);
-}
+namespace py = pybind11;
+void add_python_test_helpers(py::module&);
+}  // namespace scalopus

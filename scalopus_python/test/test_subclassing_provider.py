@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 # Copyright (c) 2018-2019, Ivor Wanders
 # All rights reserved.
 #
@@ -27,16 +26,19 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-import sys
-import time
+
+import scalopus
+import unittest
+import gc
 
 import scalopus
 import scalopus.tracing as tracing
 
+overload_called = False
 class PythonSource(scalopus.interface.TraceEventSource):
     def __init__(self):
         scalopus.interface.TraceEventSource.__init__(self)
-        print("Made a PythonSource: {:x}".format(id(self)))
+        print("Made a PythonSource: {}".format(id(self)))
 
     def startInterval(self):
         print("The interval was started")
@@ -44,15 +46,19 @@ class PythonSource(scalopus.interface.TraceEventSource):
     def stopInterval(self):
         print("The interval was stopped")
 
+    def finishInterval(self):
+        global overload_called
+        print("Overload called")
+        overload_called = True
+        return []
+
     def __del__(self):
-        print("PythonSource destroyed")
+        print("Delete is called on: {}".format(id(self)))
 
-
-z = PythonSource()
 class PythonProvider(scalopus.interface.TraceEventProvider):
     def __init__(self):
         scalopus.interface.TraceEventProvider.__init__(self)
-        print("Made a PythonProvider: {:x}".format(id(self)))
+        print("Made a PythonProvider: {}".format(id(self)))
 
     # def makeSource(self):
         # global z
@@ -61,60 +67,33 @@ class PythonProvider(scalopus.interface.TraceEventProvider):
     def makeSource(self):
         return PythonSource()
 
-@tracing.trace_function
-def fooBarBuz():
-    time.sleep(0.2)
 
-@tracing.trace_function
-def c():
-    time.sleep(0.2)
-    print("  c")
-    fooBarBuz()
-    time.sleep(0.2)
+class PythonEndpoint(unittest.TestCase):
 
-@tracing.trace_function
-def b():
-    time.sleep(0.2)
-    print(" b")
-    c()
-    time.sleep(0.2)
+    def foo(self):
+        spawner = scalopus.lib.lib.test_helpers.PythonSubclasserSpawner()
+        my_provider = PythonProvider()
+        spawner.addProvider(my_provider)
+        print("make:")
+        spawner.makeSourceFrom()
+        print("call:")
+        spawner.call()
+        gc.collect()
+        # our_source = spawner.getSource()
+        print("reset:")
+        # spawner.resetSource()
+        gc.collect()
+        scalopus.lib.lib.test_helpers.store(spawner)
 
-@tracing.trace_function
-def a():
-    print("a")
-    time.sleep(0.2)
-    b()
-    time.sleep(0.2)
+    def test_endpoint(self):
+        self.foo()
+        gc.collect()
+        print("call:")
+        # scalopus.lib.lib.test_helpers.retrieve().call()
+        scalopus.lib.lib.test_helpers.clear()
+        global overload_called
+        self.assertTrue(overload_called)
 
-if __name__ == "__main__":
-    factory = scalopus.transport.TransportLoopbackFactory()
-    exposer = scalopus.common.DefaultExposer(process_name=sys.argv[0], transport_factory=factory)
 
-    # Embedding catapult server
-    poller = scalopus.general.EndpointManagerPoll(factory)
-    native_provider = scalopus.tracing.native.NativeTraceProvider(poller)
-    poller.addEndpointFactory(scalopus.tracing.EndpointNativeTraceSender.name, native_provider.factory)
-    poller.addEndpointFactory(scalopus.tracing.EndpointTraceMapping.name, scalopus.tracing.EndpointTraceMapping.factory)
-    poller.addEndpointFactory(scalopus.general.EndpointProcessInfo.name, scalopus.general.EndpointProcessInfo.factory)
-    poller.manage()  # do one round of discovery
-
-    catapult = scalopus.catapult.CatapultServer()
-    my_python_provider = PythonProvider()
-    catapult.addProvider(native_provider)
-    catapult.addProvider(my_python_provider)
-    catapult.addProvider(scalopus.general.GeneralProvider(poller))
-
-    catapult.start(port=9222) # start the catapult server, defaults to 9222.
-
-    # execution
-    scalopus.general.setThreadName("main")
-
-    while True:
-        # fastest, one attribute lookup, name will be 'my_relevant_scope'
-        with tracing.trace_section.my_relevant_scope:
-            time.sleep(0.1)
-            a()
-        # Less fast then above, 1 method lookup and one call, allows spaces. Name will be "My Section"
-        with tracing.trace_section("My Section"):
-            time.sleep(0.1)
-            a()
+if __name__ == '__main__':
+    unittest.main()

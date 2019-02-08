@@ -93,11 +93,7 @@ class TraceEventSource(lib.interface.TraceEventSource):
                      Trace Event Format events.
             :rtype: list of dictionaries.
         """
-        return [{"tid": 4755,"pid": "a.out","cat": "PERF","ph": "B","name": "scope0","ts": 1549504377576676.0}]
-        
-    def __del__(self):
-        print("Delete is called on: {}".format(id(self)))
-
+        return []
 
 class TraceEventProvider(lib.interface.TraceEventProvider):
     """TraceEventProvider base class for Python providers.

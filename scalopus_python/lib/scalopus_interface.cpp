@@ -33,8 +33,6 @@
 #include <scalopus_interface/trace_event_provider.h>
 #include <scalopus_interface/trace_event_source.h>
 #include "json_util.h"
-#include "pybind_fix.h"
-
 
 namespace scalopus
 {
@@ -142,9 +140,44 @@ py::object PendingResponse::wait_for(double seconds)
 TraceEventSource::Ptr PyTraceEventProvider::makeSource()
 {
   std::cout << "PyTraceEventProvider: " << this << std::endl;
-  PYBIND11_OVERLOAD_PURE(TraceEventSource::Ptr, TraceEventProvider, makeSource, );
+  {
+    pybind11::gil_scoped_acquire gil;
+    pybind11::function overload = pybind11::get_overload(static_cast<const TraceEventProvider*>(this), "makeSource");
+    if (overload)
+    {
+      auto o = overload();
+      auto v = pybind11::detail::cast_safe<TraceEventSource::Ptr>(std::move(o));
+      std::cout << "v: " << v.get() << std::endl;
+      auto dumb = o.ptr();
+      std::cout << "Dumb python object: " << dumb << std::endl;
+      auto shim = std::shared_ptr<WrappedPythonSource>(new WrappedPythonSource, [dumb](auto ptr)
+      {
+        auto z = dumb;
+        Py_CLEAR(z);  // segfault here, in cleaning up the python subtype.
+        // CC=clang-7  CXX=clang++-7 cmake -DPYTHON_EXECUTABLE=$(which python3.6-dbg) -DCMAKE_BUILD_TYPE=Debug ../repo/ && VERBOSE=1 make -j8 && ctest .
+
+      });
+      std::cout << "shim: " << shim.get() << std::endl;
+      shim->real_ = v;
+      //  std::cout << "v: " << v.use_count() << std::endl;
+      //  o.cast<PyTraceEventSource::Ptr>()->obj_ = o.ptr();
+      //  std::cout << "Current ref count: " << o.ref_count() << std::endl;
+      Py_INCREF(o.ptr());
+      return shim;
+    }
+  }
+  pybind11::pybind11_fail("Tried to call pure virtual function \""
+                          "TraceEventProvider"
+                          "::"
+                          "makeSource"
+                          "\"");
+  ;
 }
 
+PyTraceEventSource::~PyTraceEventSource()
+{
+  std::cout << "PyTraceEvent cleaned up." << std::endl;
+}
 void PyTraceEventSource::startInterval()
 {
   std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -155,10 +188,9 @@ void PyTraceEventSource::stopInterval()
 {
   std::cout << __PRETTY_FUNCTION__ << std::endl;
   {
-
     pybind11::gil_scoped_acquire gil;
     pybind11::function overload = pybind11::get_overload(this, "finishInterval");
-    std::cout << "overload: " << bool{overload} << std::endl;
+    std::cout << "overload: " << bool{ overload } << std::endl;
     std::cout << "this: " << this << std::endl;
   }
   PYBIND11_OVERLOAD(void, TraceEventSource, stopInterval, );
@@ -203,7 +235,7 @@ void add_scalopus_interface(py::module& m)
   });
 
   py::class_<Endpoint, PyEndpoint, Endpoint::Ptr> py_endpoint(interface, "Endpoint");
-  py_endpoint.def(py::init<>());
+  py_endpoint.def(py::init_alias<>());
   py_endpoint.def("getName", &Endpoint::getName);
   py_endpoint.def("handle", &Endpoint::handle);
   py_endpoint.def("unsolicited", &Endpoint::unsolicited);
@@ -216,7 +248,7 @@ void add_scalopus_interface(py::module& m)
 
   py::class_<TraceEventSource, PyTraceEventSource, TraceEventSource::Ptr> trace_event_source(interface,
                                                                                              "TraceEventSource");
-  trace_event_source.def(py::init<>());
+  trace_event_source.def(py::init_alias<>());
   trace_event_source.def("startInterval", &TraceEventSource::startInterval);
   trace_event_source.def("stopInterval", &TraceEventSource::stopInterval);
   //  trace_event_source.def("work", &TraceEventSource::work);

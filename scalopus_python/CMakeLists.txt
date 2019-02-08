@@ -14,6 +14,7 @@ pybind11_add_module(scalopus_python_lib
   lib/scalopus_tracing.cpp
   lib/scalopus_catapult.cpp
   lib/json_util.cpp
+  lib/python_test_helpers.cpp
   )
 target_link_libraries(scalopus_python_lib
   PRIVATE
