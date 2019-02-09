@@ -77,22 +77,23 @@ class PythonEndpoint(unittest.TestCase):
         print("make:")
         spawner.makeSourceFrom()
         print("call:")
+        gc.collect()
         spawner.call()
-        gc.collect()
         # our_source = spawner.getSource()
-        print("reset:")
-        # spawner.resetSource()
         gc.collect()
-        scalopus.lib.lib.test_helpers.store(spawner)
+        print("Staging destruction from another thread.")
+        spawner.stage_destroy(50)
+        for i in range(0, 10):
+            time.sleep(0.01)
+            print(".", endl="")
+        spawner.join()
 
     def test_endpoint(self):
         self.foo()
-        gc.collect()
-        print("call:")
-        # scalopus.lib.lib.test_helpers.retrieve().call()
-        scalopus.lib.lib.test_helpers.clear()
         global overload_called
         self.assertTrue(overload_called)
+
+        
 
 
 if __name__ == '__main__':
