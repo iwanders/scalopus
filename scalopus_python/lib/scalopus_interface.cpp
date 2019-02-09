@@ -126,15 +126,11 @@ PendingResponse::PendingResponse(Transport::PendingResponse resp) : resp_{ resp 
 
 py::object PendingResponse::wait_for(double seconds)
 {
-  std::cout << "Blocking for " << seconds << " s on future" << std::endl;
-
   py::gil_scoped_release release;
   if (resp_->wait_for(std::chrono::duration<double>(seconds)) == std::future_status::ready)
   {
-    std::cout << "Succesfully waited for future" << std::endl;
     return dataToPy(resp_->get());
   }
-  std::cout << "bummer " << std::endl;
   return py::cast<py::none>(Py_None);
 }
 
@@ -145,25 +141,16 @@ TraceEventSource::Ptr PyTraceEventProvider::makeSource()
 
 void PyTraceEventSource::startInterval()
 {
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
   PYBIND11_OVERLOAD(void, TraceEventSource, startInterval, );
 }
 
 void PyTraceEventSource::stopInterval()
 {
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
-  {
-    pybind11::gil_scoped_acquire gil;
-    pybind11::function overload = pybind11::get_overload(this, "finishInterval");
-    std::cout << "overload: " << bool{ overload } << std::endl;
-    std::cout << "this: " << this << std::endl;
-  }
   PYBIND11_OVERLOAD(void, TraceEventSource, stopInterval, );
 }
 
 std::vector<json> PyTraceEventSource::finishInterval()
 {
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
   // The body here should be:
   //  PYBIND11_OVERLOAD(std::vector<json>, TraceEventSource, finishInterval,);
   // but that causes a incomplete type on resolving the 'is_copy_constructable' template.

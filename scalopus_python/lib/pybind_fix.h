@@ -40,6 +40,8 @@
 
 namespace scalopus
 {
+class Endpoint;
+class TraceEventProvider;
 class TraceEventSource;
 }
 // Based on https://github.com/pybind/pybind11/issues/1546
@@ -49,6 +51,89 @@ namespace py = pybind11;
 namespace detail
 {
 
+
+  // Start of Endpoint
+  template<>
+  struct type_caster<std::shared_ptr<scalopus::Endpoint>>
+  {
+    PYBIND11_TYPE_CASTER (std::shared_ptr<scalopus::Endpoint>, _("scalopus::Endpoint"));
+
+    using EndpointCaster = copyable_holder_caster<scalopus::Endpoint, std::shared_ptr<scalopus::Endpoint>>;
+
+    bool load (pybind11::handle src, bool b)
+    {
+      EndpointCaster bc;
+      bool success = bc.load (src, b);
+      if (!success)
+      {
+        return false;
+      }
+
+      auto py_obj = py::reinterpret_borrow<py::object> (src);
+      auto base_ptr = static_cast<std::shared_ptr<scalopus::Endpoint>> (bc);
+      auto py_obj_ptr = std::shared_ptr<py::object> (new py::object{py_obj}, [](auto py_object_ptr)
+      {
+        pybind11::gil_scoped_acquire gil;
+        delete py_object_ptr;
+      });
+
+      value = std::shared_ptr<scalopus::Endpoint> (py_obj_ptr, base_ptr.get ());
+      return true;
+    }
+
+    static handle cast (std::shared_ptr<scalopus::Endpoint> base,
+                        return_value_policy rvp,
+                        handle h)
+    {
+      return EndpointCaster::cast (base, rvp, h);
+    }
+  };
+
+  template <>
+  struct is_holder_type<scalopus::Endpoint, std::shared_ptr<scalopus::Endpoint>> : std::true_type {};
+  // End of Endpoint
+  // Start of TraceEventProvider
+  template<>
+  struct type_caster<std::shared_ptr<scalopus::TraceEventProvider>>
+  {
+    PYBIND11_TYPE_CASTER (std::shared_ptr<scalopus::TraceEventProvider>, _("scalopus::TraceEventProvider"));
+
+    using TraceEventProviderCaster = copyable_holder_caster<scalopus::TraceEventProvider, std::shared_ptr<scalopus::TraceEventProvider>>;
+
+    bool load (pybind11::handle src, bool b)
+    {
+      TraceEventProviderCaster bc;
+      bool success = bc.load (src, b);
+      if (!success)
+      {
+        return false;
+      }
+
+      auto py_obj = py::reinterpret_borrow<py::object> (src);
+      auto base_ptr = static_cast<std::shared_ptr<scalopus::TraceEventProvider>> (bc);
+      auto py_obj_ptr = std::shared_ptr<py::object> (new py::object{py_obj}, [](auto py_object_ptr)
+      {
+        pybind11::gil_scoped_acquire gil;
+        delete py_object_ptr;
+      });
+
+      value = std::shared_ptr<scalopus::TraceEventProvider> (py_obj_ptr, base_ptr.get ());
+      return true;
+    }
+
+    static handle cast (std::shared_ptr<scalopus::TraceEventProvider> base,
+                        return_value_policy rvp,
+                        handle h)
+    {
+      return TraceEventProviderCaster::cast (base, rvp, h);
+    }
+  };
+
+  template <>
+  struct is_holder_type<scalopus::TraceEventProvider, std::shared_ptr<scalopus::TraceEventProvider>> : std::true_type {};
+  // End of TraceEventProvider
+
+  // Start of TraceEventSource
   template<>
   struct type_caster<std::shared_ptr<scalopus::TraceEventSource>>
   {
@@ -87,5 +172,7 @@ namespace detail
 
   template <>
   struct is_holder_type<scalopus::TraceEventSource, std::shared_ptr<scalopus::TraceEventSource>> : std::true_type {};
+  // End of TraceEventSource
+
 }
 }
