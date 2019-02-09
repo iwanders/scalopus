@@ -8,7 +8,7 @@ target_compile_options(scalopus_interface PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 
 target_include_directories(scalopus_interface
   PUBLIC
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_interface/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 add_library(Scalopus::scalopus_interface ALIAS scalopus_interface)
@@ -21,7 +21,7 @@ add_library(scalopus_consumer SHARED
 target_compile_options(scalopus_consumer PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_include_directories(scalopus_consumer
   PUBLIC
-    $<INSTALL_INTERFACE:include_consumer>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_interface/include_consumer>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include_consumer>
 )
 target_link_libraries(scalopus_consumer
@@ -35,10 +35,11 @@ add_library(Scalopus::scalopus_consumer ALIAS scalopus_consumer)
 export(
   TARGETS scalopus_interface scalopus_consumer
   NAMESPACE Scalopus::
-  FILE ${SCALOPUS_COMPONENT_CMAKE_CONFIG_DIR}/ScalopusInterfaceConfig.cmake
+  FILE ${SCALOPUS_EXPORT_CMAKE_DIR}/ScalopusInterfaceConfig.cmake
 )
-install(TARGETS scalopus_interface scalopus_consumer EXPORT ScalopusInterface
+install(TARGETS scalopus_interface scalopus_consumer EXPORT ScalopusInterfaceConfig
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(EXPORT ScalopusInterface DESTINATION share/scalopus_interface/cmake)
+install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_interface/)
+install(DIRECTORY include_consumer DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_interface/)
+install(EXPORT ScalopusInterfaceConfig DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR})

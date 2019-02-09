@@ -10,10 +10,10 @@ target_compile_features(scalopus_general PUBLIC cxx_relaxed_constexpr)
 
 target_include_directories(scalopus_general
   PUBLIC 
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_general/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
 add_library(Scalopus::scalopus_general ALIAS scalopus_general)
 
@@ -33,10 +33,10 @@ add_library(scalopus_general_consumer SHARED
 target_compile_options(scalopus_general_consumer PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_include_directories(scalopus_general_consumer
   PUBLIC 
-    $<INSTALL_INTERFACE:include_consumer>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_general/include_consumer>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include_consumer>
   PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
 add_library(Scalopus::scalopus_general_consumer ALIAS scalopus_general_consumer)
 target_link_libraries(scalopus_general_consumer
@@ -48,12 +48,13 @@ target_link_libraries(scalopus_general_consumer
 export(
   TARGETS scalopus_general scalopus_general_consumer
   NAMESPACE Scalopus::
-  FILE ${SCALOPUS_COMPONENT_CMAKE_CONFIG_DIR}/ScalopusGeneralConfig.cmake
+  FILE ${SCALOPUS_EXPORT_CMAKE_DIR}/ScalopusGeneralConfig.cmake
 )
-install(TARGETS scalopus_general scalopus_general_consumer EXPORT ScalopusGeneral
+install(TARGETS scalopus_general scalopus_general_consumer EXPORT ScalopusGeneralConfig
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(EXPORT ScalopusGeneral DESTINATION share/scalopus_general/cmake)
+install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_general/)
+install(DIRECTORY include_consumer DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_general/)
+install(EXPORT ScalopusGeneralConfig DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR})
 
 add_subdirectory(test)

@@ -89,7 +89,7 @@ Counterpart to the main [scalopus_general](/scalopus_general/) component. This p
 - `EndpointManagerPoll`: See the readme in the general folder.
 - `setThreadName("name")`: Sets the name of the calling thread.
 - `weak_provider_endpoint_factory`: If you have a provider that has a `.factory()` method to create endpoints that are
- associated to it. You may need this function to wrap the factory method before passing it to the `EndpointManagerPoll`
+ associated to it. You may need this function to wrap the provider before passing it to the `EndpointManagerPoll`
  to prevent a circular reference being formed.
 
 ## scalopus.transport

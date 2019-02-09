@@ -7,10 +7,10 @@ add_library(scalopus_catapult SHARED
 
 target_include_directories(scalopus_catapult
   PUBLIC 
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_catapult/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
 add_library(Scalopus::scalopus_catapult ALIAS scalopus_catapult)
 target_compile_options(scalopus_catapult PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
@@ -32,10 +32,11 @@ target_compile_options(scalopus_catapult_server PRIVATE ${SCALOPUS_COMPILE_OPTIO
 export(
   TARGETS scalopus_catapult
   NAMESPACE Scalopus::
-  FILE ${SCALOPUS_COMPONENT_CMAKE_CONFIG_DIR}/ScalopusCatapultConfig.cmake
+  FILE ${SCALOPUS_EXPORT_CMAKE_DIR}/ScalopusCatapultConfig.cmake
 )
-install(TARGETS scalopus_catapult EXPORT ScalopusCatapult
+install(TARGETS scalopus_catapult scalopus_catapult_server EXPORT ScalopusCatapultConfig
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(EXPORT ScalopusCatapult DESTINATION share/scalopus_catapult/cmake)
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_catapult/)
+install(EXPORT ScalopusCatapultConfig DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR})

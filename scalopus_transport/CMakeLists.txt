@@ -8,7 +8,7 @@ add_library(Scalopus::scalopus_transport ALIAS scalopus_transport)
 
 target_include_directories(scalopus_transport
   PUBLIC
-      $<INSTALL_INTERFACE:include>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_transport/include>
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -26,13 +26,13 @@ target_compile_options(scalopus_transport PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 export(
   TARGETS scalopus_transport
   NAMESPACE Scalopus::
-  FILE ${SCALOPUS_COMPONENT_CMAKE_CONFIG_DIR}/ScalopusTransportConfig.cmake
+  FILE ${SCALOPUS_EXPORT_CMAKE_DIR}/ScalopusTransportConfig.cmake
 )
-install(TARGETS scalopus_transport EXPORT ScalopusTransport
+install(TARGETS scalopus_transport EXPORT ScalopusTransportConfig
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(EXPORT ScalopusTransport DESTINATION share/scalopus_transport/cmake)
+install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_transport/)
+install(EXPORT ScalopusTransportConfig DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR})
 
 add_subdirectory(test)
 

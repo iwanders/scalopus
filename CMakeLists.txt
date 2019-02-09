@@ -15,10 +15,10 @@ option(SCALOPUS_USE_PYTHON3 "Set PYBIND11_PYTHON_VERSION to 3." OFF)
 
 set(SCALOPUS_TRACING_HAVE_BUILT_LTTNG OFF)
 
-set(SCALOPUS_CMAKE_CONFIG_DIR          "${CMAKE_CURRENT_BINARY_DIR}")
-set(SCALOPUS_COMPONENT_CMAKE_CONFIG_DIR          "${CMAKE_CURRENT_BINARY_DIR}/cmake/")
-set(SCALOPUS_CMAKE_PROJECT_CONFIG_FILE "${SCALOPUS_CMAKE_CONFIG_DIR}/${PROJECT_NAME}Config.cmake")
-set(SCALOPUS_CONFIG_INSTALL_DIR        "cmake/${PROJECT_NAME}" CACHE INTERNAL "")
+include(GNUInstallDirs)
+set(SCALOPUS_MAIN_EXPORT_CMAKE_DIR          "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/")
+set(SCALOPUS_INSTALL_EXPORT_CMAKE_DIR  "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/")
+set(SCALOPUS_EXPORT_CMAKE_DIR "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/")
 
 # We need an include here to ensure that the find package call originates from the root.
 # add_subdirectory won't work as that won't expose embedded targets to the scalopus subcomponent directories.
@@ -39,7 +39,6 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 endif()
 set(SCALOPUS_COMPILE_OPTIONS "-Werror;-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-Wpedantic;${CLANG_ONLY_COMPILE_FLAGS}")
 
-include(GNUInstallDirs)
 include(FindThreads)
 
 include(CTest)
@@ -63,11 +62,11 @@ add_custom_target(clang_format_scalopus COMMAND clang-format-7 -i ${FORMAT_SRC_F
 
 configure_file(
   ${CMAKE_CURRENT_LIST_DIR}/cmake/ScalopusConfig.cmake.in
-  ${SCALOPUS_CMAKE_PROJECT_CONFIG_FILE}
+  ${SCALOPUS_EXPORT_CMAKE_DIR}/ScalopusConfig.cmake
   @ONLY
 )
 
 install(
-  FILES ${SCALOPUS_CMAKE_PROJECT_CONFIG_FILE}
-  DESTINATION ${SCALOPUS_CONFIG_INSTALL_DIR}
+  FILES ${SCALOPUS_MAIN_EXPORT_CMAKE_DIR}ScalopusConfig.cmake
+  DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR}
 )
