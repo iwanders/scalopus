@@ -1,3 +1,6 @@
+
+# This function magically makes 'import scalopus_python_lib' load the the shared object
+# that's found inside the .egg file instead of 'this' python file.
 def __bootstrap__():
     global __bootstrap__, __loader__, __file__
     import sys, pkg_resources, imp, sysconfig

@@ -36,7 +36,7 @@ GeneralProvider = general.GeneralProvider
 
 setThreadName = general.setThreadName
 
-def WeakProviderEndpointFactory(provider):
+def weak_provider_endpoint_factory(provider):
     """
       If you have a provider that exposes a factory method to create the
       appropriate endpoint, you may need to break the circular reference

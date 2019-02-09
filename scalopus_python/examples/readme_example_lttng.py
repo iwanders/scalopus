@@ -71,6 +71,11 @@ if __name__ == "__main__":
     scalopus.general.setThreadName("main")
 
     while True:
-        with tracing.trace_sections.quux:
+        # fastest, one attribute lookup, name will be 'my_relevant_scope'
+        with tracing.trace_section.my_relevant_scope:
+            time.sleep(0.1)
+            a()
+        # Less fast then above, 1 method lookup and one call, allows spaces. Name will be "My Section"
+        with tracing.trace_section("My Section"):
             time.sleep(0.1)
             a()

@@ -31,7 +31,16 @@ from . import tracing, general, transport
 import sys
 
 class DefaultExposer(object):
+    """Default Exposer object that instantiates a server and all endpoints that
+       are natively supported."""
     def __init__(self, process_name=sys.argv[0], transport_factory=transport.TransportUnixFactory()):
+        """Constructs the exposer and sets up the server and endpoints.
+
+        :param process_name: The process name to register to the processinfo endpoint. Defaults to sys.argv[0].
+        :type process_name: str
+        :param transport_factory: The transport factory to use for the exposer. Defaults to TransportUnixFactory.
+        :type transport_factory: TransportFactory.
+        """
         self.factory = transport_factory
         self.server = self.factory.serve()
         self.server.addEndpoint(general.EndpointIntrospect())

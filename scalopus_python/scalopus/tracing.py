@@ -37,6 +37,9 @@ setTraceName = tracing.setTraceName
 EndpointTraceMapping = tracing.EndpointTraceMapping
 EndpointNativeTraceSender = tracing.native.EndpointNativeTraceSender
 NativeTraceProvider = tracing.native.NativeTraceProvider
+
+# This function provides a new unique integer each time it is called.
+# It is backed by an std::atomic_size_t on the C++ side.
 uniqueTraceId = tracing.uniqueTraceId
 
 # Also for the tracing providers.

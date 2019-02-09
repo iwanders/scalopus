@@ -9,7 +9,9 @@ where time is spent in the program. It requires instrumenting the source code of
 tracepoints to indicate which scopes need to be tracked. To get the tracepoints out of the program there are two options
 [LTTng][lttng] can be used, minimal knowledge or interaction with LTTng is necessary to use Scalopus. Tracepoints can
 also be transfered over Scalopus' native transports, this elminates the need for LTTng, but is less performant.
-The system can also be used from Python (both versions) through the Python bindings and the `scalopus` Python module.
+
+The system can be used from either Python 2 or 3 through the use of the Python bindings and the `scalopus` Python
+module. See the readme of the [scalopus_python](/scalopus_python) folder for details.
 
 The trace viewer used is available in all recent Chrome and Chromium browsers and can be opened by typing 
 [`chrome://inspect?tracing`][chrome_tracing] in the address bar. This is normally used to display traces from Android
@@ -45,7 +47,7 @@ View locally by opening [`chrome://tracing`](chrome://tracing) and loading
 [trace_readme_example.json.gz](/doc/trace_readme_example.json.gz)
 
 The [scalopus_examples](/scalopus_examples) readme shows another, larger example that shows multiple processes and
-threads.
+threads. The [scalopus_python](/scalopus_python) page shows how this would look using the Python bindings.
 
 ## Scope tracing
 For a brief explanation what we mean by tracing a scope, watch one minute of [this][cppcon_2016_quest_for_performance]

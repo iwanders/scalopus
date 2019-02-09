@@ -67,19 +67,19 @@ def run_catapult_server(args):
     except KeyboardInterrupt:
         pass
 
-    # poller.stopPolling()
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Scalopus, a framework that makes tracing easier."
+        description="Scalopus, a tracing framework for C++ and Python."
         )
 
     subparsers = parser.add_subparsers(dest="command")
 
     # Catapult server, to create the devtools endpoint.
+    catapult_server_help = ("Start a catapult server that allows connecting "
+      "from chrome://inspect?tracing. It always uses the Unix transport, and "
+      " initialises all providers supported natively by scalopus.")
     parser_catapult_server = subparsers.add_parser("catapult_server",
-        help="Start a catapult server that allows connecting from "
-             "chrome://inspect?tracing.")
+        help=catapult_server_help, description=catapult_server_help)
     parser_catapult_server.add_argument("-p", "--port", type=int,
         default=9222, help="The port to bind the webserver on. Defaults to "
         "%(default)s.")
