@@ -77,16 +77,7 @@ public:
   TraceEventSource::Ptr makeSource() override;
 };
 
-class WrappedPythonSource : public TraceEventSource, std::enable_shared_from_this<WrappedPythonSource>
-{
-public:
-  TraceEventSource::Ptr real_;
-  void startInterval(){ real_->startInterval();};
-  void stopInterval() { real_->stopInterval();};
-  std::vector<json> finishInterval() { return real_->finishInterval();};
-};
-
-class PyTraceEventSource : public TraceEventSource, std::enable_shared_from_this<PyTraceEventSource>
+class PyTraceEventSource : public TraceEventSource
 {
 public:
   using Ptr = std::shared_ptr<PyTraceEventSource>;
@@ -95,9 +86,6 @@ public:
   void startInterval() override;
   void stopInterval() override;
   std::vector<json> finishInterval() override;
-  //  void* obj_;
-
-  ~PyTraceEventSource() override;
 };
 
 class PendingResponse

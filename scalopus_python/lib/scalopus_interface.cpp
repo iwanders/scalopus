@@ -32,6 +32,7 @@
 #include <scalopus_interface/endpoint_manager.h>
 #include <scalopus_interface/trace_event_provider.h>
 #include <scalopus_interface/trace_event_source.h>
+#include "pybind_fix.h"
 #include "json_util.h"
 
 namespace scalopus
@@ -139,39 +140,9 @@ py::object PendingResponse::wait_for(double seconds)
 
 TraceEventSource::Ptr PyTraceEventProvider::makeSource()
 {
-  std::cout << "PyTraceEventProvider: " << this << std::endl;
-  {
-    pybind11::gil_scoped_acquire gil;
-    pybind11::function overload = pybind11::get_overload(static_cast<const TraceEventProvider*>(this), "makeSource");
-    if (overload)
-    {
-      auto o = overload();
-      auto v = pybind11::detail::cast_safe<TraceEventSource::Ptr>(std::move(o));
-      auto dumb = o.ptr();
-      auto shim = std::shared_ptr<WrappedPythonSource>(new WrappedPythonSource, [dumb](auto ptr)
-      {
-        pybind11::gil_scoped_acquire gil;
-        auto z = dumb;
-        Py_CLEAR(z);
-      });
-      std::cout << "shim: " << shim.get() << std::endl;
-      shim->real_ = v;
-      Py_INCREF(o.ptr());
-      return shim;
-    }
-  }
-  pybind11::pybind11_fail("Tried to call pure virtual function \""
-                          "TraceEventProvider"
-                          "::"
-                          "makeSource"
-                          "\"");
-  ;
+  PYBIND11_OVERLOAD_PURE(TraceEventSource::Ptr, TraceEventProvider, makeSource, );
 }
 
-PyTraceEventSource::~PyTraceEventSource()
-{
-  std::cout << "PyTraceEvent cleaned up." << std::endl;
-}
 void PyTraceEventSource::startInterval()
 {
   std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -194,7 +165,7 @@ std::vector<json> PyTraceEventSource::finishInterval()
 {
   std::cout << __PRETTY_FUNCTION__ << std::endl;
   // The body here should be:
-  // PYBIND11_OVERLOAD(std::vector<json>, TraceEventSource, finishInterval,);
+  //  PYBIND11_OVERLOAD(std::vector<json>, TraceEventSource, finishInterval,);
   // but that causes a incomplete type on resolving the 'is_copy_constructable' template.
   // So we do it by hand here.
 

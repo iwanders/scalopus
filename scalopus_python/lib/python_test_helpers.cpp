@@ -40,6 +40,7 @@ public:
   using Ptr = std::shared_ptr<PythonSubclasserSpawner>;
   TraceEventProvider::Ptr provider;
   TraceEventSource::Ptr source;
+  std::thread thread_;
 
   void addProvider(TraceEventProvider::Ptr prov)
   {
@@ -61,16 +62,28 @@ public:
   {
     source.reset();
   }
+  void stage_destroy(int ms)
+  {
+    thread_ = std::thread([&]()
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+      source.reset();
+      provider.reset();
+    });
+  }
+  void join()
+  {
+    thread_.join();
+  }
 };
 
-PythonSubclasserSpawner::Ptr stored;
 
 namespace py = pybind11;
 void add_python_test_helpers(py::module& m)
 {
   pybind11_nlohmann_conversion::add_pybind11_nlohmann_tests(m);
 
-  py::module test_helpers = m.def_submodule("test_helpers", "The catapult components.");
+  py::module test_helpers = m.def_submodule("test_helpers", "Some test helpers.");
 
   py::class_<PythonSubclasserSpawner, PythonSubclasserSpawner::Ptr> subclass_spawner(test_helpers,
                                                                                      "PythonSubclasserSpawner");
@@ -80,9 +93,7 @@ void add_python_test_helpers(py::module& m)
   subclass_spawner.def("getSource", &PythonSubclasserSpawner::getSource);
   subclass_spawner.def("resetSource", &PythonSubclasserSpawner::resetSource);
   subclass_spawner.def("call", &PythonSubclasserSpawner::call);
-
-  test_helpers.def("store", [&](PythonSubclasserSpawner::Ptr thing) { stored = thing; });
-  test_helpers.def("clear", [&]() { stored.reset(); });
-  test_helpers.def("retrieve", [&]() { return stored; });
+  subclass_spawner.def("stage_destroy", &PythonSubclasserSpawner::stage_destroy);
+  subclass_spawner.def("join", &PythonSubclasserSpawner::join);
 }
 }  // namespace scalopus
