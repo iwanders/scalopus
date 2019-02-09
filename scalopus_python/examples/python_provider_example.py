@@ -40,9 +40,26 @@ class PythonSource(scalopus.interface.TraceEventSource):
 
     def startInterval(self):
         print("The interval was started")
+        self.start_time = time.time()
 
     def stopInterval(self):
         print("The interval was stopped")
+        self.stop_time = time.time()
+
+    def finishInterval(self):
+        print("Interval from: {} - {}".format(self.start_time, self.stop_time))
+        events = []
+        t = self.start_time
+        while t < self.stop_time:
+            # add start and stop scope.
+            events.append({"tid": "MyThread", "pid": "DataFromPythonSource",
+                           "cat": "PERF","ph": "B","ts": t * 1e6, "name": 
+                            "t: {:.2f}".format(t - self.start_time)})
+            events.append({"tid": "MyThread", "pid": "DataFromPythonSource",
+                           "cat": "PERF","ph": "E","ts": (t + 1) * 1e6, "name":
+                            "t: {:.2f}".format(t - self.start_time)})
+            t += 1.0
+        return events
 
     def __del__(self):
         print("PythonSource destroyed")
@@ -53,10 +70,6 @@ class PythonProvider(scalopus.interface.TraceEventProvider):
     def __init__(self):
         scalopus.interface.TraceEventProvider.__init__(self)
         print("Made a PythonProvider: {:x}".format(id(self)))
-
-    # def makeSource(self):
-        # global z
-        # return z
 
     def makeSource(self):
         return PythonSource()
