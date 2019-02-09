@@ -67,7 +67,11 @@ namespace detail
 
       auto py_obj = py::reinterpret_borrow<py::object> (src);
       auto base_ptr = static_cast<std::shared_ptr<scalopus::TraceEventSource>> (bc);
-      auto py_obj_ptr = std::make_shared<py::object> (py_obj);
+      auto py_obj_ptr = std::shared_ptr<py::object> (new py::object{py_obj}, [](auto py_object_ptr)
+      {
+        pybind11::gil_scoped_acquire gil;
+        delete py_object_ptr;
+      });
 
       value = std::shared_ptr<scalopus::TraceEventSource> (py_obj_ptr, base_ptr.get ());
       return true;

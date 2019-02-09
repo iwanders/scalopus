@@ -30,6 +30,7 @@
 import scalopus
 import unittest
 import gc
+import time
 
 import scalopus
 import scalopus.tracing as tracing
@@ -60,10 +61,6 @@ class PythonProvider(scalopus.interface.TraceEventProvider):
         scalopus.interface.TraceEventProvider.__init__(self)
         print("Made a PythonProvider: {}".format(id(self)))
 
-    # def makeSource(self):
-        # global z
-        # return z
-
     def makeSource(self):
         return PythonSource()
 
@@ -79,13 +76,14 @@ class PythonEndpoint(unittest.TestCase):
         print("call:")
         gc.collect()
         spawner.call()
-        # our_source = spawner.getSource()
         gc.collect()
+        # check that we don't segfault if destruction happens from another
+        # thread without that throwing owning the GIL.
         print("Staging destruction from another thread.")
-        spawner.stage_destroy(50)
-        for i in range(0, 10):
+        spawner.stage_destroy(50) # stage 50 milliseconds
+        for i in range(200):
             time.sleep(0.01)
-            print(".", endl="")
+            print(".", end="")
         spawner.join()
 
     def test_endpoint(self):

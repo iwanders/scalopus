@@ -41,6 +41,7 @@ public:
   TraceEventProvider::Ptr provider;
   TraceEventSource::Ptr source;
   std::thread thread_;
+  bool thread_running_ { false };
 
   void addProvider(TraceEventProvider::Ptr prov)
   {
@@ -68,12 +69,20 @@ public:
     {
       std::this_thread::sleep_for(std::chrono::milliseconds(ms));
       source.reset();
-      provider.reset();
     });
+    thread_running_ = true;
   }
   void join()
   {
-    thread_.join();
+    if (thread_running_)
+    {
+      thread_.join();
+      thread_running_ = false;
+    }
+  }
+  ~PythonSubclasserSpawner()
+  {
+    join();
   }
 };
 
