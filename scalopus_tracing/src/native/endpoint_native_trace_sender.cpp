@@ -63,7 +63,7 @@ static Data process_events(const EventMap& tid_event_map)
   events["pid"] = static_cast<unsigned long>(::getpid());
   // The event map is composed of default serializable types, so conversion is trivial:
   events["events"] = tid_event_map;
-  return json::to_bson(events);
+  return json::to_cbor(events);
 }
 
 void EndpointNativeTraceSender::work()

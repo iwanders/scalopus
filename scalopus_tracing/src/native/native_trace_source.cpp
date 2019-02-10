@@ -91,7 +91,7 @@ std::vector<json> NativeTraceSource::finishInterval()
   for (const auto& dptr : data)
   {
     // First, we parse the bson we got and convert it to events.
-    const json parsed = json::from_bson(*dptr);
+    const json parsed = json::from_cbor(*dptr);
     int pid = parsed.at("pid").get<int>();
     tracepoint_collector_types::ThreadedEvents events;
     parsed.at("events").get_to(events);
