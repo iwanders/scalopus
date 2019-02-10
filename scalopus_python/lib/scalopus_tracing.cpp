@@ -82,12 +82,6 @@ void add_scalopus_tracing(py::module& m)
 
   py::class_<LttngProvider, LttngProvider::Ptr, TraceEventProvider> lttng_provider(lttng, "LttngProvider");
   lttng_provider.def(py::init<std::string, EndpointManager::Ptr>());
-  lttng_provider.def("setLogger", [](LttngProvider& provider, py::object fun) {
-    provider.setLogger([fun](const std::string& str) {
-      pybind11::gil_scoped_acquire gil;
-      fun(str);
-    });
-  });
 #endif
 
   native.def("scope_entry", &native::scope_entry);

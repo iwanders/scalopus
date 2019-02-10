@@ -185,7 +185,7 @@ void add_scalopus_interface(py::module& m)
   transport_interface.def("request", [](Transport& transport, const std::string& name, const py::object& outgoing) {
     return std::make_shared<PendingResponse>(transport.request(name, pyToData(outgoing)));
   });
-  transport_interface.def("setLogger", &Transport::setLogger);
+  //  transport_interface.def("setLogger", &Transport::setLogger);  // causes deadlocks when python shuts down.
 
   py::class_<Endpoint, PyEndpoint, Endpoint::Ptr> py_endpoint(interface, "Endpoint");
   py_endpoint.def(py::init_alias<>());
@@ -231,7 +231,7 @@ void add_scalopus_interface(py::module& m)
   transport_factory.def("discover", &TransportFactory::discover);
   transport_factory.def("serve", &TransportFactory::serve);
   transport_factory.def("connect", &TransportFactory::connect, py::return_value_policy::copy);
-  transport_factory.def("setLogger", &TransportFactory::setLogger);
+  //  transport_factory.def("setLogger", &TransportFactory::setLogger);  // causes deadlocks when python shuts down.
 }
 
 }  // namespace scalopus
