@@ -68,6 +68,12 @@ void add_scalopus_general(py::module& m)
   endpoint_manager_poll.def("startPolling", &EndpointManagerPoll::startPolling);
   endpoint_manager_poll.def("stopPolling", &EndpointManagerPoll::stopPolling);
   endpoint_manager_poll.def("manage", &EndpointManagerPoll::manage);
+  endpoint_manager_poll.def("setLogger", [](EndpointManagerPoll& poller, py::object fun) {
+    poller.setLogger([fun](const std::string& str) {
+      pybind11::gil_scoped_acquire gil;
+      fun(str);
+    });
+  });
 
   // General provider.
   py::class_<GeneralProvider, GeneralProvider::Ptr, TraceEventProvider> general_provider(general, "GeneralProvider");

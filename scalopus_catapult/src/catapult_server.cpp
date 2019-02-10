@@ -52,7 +52,7 @@ void CatapultServer::setSeasocksLogger(std::shared_ptr<ss::Logger> logger)
   seasocks_logger_ = std::move(logger);
 }
 
-void CatapultServer::setSeasocksDefaultLogger()
+void CatapultServer::setSeasocksWarningLogger()
 {
   setSeasocksLogger(std::make_shared<ss::PrintfLogger>(ss::Logger::Level::Warning));
 }
@@ -98,7 +98,7 @@ CatapultServer::~CatapultServer()
   }
 }
 
-void CatapultServer::setLogger(LoggingFunction&& logger)
+void CatapultServer::setLogger(LoggingFunction logger)
 {
   logger_ = logger;
   backend_->setLogger(logger_);

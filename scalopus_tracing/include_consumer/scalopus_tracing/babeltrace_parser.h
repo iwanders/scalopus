@@ -49,6 +49,7 @@ namespace scalopus
 class BabeltraceParser
 {
 public:
+  using LoggingFunction = std::function<void(const std::string& output)>;
   struct EventCallback
   {
     bool active{ true };
@@ -82,6 +83,11 @@ public:
   void halt();
 
   /**
+   * @brief Set the logging function to use.
+   */
+  void setLogger(LoggingFunction logger);
+
+  /**
    * @brief Set a sessions state, if record_state is true it is added to the set of recording sessions, otherwise it is
    *        removed.
    */
@@ -97,6 +103,7 @@ private:
 
   std::mutex mutex_;                                             //! Mutex for the recording sessions set.
   std::set<std::shared_ptr<EventCallback>> sessions_recording_;  //! Set of sessions that are actively recording.
+  LoggingFunction logger_;
 };
 
 }  // namespace scalopus

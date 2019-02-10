@@ -29,11 +29,13 @@
 */
 #include "scalopus_tracing/babeltrace_parser.h"
 #include <iostream>
+#include <sstream>
 
 namespace scalopus
 {
 BabeltraceParser::BabeltraceParser()
 {
+  setLogger([](const std::string&){});
 }
 
 CTFEvent BabeltraceParser::parse(std::string line)
@@ -41,6 +43,11 @@ CTFEvent BabeltraceParser::parse(std::string line)
   // Conversion is at the moment only offloaded to the CTFEvent class, but we may need some conversion here if we
   // are to deal with multiple outputs from babeltrace.
   return CTFEvent{ line };
+}
+
+void BabeltraceParser::setLogger(LoggingFunction logger)
+{
+  logger_ = logger;
 }
 
 void BabeltraceParser::process(FILE* stdout)
@@ -68,7 +75,9 @@ void BabeltraceParser::process(FILE* stdout)
           if ((*it)->active == false)
           {
             // session went inactive, remove it.
-            std::cout << "[BabeltraceParser] callback inactive: " << (*it).get() << std::endl;
+            std::stringstream ss;
+            ss << "[BabeltraceParser] callback inactive: " << it->get();
+            logger_(ss.str());
             it = sessions_recording_.erase(it);
             continue;
           }
@@ -82,7 +91,7 @@ void BabeltraceParser::process(FILE* stdout)
     }
     if (std::feof(stdout))
     {
-      std::cout << "[BabeltraceParser] Reached end of file, quiting parser function." << std::endl;
+      logger_("[BabeltraceParser] Reached end of file, quiting parser function.");
       processing_.store(false);
     }
   };
@@ -103,7 +112,9 @@ void BabeltraceParser::halt()
 void BabeltraceParser::setCallback(const std::shared_ptr<EventCallback>& callback)
 {
   std::lock_guard<std::mutex> lock(mutex_);
-  std::cout << "[BabeltraceParser] Adding callback: " << callback.get() << std::endl;
+  std::stringstream ss;
+  ss << "[BabeltraceParser] Adding callback: " << callback.get();
+  logger_(ss.str());
   sessions_recording_.insert(callback);
 }
 

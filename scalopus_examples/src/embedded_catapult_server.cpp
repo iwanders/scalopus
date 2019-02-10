@@ -95,7 +95,7 @@ int main(int /* argc */, char** argv)
   logging_function("Logging can be enabled in the source, uncomment the lines below this one.");
   //  manager->setLogger(logging_function);  // enable logging for transport discovery.
   //  catapult_server->setLogger(logging_function);    // Enable logging on the catapult server & trace sessions.
-  //  catapult_server->setSeasocksDefaultLogger();  // Enable seasocks warnings.
+  //  catapult_server->setSeasocksWarningLogger();  // Enable seasocks warnings.
 
   manager->manage();         // call manage once to discover the loopback client.
   catapult_server->start();  // start the seasocks server.

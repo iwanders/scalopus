@@ -41,6 +41,10 @@ LttngProvider::LttngProvider(std::string path, EndpointManager::Ptr manager) : S
   tracing_tool_->init(path);
 }
 
+void LttngProvider::setLogger(LoggingFunction logger)
+{
+  tracing_tool_->setLogger(logger);
+}
 LttngProvider::~LttngProvider()
 {
   tracing_tool_->halt();

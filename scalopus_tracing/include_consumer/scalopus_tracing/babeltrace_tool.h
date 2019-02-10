@@ -48,6 +48,7 @@ class BabeltraceTool
 {
 public:
   using Ptr = std::shared_ptr<BabeltraceTool>;
+  using LoggingFunction = std::function<void(const std::string& output)>;
 
   BabeltraceTool();
   ~BabeltraceTool();
@@ -66,6 +67,11 @@ public:
   void halt();
 
   /**
+   * @brief Set the logging function to use.
+   */
+  void setLogger(LoggingFunction logger);
+
+  /**
    * @brief Create a session and set its callbacks up correctly such that starting record and stopping it adds and
    *        removes its state from the parser.
    */
@@ -76,6 +82,7 @@ private:
 
   BabeltraceParser::Ptr parser_;  //! Parser that consumes stdout from babeltrace.
   std::thread parser_worker_;     //! Worker thread for the parse function.
+  LoggingFunction logger_;
 };
 }  // namespace scalopus
 

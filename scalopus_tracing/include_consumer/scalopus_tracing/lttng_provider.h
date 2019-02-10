@@ -50,6 +50,7 @@ class LttngProvider : public ScopeTracingProvider, public std::enable_shared_fro
 {
 public:
   using Ptr = std::shared_ptr<LttngProvider>;
+  using LoggingFunction = std::function<void(const std::string& output)>;
 
   /**
    * @brief Create the lttng provider.
@@ -57,6 +58,11 @@ public:
    * @param manager The endpoint manager that provides the endpoints to resolve the trace id's.
    */
   LttngProvider(std::string path, EndpointManager::Ptr manager);
+
+  /**
+   * @brief Set the logging function to use by this provider and the babeltrace parser.
+   */
+  void setLogger(LoggingFunction logger);
 
   // From TraceEventProvider.
   TraceEventSource::Ptr makeSource();

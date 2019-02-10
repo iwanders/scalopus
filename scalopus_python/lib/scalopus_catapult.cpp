@@ -41,7 +41,14 @@ void add_scalopus_catapult(py::module& m)
   py::class_<CatapultServer, CatapultServer::Ptr> catapult_server(catapult, "CatapultServer");
   catapult_server.def(py::init<>());
   catapult_server.def("addProvider", &CatapultServer::addProvider, py::keep_alive<1, 2>());
-  catapult_server.def("setSeasocksDefaultLogger", &CatapultServer::setSeasocksDefaultLogger);
+  catapult_server.def("setSeasocksWarningLogger", &CatapultServer::setSeasocksWarningLogger);
+  catapult_server.def("setLogger", [](CatapultServer& server, py::object fun) {
+    server.setLogger([fun](const std::string& str) {
+      pybind11::gil_scoped_acquire gil;
+      fun(str);
+    });
+  });
+
   catapult_server.def("setMaxBuffersize", &CatapultServer::setMaxBuffersize);
   catapult_server.def("start", [](CatapultServer& server, int port) { server.start(port); }, py::arg("port") = 9222);
 }

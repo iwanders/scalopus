@@ -103,13 +103,15 @@ int main(int argc, char** argv)
 
   // Create the server and add the providers
   auto catapult_server = std::make_shared<scalopus::CatapultServer>();
-  catapult_server->addProvider(std::make_shared<scalopus::LttngProvider>(path, manager));
+  auto lttng_provider = std::make_shared<scalopus::LttngProvider>(path, manager);
+  lttng_provider->setLogger(logging_function);
+  catapult_server->addProvider(lttng_provider);
   catapult_server->addProvider(native_trace_provider);
   catapult_server->addProvider(std::make_shared<scalopus::GeneralProvider>(manager));
   catapult_server->setLogger(logging_function);
 
   // Use default logging at warn level.
-  catapult_server->setSeasocksDefaultLogger();
+  catapult_server->setSeasocksWarningLogger();
 
   // Bind and start.
   catapult_server->start();

@@ -34,6 +34,16 @@ namespace scalopus
 BabeltraceTool::BabeltraceTool()
 {
   parser_ = std::make_shared<BabeltraceParser>();
+  setLogger([](const std::string&){});
+}
+
+void BabeltraceTool::setLogger(LoggingFunction logger)
+{
+  logger_ = logger;
+  if (parser_ != nullptr)
+  {
+    parser_->setLogger(logger);
+  }
 }
 
 void BabeltraceTool::init(std::string path)
@@ -96,7 +106,7 @@ BabeltraceTool::addCallback(std::function<void(const CTFEvent& event)> fun)
 {
   if (!parser_->isProcessing())
   {
-    std::cout << "Making a session on a parser that's not processing." << std::endl;
+    logger_("Making a session on a parser that's not processing.");
   }
   // make a new session
   auto session = std::make_shared<BabeltraceParser::EventCallback>();

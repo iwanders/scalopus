@@ -53,10 +53,21 @@ def run_catapult_server(args):
     general_provider = general.GeneralProvider(poller)
     catapult.addProvider(general_provider)
 
+    def logger(s):
+        print(s)
+
+    if (args.catapult_log):
+        catapult.setLogger(logger)
+
+    if (args.poll_log):
+        poller.setLogger(logger)
+
     if tracing.have_lttng:
         lttng_provider = tracing.lttng.LttngProvider(args.lttng_session,
                                                      poller)
         catapult.addProvider(lttng_provider)
+        if (args.lttng_log):
+            lttng_provider.setLogger(logger)
 
     # Finally, start the server on the desired port.
     catapult.start(port=args.port)
@@ -86,11 +97,20 @@ if __name__ == "__main__":
     parser_catapult_server.add_argument("--poll-interval", type=float,
         default=1.0, help="The interval in seconds between server discovery."
         " Defaults to %(default)s.")
+    parser_catapult_server.add_argument("--no-poll-log", dest="poll_log",
+        default=True, action="store_false",
+        help="Disable log output for the endpoint poller.")
+    parser_catapult_server.add_argument("--no-catapult-log",
+        dest="catapult_log", default=True, action="store_false",
+        help="Disable log output for the catapult server.")
 
     if tracing.have_lttng:
         parser_catapult_server.add_argument("--lttng-session", type=str,
         default="scalopus_target_session",
         help="The lttng session name to connect to, defaults to %(default)s.")
+        parser_catapult_server.add_argument("--no-lttng-log",
+            dest="lttng_log", default=True, action="store_false",
+            help="Disable log output for the lttng provider.")
 
     parser_catapult_server.set_defaults(func=run_catapult_server)
 

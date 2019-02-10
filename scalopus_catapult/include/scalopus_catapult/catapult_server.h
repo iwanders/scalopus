@@ -74,7 +74,7 @@ public:
   /**
    * @brief Same as calling setLogger(std::make_shared<ss::PrintfLogger>(ss::Logger::Level::Warning)).
    */
-  void setSeasocksDefaultLogger();
+  void setSeasocksWarningLogger();
 
   /**
    * @brief This is passed directly to seasocks' setClientBufferSize method. This is the limit that can be present in
@@ -91,7 +91,7 @@ public:
   /**
    * @brief Function to set the logger to use for the backend and session output.
    */
-  void setLogger(LoggingFunction&& logger);
+  void setLogger(LoggingFunction logger);
 
   ~CatapultServer();
 
