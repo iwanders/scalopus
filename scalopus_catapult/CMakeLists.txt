@@ -41,7 +41,7 @@ install(TARGETS scalopus_catapult scalopus_catapult_server EXPORT ScalopusCatapu
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_catapult/)
 install(
   EXPORT ScalopusCatapultConfig
-  FILE ScalopusCatapultTargets.cmake
+  FILE ScalopusCatapultConfig.cmake
   NAMESPACE ${PROJECT_NAME}::
   DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR}
 )

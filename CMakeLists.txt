@@ -45,9 +45,8 @@ if(BUILD_TESTING)
   enable_testing()
 endif()
 
-# Each 'submodule' acts as a completely seperate cmake package basically, they only thing they lack is find_package()
-# to each other. This ensures that any externally created provider / source has the exact same capabilities as the
-# ones inside this cmake project.
+# Each 'submodule' acts as a completely seperate cmake package. They all export a `ScalopusInterfaceConfig.cmake` file
+# the main `ScalopusConfig.cmake` uses find_package() on the others to find them.
 add_subdirectory(scalopus_interface)
 add_subdirectory(scalopus_transport)
 add_subdirectory(scalopus_tracing)
@@ -59,4 +58,20 @@ add_subdirectory(scalopus_python)
 file(GLOB_RECURSE FORMAT_SRC_FILES  "${PROJECT_SOURCE_DIR}/scalopus*/**.h"  "${PROJECT_SOURCE_DIR}/scalopus*/**.cpp")
 add_custom_target(clang_format_scalopus COMMAND clang-format-7 -i ${FORMAT_SRC_FILES})
 
-include(cmake/makeConfigs.cmake)
+# Write version file
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY AnyNewerVersion
+)
+
+# Write package config file
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ScalopusConfig.cmake.in
+    ${SCALOPUS_EXPORT_CMAKE_DIR}/${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR})
+
+# Install both files.
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR}
+)

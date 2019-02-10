@@ -1,4 +1,0 @@
-get_filename_component(Scalopus_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-if(NOT TARGET Scalopus::@SUBMODULE_TARGET_LIB@)
-    include("${Scalopus_CMAKE_DIR}/@PROJECT_NAME@@SUBMODULE_TARGET_NAME@Targets.cmake")
-endif()

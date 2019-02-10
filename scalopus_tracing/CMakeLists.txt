@@ -228,7 +228,7 @@ install(DIRECTORY src/lttng/include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scal
 install(DIRECTORY src/native/include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_tracing/)
 install(
   EXPORT ScalopusTracingConfig
-  FILE ScalopusTracingTargets.cmake
+  FILE ScalopusTracingConfig.cmake
   NAMESPACE ${PROJECT_NAME}::
   DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR}
 )
