@@ -42,4 +42,9 @@ install(TARGETS scalopus_interface scalopus_consumer EXPORT ScalopusInterfaceCon
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_interface/)
 install(DIRECTORY include_consumer DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_interface/)
-install(EXPORT ScalopusInterfaceConfig DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR})
+install(
+  EXPORT ScalopusInterfaceConfig
+  FILE ScalopusInterfaceTargets.cmake
+  NAMESPACE ${PROJECT_NAME}::
+  DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR}
+)

@@ -32,7 +32,12 @@ install(TARGETS scalopus_transport EXPORT ScalopusTransportConfig
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_transport/)
-install(EXPORT ScalopusTransportConfig DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR})
+install(
+  EXPORT ScalopusTransportConfig
+  FILE ScalopusTransportTargets.cmake
+  NAMESPACE ${PROJECT_NAME}::
+  DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR}
+)
 
 add_subdirectory(test)
 

@@ -210,7 +210,6 @@ target_link_libraries(scalopus_tracing_consumer
 set_property(TARGET scalopus_tracing_consumer PROPERTY POSITION_INDEPENDENT_CODE ON)
 list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracing_consumer)
 
-message(WARN "targets: ${SCALOPUS_TRACING_EXPORTS}")
 export(
   TARGETS
     ${SCALOPUS_TRACING_EXPORTS}
@@ -227,7 +226,11 @@ install(DIRECTORY include_consumer DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalo
 install(DIRECTORY src/nop/include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_tracing/)
 install(DIRECTORY src/lttng/include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_tracing/)
 install(DIRECTORY src/native/include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_tracing/)
-install(EXPORT ScalopusTracingConfig DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR})
-
+install(
+  EXPORT ScalopusTracingConfig
+  FILE ScalopusTracingTargets.cmake
+  NAMESPACE ${PROJECT_NAME}::
+  DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR}
+)
 add_subdirectory(test)
 

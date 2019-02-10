@@ -16,9 +16,8 @@ option(SCALOPUS_USE_PYTHON3 "Set PYBIND11_PYTHON_VERSION to 3." OFF)
 set(SCALOPUS_TRACING_HAVE_BUILT_LTTNG OFF)
 
 include(GNUInstallDirs)
-set(SCALOPUS_MAIN_EXPORT_CMAKE_DIR          "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/")
 set(SCALOPUS_INSTALL_EXPORT_CMAKE_DIR  "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/")
-set(SCALOPUS_EXPORT_CMAKE_DIR "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/")
+set(SCALOPUS_EXPORT_CMAKE_DIR "${CMAKE_CURRENT_BINARY_DIR}/")
 
 # We need an include here to ensure that the find package call originates from the root.
 # add_subdirectory won't work as that won't expose embedded targets to the scalopus subcomponent directories.
@@ -60,13 +59,4 @@ add_subdirectory(scalopus_python)
 file(GLOB_RECURSE FORMAT_SRC_FILES  "${PROJECT_SOURCE_DIR}/scalopus*/**.h"  "${PROJECT_SOURCE_DIR}/scalopus*/**.cpp")
 add_custom_target(clang_format_scalopus COMMAND clang-format-7 -i ${FORMAT_SRC_FILES})
 
-configure_file(
-  ${CMAKE_CURRENT_LIST_DIR}/cmake/ScalopusConfig.cmake.in
-  ${SCALOPUS_EXPORT_CMAKE_DIR}/ScalopusConfig.cmake
-  @ONLY
-)
-
-install(
-  FILES ${SCALOPUS_MAIN_EXPORT_CMAKE_DIR}ScalopusConfig.cmake
-  DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR}
-)
+include(cmake/makeConfigs.cmake)

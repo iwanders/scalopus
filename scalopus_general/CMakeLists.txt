@@ -55,6 +55,11 @@ install(TARGETS scalopus_general scalopus_general_consumer EXPORT ScalopusGenera
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_general/)
 install(DIRECTORY include_consumer DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_general/)
-install(EXPORT ScalopusGeneralConfig DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR})
+install(
+  EXPORT ScalopusGeneralConfig
+  FILE ScalopusGeneralTargets.cmake
+  NAMESPACE ${PROJECT_NAME}::
+  DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR}
+)
 
 add_subdirectory(test)

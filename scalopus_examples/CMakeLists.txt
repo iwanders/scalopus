@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.5.0)
 
 # Examples defaulting to native tracepoints.
 add_executable(readme_example_native src/readme_example.cpp)
