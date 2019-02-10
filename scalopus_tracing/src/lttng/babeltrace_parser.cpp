@@ -55,43 +55,70 @@ void BabeltraceParser::process(FILE* stdout)
   // start the processing.
   processing_.store(true);
   std::array<char, 1024> tmp;
+  int fd = fileno(stdout);
+  fd_set read_fds;
+  fd_set write_fds;
+  fd_set except_fds;
+  FD_ZERO(&read_fds);
+  FD_ZERO(&write_fds);
+  FD_ZERO(&except_fds);
+  struct timeval tv;
   while (processing_.load())  // while processing.
   {
-    // read line
-    std::string line;
-    if (std::fgets(tmp.data(), tmp.size(), stdout))
+    tv.tv_sec = 0;
+    tv.tv_usec = 10000;
+    FD_SET(fd, &read_fds);
+    FD_SET(fd, &except_fds);
+
+    const int nfds = fd + 1;
+    int select_result = select(nfds, &read_fds, &write_fds, &except_fds, &tv);
+    if (select_result == -1)
     {
-      line = std::string(tmp.data());
+      continue;
     }
-    if (!line.empty())
+    if (FD_ISSET(fd, &read_fds))
     {
-      // lock, if recording sessions, parse and pass to all recording sessions.
-      std::lock_guard<std::mutex> lock(mutex_);
-      if (!sessions_recording_.empty())
+      // read line
+      std::string line;
+      if (std::fgets(tmp.data(), tmp.size(), stdout))
       {
-        auto event = parse(line);
-        for (auto it = sessions_recording_.begin(); it != sessions_recording_.end();)
+        line = std::string(tmp.data());
+      }
+      if (!line.empty())
+      {
+        // lock, if recording sessions, parse and pass to all recording sessions.
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (!sessions_recording_.empty())
         {
-          if ((*it)->active == false)
+          auto event = parse(line);
+          for (auto it = sessions_recording_.begin(); it != sessions_recording_.end();)
           {
-            // session went inactive, remove it.
-            std::stringstream ss;
-            ss << "[BabeltraceParser] callback inactive: " << it->get();
-            logger_(ss.str());
-            it = sessions_recording_.erase(it);
-            continue;
+            if ((*it)->active == false)
+            {
+              // session went inactive, remove it.
+              std::stringstream ss;
+              ss << "[BabeltraceParser] callback inactive: " << it->get();
+              logger_(ss.str());
+              it = sessions_recording_.erase(it);
+              continue;
+            }
+            if ((*it)->callback)
+            {
+              (*it)->callback(event);
+            }
+            it++;
           }
-          if ((*it)->callback)
-          {
-            (*it)->callback(event);
-          }
-          it++;
         }
       }
+      if (std::feof(stdout))
+      {
+        logger_("[BabeltraceParser] Reached end of file, quiting parser function.");
+        processing_.store(false);
+      }
     }
-    if (std::feof(stdout))
+    if (FD_ISSET(fd, &except_fds))
     {
-      logger_("[BabeltraceParser] Reached end of file, quiting parser function.");
+      logger_("[BabeltraceParser] Exception occured while reading from babeltrace stdout.");
       processing_.store(false);
     }
   };
