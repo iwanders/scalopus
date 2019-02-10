@@ -33,6 +33,7 @@
 #include <scalopus_interface/trace_event_provider.h>
 #include <scalopus_interface/trace_event_source.h>
 #include "json_util.h"
+#include <pybind11/functional.h>
 
 namespace scalopus
 {
@@ -184,6 +185,7 @@ void add_scalopus_interface(py::module& m)
   transport_interface.def("request", [](Transport& transport, const std::string& name, const py::object& outgoing) {
     return std::make_shared<PendingResponse>(transport.request(name, pyToData(outgoing)));
   });
+  transport_interface.def("setLogger", &Transport::setLogger);
 
   py::class_<Endpoint, PyEndpoint, Endpoint::Ptr> py_endpoint(interface, "Endpoint");
   py_endpoint.def(py::init_alias<>());
@@ -229,6 +231,7 @@ void add_scalopus_interface(py::module& m)
   transport_factory.def("discover", &TransportFactory::discover);
   transport_factory.def("serve", &TransportFactory::serve);
   transport_factory.def("connect", &TransportFactory::connect, py::return_value_policy::copy);
+  transport_factory.def("setLogger", &TransportFactory::setLogger);
 }
 
 }  // namespace scalopus

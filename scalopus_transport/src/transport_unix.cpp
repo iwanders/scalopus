@@ -53,7 +53,7 @@ bool TransportUnix::serve()
 
   if (server_fd_ == -1)
   {
-    std::cerr << "[scalopus] Could not create socket." << std::endl;
+    logger_("[TransportUnix] Could not create socket.");
     return false;
   }
 
@@ -73,15 +73,19 @@ bool TransportUnix::serve()
   // Bind the unix socket on the path we created.
   if (bind(server_fd_, reinterpret_cast<sockaddr*>(&socket_config), static_cast<unsigned int>(path_length)) == -1)
   {
-    std::cerr << "[scalopus] Could not bind socket." << std::endl;
+    logger_("[TransportUnix] Could not bind socket.");
     return false;
   }
 
   // Listen for connections, with a queue of five.
   if (listen(server_fd_, 5) == -1)
   {
-    std::cerr << "[scalopus] Could not start listening for connections." << std::endl;
+    logger_("[TransportUnix] Could not start listening for connections.");
     return false;
+  }
+  else
+  {
+    //  logger_("[TransportUnix] Succesfully bound: " + ss.str());
   }
 
   connections_.insert(server_fd_);
@@ -99,7 +103,7 @@ bool TransportUnix::connect(std::size_t pid)
 
   if (client_fd_ == -1)
   {
-    std::cerr << "[scalopus] Could not create socket." << std::endl;
+    std::cerr << "[TransportUnix] Could not create socket." << std::endl;
     return false;
   }
 
@@ -115,8 +119,12 @@ bool TransportUnix::connect(std::size_t pid)
   std::size_t path_length = sizeof(socket_config.sun_family) + strlen(socket_config.sun_path + 1) + 1;
   if (::connect(client_fd_, reinterpret_cast<sockaddr*>(&socket_config), static_cast<unsigned int>(path_length)) == -1)
   {
-    std::cerr << "[scalopus] Could not connect socket." << std::endl;
+    logger_("[TransportUnix] Could not connect socket.");
     return false;
+  }
+  else
+  {
+    //  logger_("[TransportUnix] Succesfully connected: " + ss.str());
   }
   connections_.insert(client_fd_);
 
@@ -232,7 +240,7 @@ void TransportUnix::work()
 
     if (select_result == -1)
     {
-      std::cerr << "[scalopus]: Failure occured on select." << std::endl;
+      logger_("[TransportUnix]: Failure occured on select.");
     }
 
     // Handle server stuff, accept new connection:
@@ -242,7 +250,7 @@ void TransportUnix::work()
       client = accept(server_fd_, nullptr, nullptr);
       if (client == -1)
       {
-        std::cerr << "[scalopus] Could not accept client." << std::endl;
+        logger_("[TransportUnix] Could not accept client.");
         continue;
       }
       connections_.insert(client);
@@ -294,7 +302,7 @@ void TransportUnix::work()
 
     if (FD_ISSET(server_fd_, &except_fds))
     {
-      std::cout << "[scalopus] Exception on server " << std::endl;
+      logger_("[TransportUnix] Exception on server ");
     }
 
     // else; check everything.
@@ -430,6 +438,7 @@ std::vector<Destination::Ptr> TransportUnixFactory::discover()
 Transport::Ptr TransportUnixFactory::serve()
 {
   auto t = std::make_shared<TransportUnix>();
+  t->setLogger(logger_);
   if (t->serve())
   {
     return t;
@@ -445,6 +454,7 @@ Transport::Ptr TransportUnixFactory::connect(const Destination::Ptr& destination
     return nullptr;
   }
   auto t = std::make_shared<TransportUnix>();
+  t->setLogger(logger_);
   if (t->connect(dest->pid_))
   {
     return t;

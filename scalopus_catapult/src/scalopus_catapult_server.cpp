@@ -88,9 +88,11 @@ int main(int argc, char** argv)
   std::cout << "[main] Using path: \"" << path << "\"  (defaults to lttng view scalopus_target_session)" << std::endl;
 
   // Create the transport & endpoint manager.
-  auto manager = std::make_shared<scalopus::EndpointManagerPoll>(std::make_shared<scalopus::TransportUnixFactory>());
+  auto factory = std::make_shared<scalopus::TransportUnixFactory>();
+  auto manager = std::make_shared<scalopus::EndpointManagerPoll>(factory);
   auto logging_function = [](const std::string& msg) { std::cout << msg << std::endl; };
   manager->setLogger(logging_function);
+  //  factory->setLogger(logging_function);
 
   // Add scope tracing endpoint factory function.
   manager->addEndpointFactory<scalopus::EndpointTraceMapping>();

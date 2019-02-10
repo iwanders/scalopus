@@ -80,6 +80,10 @@ Endpoint::Ptr Transport::getEndpoint(const std::string& name) const
   return nullptr;
 }
 
+void Transport::setLogger(LoggingFunction logger)
+{
+  logger_ = logger;
+}
 Destination::Ptr Transport::getAddress()
 {
   return nullptr;

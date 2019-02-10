@@ -93,8 +93,9 @@ int main(int /* argc */, char** argv)
 
   auto logging_function = [](const std::string& msg) { std::cout << msg << std::endl; };
   logging_function("Logging can be enabled in the source, uncomment the lines below this one.");
-  //  manager->setLogger(logging_function);  // enable logging for transport discovery.
+  //  manager->setLogger(logging_function);  // Enable logging for transport discovery.
   //  catapult_server->setLogger(logging_function);    // Enable logging on the catapult server & trace sessions.
+  //  factory->setLogger(logging_function);    // Enable logging output for the server.
   //  catapult_server->setSeasocksWarningLogger();  // Enable seasocks warnings.
 
   manager->manage();         // call manage once to discover the loopback client.

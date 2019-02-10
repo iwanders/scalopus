@@ -140,7 +140,6 @@ int main(int /* argc */, char** /* argv */)
   scalopus::SPSCRingBuffer<std::array<int, 3>> ring_array{ std::array<int, 3>() };
   run_tests(ring_array);
 
-
   scalopus::SPSCRingBuffer<std::vector<int>> ring_vector_read_into{ std::vector<int>(8, 0) };
   test_readinto(ring_vector_read_into);
   scalopus::SPSCRingBuffer<std::array<int, 8>> ring_array_read_into{ std::array<int, 8>() };

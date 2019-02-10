@@ -46,6 +46,7 @@ public:
   using Ptr = std::shared_ptr<Transport>;
   using WeakPtr = std::weak_ptr<Transport>;
   using PendingResponse = std::shared_ptr<std::future<Data>>;
+  using LoggingFunction = std::function<void(const std::string& output)>;
 
   virtual ~Transport() = default;
 
@@ -97,6 +98,12 @@ public:
    */
   virtual Destination::Ptr getAddress();
 
+  /**
+   * @brief Set the logger function to be used for this transport.
+   * @param logger A function to provide logging strings to.
+   */
+  void setLogger(LoggingFunction logger);
+
 protected:
   /**
    * @brief Returns whether or not there are any broadcasts in the queue to be sent out.
@@ -115,6 +122,8 @@ protected:
 
   std::map<std::string, Endpoint::Ptr> endpoints_;  //!< Endpoints known by this transport, key is their name.
   mutable std::mutex endpoint_mutex_;
+
+  LoggingFunction logger_{ [](const std::string&) {} };
 };
 
 }  // namespace scalopus

@@ -27,51 +27,12 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef SCALOPUS_INTERFACE_TRANSPORT_FACTORY_H
-#define SCALOPUS_INTERFACE_TRANSPORT_FACTORY_H
-
-#include <memory>
-#include <vector>
-#include "scalopus_interface/destination.h"
-#include "scalopus_interface/transport.h"
+#include "scalopus_interface/transport_factory.h"
 
 namespace scalopus
 {
-/**
- * @brief The transport factory provides a standardized way to start transport servers, discover and connect to them.
- */
-class TransportFactory
+void TransportFactory::setLogger(LoggingFunction logger)
 {
-public:
-  using Ptr = std::shared_ptr<TransportFactory>;
-  using LoggingFunction = std::function<void(const std::string& output)>;
-
-  /**
-   * @brief Provide a list of discovered servers.
-   */
-  virtual std::vector<Destination::Ptr> discover() = 0;
-
-  /**
-   * @brief Start a server.
-   */
-  virtual Transport::Ptr serve() = 0;
-
-  /**
-   * @brief Connect to a specified destination, connectable destinations are provided by the discover method.
-   */
-  virtual Transport::Ptr connect(const Destination::Ptr& destination) = 0;
-
-  /**
-   * @brief Set the logger function to be used for all clients and servers that are created from this factory.
-   * @param logger A function to provide logging strings to.
-   */
-  virtual void setLogger(LoggingFunction logger);
-
-  virtual ~TransportFactory() = default;
-
-protected:
-  LoggingFunction logger_{ [](const std::string&) {} };
-};
-
+  logger_ = logger;
+}
 }  // namespace scalopus
-#endif  // SCALOPUS_INTERFACE_TRANSPORT_FACTORY_H

@@ -34,7 +34,7 @@ namespace scalopus
 BabeltraceTool::BabeltraceTool()
 {
   parser_ = std::make_shared<BabeltraceParser>();
-  setLogger([](const std::string&){});
+  setLogger([](const std::string&) {});
 }
 
 void BabeltraceTool::setLogger(LoggingFunction logger)

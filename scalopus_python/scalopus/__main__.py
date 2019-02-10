@@ -66,8 +66,6 @@ def run_catapult_server(args):
         lttng_provider = tracing.lttng.LttngProvider(args.lttng_session,
                                                      poller)
         catapult.addProvider(lttng_provider)
-        if (args.lttng_log):
-            lttng_provider.setLogger(logger)
 
     # Finally, start the server on the desired port.
     catapult.start(port=args.port)
@@ -108,9 +106,6 @@ if __name__ == "__main__":
         parser_catapult_server.add_argument("--lttng-session", type=str,
         default="scalopus_target_session",
         help="The lttng session name to connect to, defaults to %(default)s.")
-        parser_catapult_server.add_argument("--no-lttng-log",
-            dest="lttng_log", default=True, action="store_false",
-            help="Disable log output for the lttng provider.")
 
     parser_catapult_server.set_defaults(func=run_catapult_server)
 

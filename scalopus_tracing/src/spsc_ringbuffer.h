@@ -124,7 +124,7 @@ public:
    * @param max_count The maximum number of entries to write to the output iterator.
    * @return The number of elements read into the output iterator.
    */
-  template<typename OutputIterator>
+  template <typename OutputIterator>
   std::size_t pop_into(OutputIterator output, const std::size_t max_count)
   {
     const std::size_t write_index = write_index_.load(std::memory_order_acquire);

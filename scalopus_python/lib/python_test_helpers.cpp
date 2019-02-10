@@ -41,7 +41,7 @@ public:
   TraceEventProvider::Ptr provider;
   TraceEventSource::Ptr source;
   std::thread thread_;
-  bool thread_running_ { false };
+  bool thread_running_{ false };
 
   void addProvider(TraceEventProvider::Ptr prov)
   {
@@ -65,8 +65,7 @@ public:
   }
   void stage_destroy(int ms)
   {
-    thread_ = std::thread([&]()
-    {
+    thread_ = std::thread([&]() {
       std::this_thread::sleep_for(std::chrono::milliseconds(ms));
       source.reset();
     });
@@ -85,7 +84,6 @@ public:
     join();
   }
 };
-
 
 namespace py = pybind11;
 void add_python_test_helpers(py::module& m)

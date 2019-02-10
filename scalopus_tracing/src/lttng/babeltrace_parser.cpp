@@ -35,7 +35,7 @@ namespace scalopus
 {
 BabeltraceParser::BabeltraceParser()
 {
-  setLogger([](const std::string&){});
+  setLogger([](const std::string&) {});
 }
 
 CTFEvent BabeltraceParser::parse(std::string line)
