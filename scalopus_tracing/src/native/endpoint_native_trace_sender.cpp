@@ -80,15 +80,12 @@ void EndpointNativeTraceSender::work()
       // collect all events...
       auto& thread_id = tid_buffer.first;
       auto& buffer = tid_buffer.second;
-      tracepoint_collector_types::ScopeTraceEvent event;
 
       // Collect all samples from this buffer.
-      // @TODO This is some low-hanging fruit, this call uses an atomic for each event, we can do better.
-      while (buffer->pop(event))
-      {
-        events[thread_id].push_back(event);
-        collected++;
-      }
+      const auto available = buffer->size();
+      auto& output_buffer = events[thread_id];
+      output_buffer.reserve(output_buffer.size() + available);
+      collected += buffer->pop_into(std::back_inserter(output_buffer), available);
     }
     if (collected)
     {

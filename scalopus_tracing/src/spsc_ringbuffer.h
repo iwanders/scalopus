@@ -58,6 +58,22 @@ public:
     }
   }
 
+  std::size_t available(const std::size_t write_index, const std::size_t read_index) const
+  {
+    if (write_index >= read_index)
+    {
+      return write_index - read_index;
+    }
+    return write_index + max_size_ - read_index;
+  }
+
+  std::size_t size() const
+  {
+    const std::size_t write_index = write_index_.load(std::memory_order_acquire);
+    const std::size_t read_index = read_index_.load(std::memory_order_relaxed);
+
+    return available(write_index, read_index);
+  }
   /**
    * @brief Move a value onto the ringbuffer.
    * @return true if the value was stored, false if the ring buffer was full.
@@ -100,6 +116,28 @@ public:
     std::size_t next = (read_index + 1) % max_size_;
     read_index_.store(next, std::memory_order_release);
     return true;
+  }
+
+  /**
+   * @brief Pop up to pop_count entries from the ringbuffer into an output iterator.
+   * @param output The output iterator to write to.
+   * @param max_count The maximum number of entries to write to the output iterator.
+   * @return The number of elements read into the output iterator.
+   */
+  template<typename OutputIterator>
+  std::size_t pop_into(OutputIterator output, const std::size_t max_count)
+  {
+    const std::size_t write_index = write_index_.load(std::memory_order_acquire);
+    const std::size_t read_index = read_index_.load(std::memory_order_relaxed);
+
+    size_t readable_count = std::min(available(write_index, read_index), max_count);
+    for (std::size_t index = read_index; index < read_index + readable_count; index++)
+    {
+      *(output++) = std::move(container_[index % max_size_]);  // This deals with wrapping automatically.
+    }
+    std::size_t next = (read_index + readable_count) % max_size_;
+    read_index_.store(next, std::memory_order_release);
+    return readable_count;
   }
 
   /**
