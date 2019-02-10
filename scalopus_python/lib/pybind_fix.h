@@ -29,6 +29,8 @@
 */
 #pragma once
 #include <pybind11/pybind11.h>
+#include <scalopus_interface/endpoint.h>
+#include <scalopus_interface/trace_event_provider.h>
 
 // Python part of subclassed objects get destroyed when an subclass is created from Python and handed back to C++.
 
@@ -38,12 +40,6 @@
 // https://github.com/pybind/pybind11/issues/1546
 // https://github.com/pybind/pybind11/issues/1333
 
-namespace scalopus
-{
-class Endpoint;
-class TraceEventProvider;
-class TraceEventSource;
-}
 // Based on https://github.com/pybind/pybind11/issues/1546
 namespace pybind11
 {

@@ -32,7 +32,6 @@
 #include <scalopus_interface/endpoint_manager.h>
 #include <scalopus_interface/trace_event_provider.h>
 #include <scalopus_interface/trace_event_source.h>
-#include "pybind_fix.h"
 #include "json_util.h"
 
 namespace scalopus

@@ -33,6 +33,7 @@
 #include <scalopus_interface/endpoint_manager.h>
 #include <scalopus_interface/trace_event_provider.h>
 #include "json_util.h"
+#include "pybind_fix.h"
 
 namespace scalopus
 {
