@@ -43,3 +43,19 @@ target_link_libraries(native_tracing_macros
     Scalopus::scalopus_tracing_native
 )
 add_test(test_native_tracing_macros native_tracing_macros)
+
+
+# Setup the ringbuffer test, allow access to the private header files.
+add_executable(cbor_serializer test_cbor_serializer.cpp)
+target_link_libraries(cbor_serializer
+  PRIVATE
+    Scalopus::scalopus_tracing_native
+    nlohmann_json::nlohmann_json
+)
+target_include_directories(cbor_serializer
+  PRIVATE
+    $<TARGET_PROPERTY:Scalopus::scalopus_tracing_native,INCLUDE_DIRECTORIES>
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/native/
+)
+add_test(test_ringbuffer cbor_serializer)

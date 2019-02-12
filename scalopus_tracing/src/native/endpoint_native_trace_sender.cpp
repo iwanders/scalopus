@@ -34,6 +34,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include "tracepoint_collector_native.h"
+#include "cbor.h"
 
 namespace scalopus
 {
@@ -58,12 +59,24 @@ EndpointNativeTraceSender::~EndpointNativeTraceSender()
  */
 static Data process_events(const EventMap& tid_event_map)
 {
+  std::map<std::string, cbor::cbor_object> my_data;
   json events = json({});
   // Need to know the PID when we consume these traces.
+  my_data["pid"] = cbor::cbor_object::make(static_cast<unsigned long>(::getpid()));
   events["pid"] = static_cast<unsigned long>(::getpid());
   // The event map is composed of default serializable types, so conversion is trivial:
   events["events"] = tid_event_map;
-  return json::to_cbor(events);
+  auto result = json::to_cbor(events);
+  std::cout << "Nlohman: " << std::endl;
+  std::cout << cbor::hexdump(result) << std::endl;
+
+  my_data["events"] = cbor::cbor_object::make(tid_event_map);
+  Data output;
+  cbor::serialize(my_data, output);
+  std::swap(output[output.size() - 2], output[output.size() - 1]);
+  std::cout << "cbor: " << std::endl;
+  std::cout << cbor::hexdump(output) << std::endl;
+  return result;
 }
 
 void EndpointNativeTraceSender::work()
