@@ -70,5 +70,17 @@ int main(int /* argc */, char** /* argv */)
   Data output;
   cbor::serialize(mymap, output);
   std::cout << cbor::hexdump(output) << std::endl;
+
+  //  std::tuple<uint32_t, uint32_t, uint32_t> foo{1,2,3};
+  std::vector<std::tuple<unsigned long, EventContainer>> foo;
+  foo.push_back({1549943736559416, EventContainer{{1549943736559416, 20, 30}, {1549943736559417, 655351, 5}}});
+  //  foo.push_back({1, EventContainer{{1, 2, 3}}});
+  output.resize(0);
+  cbor::serialize(foo, output);
+  std::cout << cbor::hexdump(output) << std::endl;
+
+  //  std::vector<std::tuple<int, int>> buz;
+  //  buz = {{1,2}, {3,4}};
+  
   return 0;
 }

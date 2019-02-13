@@ -44,7 +44,7 @@ namespace cbor
   std::uint16_t fixEndianness(const std::uint16_t in)
   {
     auto b = reinterpret_cast<const std::uint8_t*>(&in);
-    return static_cast<std::uint16_t>((b[1]<< 8) | b[0]);
+    return static_cast<std::uint16_t>((b[0]<< 8) | b[1]);
   }
 
   std::uint32_t fixEndianness(const std::uint32_t in)
@@ -66,7 +66,7 @@ namespace cbor
     std::stringstream ss;
     for (const auto& v : d)
     {
-      ss << "0x" << std::setfill('0') << std::setw(2) << std::hex << int{v} << ", " ;
+      ss << "" << std::setfill('0') << std::setw(2) << std::hex << int{v} << " " ;
     }
     return ss.str();
   }
@@ -74,7 +74,7 @@ namespace cbor
   template <typename T>
   struct serializer
   {
-    static std::uint32_t serialize()
+    static std::uint32_t execute()
     {
       std::cout << "void" << std::endl;
       return 0;
@@ -90,7 +90,7 @@ namespace cbor
       static cbor_object make(const T& v)
       {
         cbor_object res;
-        serializer<T>::serialize(v, res.serialized_);
+        serializer<T>::execute(v, res.serialized_);
         return res;
       }
   };
@@ -163,7 +163,7 @@ namespace cbor
   template <typename T>
   std::size_t serialize(const T& v, Data& data)
   {
-    return serializer<T>::serialize(v, data);
+    return serializer<T>::execute(v, data);
   }
 
   template <typename T>
@@ -176,7 +176,7 @@ namespace cbor
   struct serializer<std::uint8_t>
   {
     using Type = std::uint8_t;
-    static std::size_t serialize(const Type& v, Data& data)
+    static std::size_t execute(const Type& v, Data& data)
     {
       return serializeInteger(0b000, v, data);
     }
@@ -186,7 +186,7 @@ namespace cbor
   struct serializer<std::uint16_t>
   {
     using Type = std::uint16_t;
-    static std::size_t serialize(const Type& v, Data& data)
+    static std::size_t execute(const Type& v, Data& data)
     {
       return serializeInteger(0b000, v, data);
     }
@@ -196,7 +196,7 @@ namespace cbor
   struct serializer<std::uint32_t>
   {
     using Type = std::uint32_t;
-    static std::size_t serialize(const Type& v, Data& data)
+    static std::size_t execute(const Type& v, Data& data)
     {
       return serializeInteger(0b000, v, data);
     }
@@ -206,7 +206,7 @@ namespace cbor
   struct serializer<std::uint64_t>
   {
     using Type = std::uint64_t;
-    static std::size_t serialize(const Type& v, Data& data)
+    static std::size_t execute(const Type& v, Data& data)
     {
       return serializeInteger(0b000, v, data);
     }
@@ -216,7 +216,7 @@ namespace cbor
   struct serializer<std::string>
   {
     using Type = std::string;
-    static std::size_t serialize(const Type& v, Data& data)
+    static std::size_t execute(const Type& v, Data& data)
     {
       std::size_t addition = serializeInteger(0b011, v.size(), data);
       std::size_t str_start = data.size();
@@ -231,7 +231,7 @@ namespace cbor
   struct serializer<cbor_object>
   {
     using Type = cbor_object;
-    static std::size_t serialize(const Type& obj, Data& data)
+    static std::size_t execute(const Type& obj, Data& data)
     {
       const auto& v = obj.serialized_;
       std::size_t str_start = data.size();
@@ -244,13 +244,13 @@ namespace cbor
   struct serializer<std::vector<T>>
   {
     using Type = std::vector<T>;
-    static std::size_t serialize(const Type& v, Data& data)
+    static std::size_t execute(const Type& v, Data& data)
     {
       std::size_t addition = 0;
       addition += serializeInteger(0b100, v.size(), data);
       for (const auto& k : v)
       {
-        addition += serializer<typename Type::value_type>::serialize(k, data);
+        addition += serialize(k, data);
       }
       return addition;
     }
@@ -259,11 +259,10 @@ namespace cbor
   template<size_t index, typename... Ts>
   struct serialize_tuple_element
   {
-    static std::size_t serialize(const std::tuple<Ts...>& t, Data& data)
+    static std::size_t execute(const std::tuple<Ts...>& t, Data& data)
     {
-      using ElementType = typename std::tuple_element<sizeof...(Ts) - index - 1, std::tuple<Ts...>>::type ;
-      std::size_t value = serializer< ElementType >::serialize(std::get<sizeof...(Ts) - index - 1>(t), data);
-      value += serialize_tuple_element<index - 1, Ts...>::serialize(t, data);
+      std::size_t value = serialize(std::get<sizeof...(Ts) - index>(t), data);
+      value += serialize_tuple_element<index -1, Ts...>::execute(t, data);
       return value;
     }
   };
@@ -272,28 +271,27 @@ namespace cbor
   template<typename... Ts>
   struct serialize_tuple_element<0, Ts...>
   {
-    static std::size_t serialize(const std::tuple<Ts...>& t, Data& data)
+    static std::size_t execute(const std::tuple<Ts...>& /*t*/, Data& /*data*/)
     {
-      using ElementType = typename std::tuple_element<0, std::tuple<Ts...>>::type ;
-      return serializer< ElementType >::serialize(std::get<sizeof...(Ts) - 1>(t), data);
+      return 0;
     }
   };
 
   template<typename... Ts>
   struct serializer<std::tuple<Ts...>>
   {
-    static std::size_t serialize(const std::tuple<Ts...>& v, Data& data)
+    static std::size_t execute(const std::tuple<Ts...>& v, Data& data)
     {
       std::size_t addition = 0;
       addition += serializeInteger(0b100, sizeof...(Ts), data);
-      return addition + serialize_tuple_element<sizeof...(Ts)-1, Ts...>::serialize(v, data);
+      return addition + serialize_tuple_element<sizeof...(Ts), Ts...>::execute(v, data);
     }
   };
 
   template <typename KeyType, typename ValueType>
   struct serializer<std::map<KeyType, ValueType>>
   {
-    static std::size_t serialize(const std::map<KeyType, ValueType>& v, Data& data)
+    static std::size_t execute(const std::map<KeyType, ValueType>& v, Data& data)
     {
       std::size_t addition = 0;
       addition += serializeInteger(0b101, v.size(), data); // should be this :(
@@ -301,8 +299,8 @@ namespace cbor
       {
         const auto& key = k_v.first;
         const auto& value = k_v.second;
-        addition += serializer<KeyType>::serialize(key, data);
-        addition += serializer<ValueType>::serialize(value, data);
+        addition += serialize(key, data);
+        addition += serialize(value, data);
       }
       return addition;
     }

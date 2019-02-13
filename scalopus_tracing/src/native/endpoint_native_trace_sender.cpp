@@ -60,23 +60,17 @@ EndpointNativeTraceSender::~EndpointNativeTraceSender()
 static Data process_events(const EventMap& tid_event_map)
 {
   std::map<std::string, cbor::cbor_object> my_data;
-  json events = json({});
-  // Need to know the PID when we consume these traces.
   my_data["pid"] = cbor::cbor_object::make(static_cast<unsigned long>(::getpid()));
-  events["pid"] = static_cast<unsigned long>(::getpid());
-  // The event map is composed of default serializable types, so conversion is trivial:
-  events["events"] = tid_event_map;
-  auto result = json::to_cbor(events);
-  std::cout << "Nlohman: " << std::endl;
-  std::cout << cbor::hexdump(result) << std::endl;
 
-  my_data["events"] = cbor::cbor_object::make(tid_event_map);
+  std::vector<std::tuple<EventMap::key_type, EventMap::mapped_type>> event_entries;
+  for (const auto& tid_events : tid_event_map)
+  {
+    event_entries.emplace_back(tid_events.first, tid_events.second);
+  }
+  my_data["events"] = cbor::cbor_object::make(event_entries);
   Data output;
   cbor::serialize(my_data, output);
-  std::swap(output[output.size() - 2], output[output.size() - 1]);
-  std::cout << "cbor: " << std::endl;
-  std::cout << cbor::hexdump(output) << std::endl;
-  return result;
+  return output;
 }
 
 void EndpointNativeTraceSender::work()
