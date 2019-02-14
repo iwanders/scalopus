@@ -29,58 +29,98 @@
 */
 #include <array>
 #include <iostream>
-#include <vector>
-#include "spsc_ringbuffer.h"
-#include "cbor.h"
 #include <nlohmann/json.hpp>
+#include <vector>
+#include "cbor.h"
+#include "spsc_ringbuffer.h"
 
 using json = nlohmann::json;
 using Data = std::vector<std::uint8_t>;
-
 
 template <typename A, typename B>
 void test(const A& a, const B& b)
 {
   if (a != b)
   {
-    std::cerr << "a (" << a << ") != b (" << b << ")" << std::endl;
+    std::cerr << "a (\n" << a << ") != b (\n" << b << ")" << std::endl;
     exit(1);
   }
 }
 
-//! Timepoint of that clock.
-using TimePoint = uint64_t;
-//! Trace event as it is stored in the ringbuffer.
-using ScopeTraceEvent = std::tuple<TimePoint, unsigned int, uint8_t>;
-//! The container that backs the ringbuffer.
-using EventContainer = std::vector<ScopeTraceEvent>;
-
 int main(int /* argc */, char** /* argv */)
 {
+  //! Timepoint of that clock.
+  using TimePoint = uint64_t;
+  //! Trace event as it is stored in the ringbuffer.
+  using ScopeTraceEvent = std::tuple<TimePoint, unsigned int, uint8_t>;
+  //! The container that backs the ringbuffer.
+  using EventContainer = std::vector<ScopeTraceEvent>;
+  using EventMap = std::map<unsigned long, EventContainer>;
+
+  // This is what we need to match.
   json events;
-  events["pid"] = std::uint64_t{1337};
-  events["foo"] = EventContainer{{1549943736559416, 20, 30}, {1549943736559417, 655351, 60}};
-  auto z = json::to_cbor(events);
-  std::cout << cbor::hexdump(z) << std::endl;
+  events["pid"] = std::uint64_t{ 1337 };
+  events["events"] =
+      EventMap{ { 141414, EventContainer{ { 1549943736559416, 20, 30 }, { 1549943736559417, 655351, 60 } } } };
+  const auto json_events_as_cbor = json::to_cbor(events);
+  std::cout << cbor::hexdump(json_events_as_cbor) << std::endl;
 
-  std::map<std::string, cbor::cbor_object> mymap;
-  mymap["pid"] = cbor::cbor_object::make(std::uint64_t(1337));
-  mymap["foo"] = cbor::cbor_object::make(EventContainer{{1549943736559416, 20, 30}, {1549943736559417, 655351, 60}});
-  
-  Data output;
-  cbor::serialize(mymap, output);
-  std::cout << cbor::hexdump(output) << std::endl;
+  // json doesn't allow non-string keys in maps, so those are packed as lists of (key, value) pairs.
 
-  //  std::tuple<uint32_t, uint32_t, uint32_t> foo{1,2,3};
-  std::vector<std::tuple<unsigned long, EventContainer>> foo;
-  foo.push_back({1549943736559416, EventContainer{{1549943736559416, 20, 30}, {1549943736559417, 655351, 5}}});
-  //  foo.push_back({1, EventContainer{{1, 2, 3}}});
-  output.resize(0);
-  cbor::serialize(foo, output);
-  std::cout << cbor::hexdump(output) << std::endl;
+  // Create map of string , cbor_object data
+  std::map<std::string, cbor::cbor_object> my_event_data;
+  // Add the pid entry.
+  my_event_data["pid"] = cbor::cbor_object::make(static_cast<unsigned long>(1337));
 
-  //  std::vector<std::tuple<int, int>> buz;
-  //  buz = {{1,2}, {3,4}};
-  
+  // Create the 'map' with a vector of tuples.
+  std::vector<std::tuple<unsigned long, EventContainer>> faux_event_map;
+  faux_event_map.push_back(
+      { 141414, EventContainer{ { 1549943736559416, 20, 30 }, { 1549943736559417, 655351, 60 } } });
+  my_event_data["events"] = cbor::cbor_object::make(faux_event_map);
+
+  // Serialize the map of cbor entries into the data.
+  Data events_as_cbor;
+  cbor::serialize(my_event_data, events_as_cbor);
+  std::cout << cbor::hexdump(events_as_cbor) << std::endl;  // print it
+
+  // test it! If this passes we can write data identical to nlohmann::json's to_cbor, but then lots faster.
+  test(cbor::hexdump(json_events_as_cbor), cbor::hexdump(events_as_cbor));
+
+  // some values from https://github.com/cbor/test-vectors/blob/master/appendix_a.json
+  // Test map
+  {
+    std::map<unsigned int, unsigned int> input{ { 1, 2 }, { 3, 4 } };
+    Data result = { 0xa2, 0x01, 0x02, 0x03, 0x04 };
+    Data cbor_representation;
+    cbor::serialize(input, cbor_representation);
+    test(cbor::hexdump(result), cbor::hexdump(cbor_representation));
+  }
+  // test string map
+  {
+    std::map<std::string, std::string> input{ { "a", "A" }, { "b", "B" }, { "c", "C" }, { "d", "D" }, { "e", "E" } };
+    Data result = { 0xa5, 0x61, 0x61, 0x61, 0x41, 0x61, 0x62, 0x61, 0x42, 0x61, 0x63,
+                    0x61, 0x43, 0x61, 0x64, 0x61, 0x44, 0x61, 0x65, 0x61, 0x45 };
+    Data cbor_representation;
+    cbor::serialize(input, cbor_representation);
+    test(cbor::hexdump(result), cbor::hexdump(cbor_representation));
+  }
+
+  // test tuple
+  {
+    std::tuple<unsigned int, unsigned int> input{ 1, 2 };
+    Data result = { 0x82, 0x01, 0x02 };
+    Data cbor_representation;
+    cbor::serialize(input, cbor_representation);
+    test(cbor::hexdump(result), cbor::hexdump(cbor_representation));
+  }
+
+  // test pair
+  {
+    std::pair<unsigned int, unsigned int> input{ 1, 2 };
+    Data result = { 0x82, 0x01, 0x02 };
+    Data cbor_representation;
+    cbor::serialize(input, cbor_representation);
+    test(cbor::hexdump(result), cbor::hexdump(cbor_representation));
+  }
   return 0;
 }

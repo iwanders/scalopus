@@ -58,4 +58,4 @@ target_include_directories(cbor_serializer
     ${CMAKE_CURRENT_SOURCE_DIR}/../src
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/native/
 )
-add_test(test_ringbuffer cbor_serializer)
+add_test(test_cbor_serializer cbor_serializer)

@@ -28,8 +28,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_general.h"
-#include <pybind11/stl.h>
 #include <pybind11/functional.h>
+#include <pybind11/stl.h>
 #include <scalopus_general/endpoint_manager_poll.h>
 #include <scalopus_general/general.h>
 #include <scalopus_general/general_provider.h>

@@ -33,8 +33,8 @@
 #include <cstring>
 #include <iostream>
 #include <nlohmann/json.hpp>
-#include "tracepoint_collector_native.h"
 #include "cbor.h"
+#include "tracepoint_collector_native.h"
 
 namespace scalopus
 {

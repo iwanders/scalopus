@@ -137,9 +137,8 @@ output plugin for live sessions.
 
 ### Native
 The native tracepoints use the transport system provided by Scalopus that was originally intended for just getting the
-trace mappings out. They currently use about 25% more cpu for the random callstacks example than the LTTng tracepoints
-do, so good enough for simple things and quick tests, but for real projects with lots of tracepoints it may not be the
-best choice. Additionally, they cannot be turned of or on and are basically always enabled.
+trace mappings out. The CPU usage for the process with the tracepoints is almost identical to the LTTng tracepoints,
+but it does not provide functionality to switch tracepoints on and off per process like LTTng does.
 
 Under the hood it works as follows; Each thread will get a single consumer - single producer ringbuffer allocated for
 itself when a 
