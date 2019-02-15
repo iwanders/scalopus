@@ -29,6 +29,20 @@
 */
 #include "catapult_backend.h"
 
+// This is a 32x32, 16 color .ico of the :tada: emoji.
+#define DEVTOOLS_ENDPOINT_FAVICON                                                                                      \
+  "data:image/x-icon;base64,"                                                                                          \
+  "AAABAAEAICAQAAEABADoAgAAFgAAACgAAAAgAAAAQAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADxL5sA5GG+AIJh/gAadfUA/o9hAK"     \
+  "6EpAC5g+kANZ/eABu7+wCExO8A/860ANS+/gC80+sATuT9APv8/AAAAAAA7tm+7u7u7u7u7u7u7u7u7sghG87u7u7u7u7u7u7u7u52AZ3Ynu7u"     \
+  "7u7u7u7u7r7uwBiN3dic7u7u7u7u7utr7lF4iN2REa7u7u7u7u7ua+7liIhxEbl3nu7u7u7u7u7u54eJABnd3Xeezuqu7uye7unYMAHZ3d3Yd8"     \
+  "ykTu7nju7sdwAYiN3d2WAEyu7u6c7u7nEFeIiN3bths3nO7u7uzuzACDiIiJERud2Hd87u6Xnu4Jh4iIYBHN3d2Id5nO6e7uXYiIhgAZ3d3d04"     \
+  "iN2e7u7piIh2ABfY3d2Yg4md7u7rJXh4YAbYjX3YiIiO7u7u7iJ4dQBoiI3YwMeI7u7u7u6+x3AGiIiIiEQEXK7u7u7u7udQGIiIjYjYpERKqq"     \
+  "7u7u7lEXiIiIjd3dyqRERERO7uRRl4iIM4jdie7u6qqkru7qBdiIgzKN2M5r7u7u7u7u7kWIiIgyiIzuJu7u7u7u7u6ljYhzMojO7mvu7O7u7k"     \
+  "RESniIeDJ+ru4r7Css7upO7u6Yg3My5ErsJrbiLu7upK7s6DN3IupO7mK+wi7u7uRE7dl5nibu7u7u7rLra+pEBO2esu4i7u7u7u7iZiJkSq7u"     \
+  "7rYrJq7u7u7rvu7iJE7u7u7rsiRE7u7u4ivu5ipK7u7u4iK6ru7u7uu+7ra+6u7u7usr7u7u7u7u7u7r4AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"     \
+  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"     \
+  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+
 namespace scalopus
 {
 void CatapultBackend::addProvider(TraceEventProvider::Ptr provider)
@@ -62,10 +76,10 @@ std::shared_ptr<ss::Response> CatapultBackend::handle(const ss::Request& request
         { "description", "Scalopus Operational" },
         { "devtoolsFrontendUrl", "/devtools/inspector.html?ws=127.0.0.1:9222/devtools/p" },
         { "id", "fooo" },
-        { "title", "click 'trace' -----------------------------------^" },
+        { "title", "click 'trace' -----------------------------------------^" },
         { "type", "Scalopus remote tracing target" },
         { "url", "z" },
-        //  { "faviconUrl", DEVTOOLS_ENDPOINT_FAVICON },
+        { "faviconUrl", DEVTOOLS_ENDPOINT_FAVICON },
         { "webSocketDebuggerUrl", "-" },
     } };
     return ss::Response::htmlResponse(j2.dump());
