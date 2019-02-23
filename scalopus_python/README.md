@@ -8,7 +8,7 @@ As well as unit tests and examples for Python use of Scalopus.
 The main readme provides information about the necessary packages to succesfully build and install the Python bindings
 for Scalopus. During the build process the installable Python module will be created in `build/scalopus_python/`.
 
-The Python bindings themselves are inside a shared object created through [Pybind11][pybind11], this shared object 
+The Python bindings themselves are inside a shared object created through [Pybind11][pybind11], this shared object
 refers to the paths of the other libraries in your build directory. So the dependent shared objects need to be at their
 original location or in a folder in which the library loader will look. If Scalopus is installed its shared objects
 will be installed in `/usr/local/lib`, which should be searched automatically. If using a prefix be sure to set the
@@ -37,7 +37,7 @@ found in [here](/scalopus_python/examples/python_provider_example.py).
 
 ## scalopus.tracing
 
-The tracing functionality from Python uses the C++ implementation of the tracepoints and trackers. 
+The tracing functionality from Python uses the C++ implementation of the tracepoints and trackers.
 To make the tracing Python code more convenient the [`tracing`](/scalopus_python/scalopus/tracing.py) file has
 some helpers to allow decorating functions and tracing a `with` context:
 
@@ -47,13 +47,21 @@ some helpers to allow decorating functions and tracing a `with` context:
   Python's quick attribute lookups. The sections must be unique throughout your Python process. Exposed as
   `scalopus.tracing.trace_section`.
 - `traced`: This is a decorator that wraps your function in a trace context. The function name is used as the
-  trace name. Exposed as `scalopus.tracing.traced`.
+  trace name, unless an explicit name is given. Exposed as `scalopus.tracing.traced`.
 
 ```python
 import scalopus.tracing as tracing
+
+# use function name as trace name
 @tracing.traced
 def a():
     print("a")
+    time.sleep(0.2)
+
+# use given name as trace name
+@tracing.traced('my name')
+def b():
+    print("b")
     time.sleep(0.2)
 
 # fastest, one attribute lookup, name will be 'my_relevant_scope'

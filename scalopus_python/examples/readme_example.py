@@ -45,7 +45,8 @@ def c():
     fooBarBuz()
     time.sleep(0.2)
 
-@tracing.traced
+# explicitly set custom trace name
+@tracing.traced('my trace name')
 def b():
     time.sleep(0.2)
     print(" b")

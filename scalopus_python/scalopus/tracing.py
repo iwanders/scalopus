@@ -124,13 +124,36 @@ class TraceContext(object):
         """
         tracing_backend.scope_exit(self.trace_id)
 
-def traced(f):
-    """Decorator to trace the entire function execution. Name used for the
-       tracepoint is the function name.
+def traced(f_or_name=None):
+    """Decorator to trace the entire function execution. This decorator can be
+    used in two ways. It can directly decorate a function, which will use the
+    function's name as the tracepoint name:
+
+        >>> @traced
+        ... def work_func():
+        ...     pass
+
+    It can also be given an explicit tracepoint name which will then be used
+    instead of the function's name:
+
+        >>> @traced('work')
+        ... def work_func():
+        ...     pass
+
+    The second variant is useful when decorating methods in a class.
     """
-    tracer = TraceContext(f.__name__)
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        with tracer:
-            return f(*args, **kwargs)
-    return wrapper
+    # Determine the qualities of the passed argument
+    f = f_or_name if callable(f_or_name) else None
+    name = f_or_name if not callable(f_or_name) else None
+    # registerer function that does the actual work of wrapping the function
+    # with a trace context
+    def registerer(f):
+        tracer = TraceContext(name or f.__name__)
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            with tracer:
+                return f(*args, **kwargs)
+        return wrapper
+    # invoke the registerer or return it depending on whether the given argument
+    # is callable or not
+    return registerer(f) if callable(f) else registerer
