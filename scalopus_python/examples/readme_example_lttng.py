@@ -41,25 +41,25 @@ else:
     # Swap backend to lttng.
     scalopus.tracing.setBackend(scalopus.tracing.lttng)
 
-@tracing.trace_function
+@tracing.traced
 def fooBarBuz():
     time.sleep(0.2)
 
-@tracing.trace_function
+@tracing.traced
 def c():
     time.sleep(0.2)
     print("  c")
     fooBarBuz()
     time.sleep(0.2)
 
-@tracing.trace_function
+@tracing.traced
 def b():
     time.sleep(0.2)
     print(" b")
     c()
     time.sleep(0.2)
 
-@tracing.trace_function
+@tracing.traced
 def a():
     print("a")
     time.sleep(0.2)

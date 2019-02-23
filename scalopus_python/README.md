@@ -46,12 +46,12 @@ some helpers to allow decorating functions and tracing a `with` context:
 - `TraceContextHelper`: This allows efficient lookups of already existing trace context managers. This relies on
   Python's quick attribute lookups. The sections must be unique throughout your Python process. Exposed as
   `scalopus.tracing.trace_section`.
-- `trace_function`: This is a decorator that wraps your function in a trace context. The function name is used as the
-  trace name. Exposed as `scalopus.tracing.trace_function`.
+- `traced`: This is a decorator that wraps your function in a trace context. The function name is used as the
+  trace name. Exposed as `scalopus.tracing.traced`.
 
 ```python
 import scalopus.tracing as tracing
-@tracing.trace_function
+@tracing.traced
 def a():
     print("a")
     time.sleep(0.2)

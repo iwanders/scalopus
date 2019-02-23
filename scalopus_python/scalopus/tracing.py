@@ -124,7 +124,7 @@ class TraceContext(object):
         """
         tracing_backend.scope_exit(self.trace_id)
 
-def trace_function(f):
+def traced(f):
     """Decorator to trace the entire function execution. Name used for the
        tracepoint is the function name.
     """
