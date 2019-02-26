@@ -41,6 +41,7 @@
 #include <scalopus_tracing/nop_tracepoint.h>
 
 #include <scalopus_tracing/native_trace_provider.h>
+#include <scalopus_tracing/trace_configurator.h>
 
 static std::size_t uniqueTraceId()
 {
@@ -73,6 +74,23 @@ void add_scalopus_tracing(py::module& m)
 
   tracing.def("setTraceName", [](const unsigned int id, const std::string& name) {
     ScopeTraceTracker::getInstance().insert(id, name);
+  });
+
+  tracing.def("getThreadState", []() {
+    TraceConfigurator& configurator = TraceConfigurator::getInstance();
+    return configurator.getThreadState();
+  });
+  tracing.def("setThreadState", [](bool new_state) {
+    TraceConfigurator& configurator = TraceConfigurator::getInstance();
+    return configurator.setThreadState(new_state);
+  });
+  tracing.def("getProcessState", []() {
+    TraceConfigurator& configurator = TraceConfigurator::getInstance();
+    return configurator.getProcessState();
+  });
+  tracing.def("setProcessState", [](bool new_state) {
+    TraceConfigurator& configurator = TraceConfigurator::getInstance();
+    return configurator.setProcessState(new_state);
   });
 
 #ifdef SCALOPUS_TRACING_HAVE_LTTNG

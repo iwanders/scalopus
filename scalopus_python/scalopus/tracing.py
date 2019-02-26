@@ -34,6 +34,10 @@ from functools import wraps
 
 # Make some shorthands for convenience.
 setTraceName = tracing.setTraceName
+getThreadState = tracing.getThreadState
+setThreadState = tracing.setThreadState
+getProcessState = tracing.getProcessState
+setProcessState = tracing.setProcessState
 EndpointTraceMapping = tracing.EndpointTraceMapping
 EndpointNativeTraceSender = tracing.native.EndpointNativeTraceSender
 NativeTraceProvider = tracing.native.NativeTraceProvider

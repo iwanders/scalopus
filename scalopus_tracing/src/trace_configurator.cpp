@@ -27,36 +27,69 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#define TRACEPOINT_DEFINE
-#define TRACEPOINT_CREATE_PROBES
-#include <scalopus_tracing/internal/scope_tracepoint.h>
-#include "lttng/scope_tracepoint_lttng_definition.h"
 #include <scalopus_tracing/trace_configurator.h>
 
 namespace scalopus
 {
-namespace lttng
+
+TraceConfigurator::TraceConfigurator()
 {
-void scope_entry(const unsigned int id)
-{
-  static auto& process_state = *(TraceConfigurator::getInstance().getProcessStatePtr());
-  static thread_local auto& thread_state = *(TraceConfigurator::getInstance().getThreadStatePtr());
-  if (!(process_state.load() && thread_state.load()))
-  {
-    return;
-  }
-  tracepoint(scalopus_scope_id, entry, id);
+  process_state_ = std::make_shared<std::atomic_bool>( true );  // default to enabled.
 }
 
-void scope_exit(const unsigned int id)
+TraceConfigurator::AtomicBoolPtr TraceConfigurator::getThreadStatePtr()
 {
-  static auto& process_state = *(TraceConfigurator::getInstance().getProcessStatePtr());
-  static thread_local auto& thread_state = *(TraceConfigurator::getInstance().getThreadStatePtr());
-  if (!(process_state.load() && thread_state.load()))
+  std::lock_guard<decltype(threads_map_mutex_)> lock(threads_map_mutex_);
+  auto tid = static_cast<unsigned long>(pthread_self());
+  auto it = thread_state_.find(tid);
+  if (it != thread_state_.end())
   {
-    return;
+    return thread_state_[tid];   // atomic bool already existed.
   }
-  tracepoint(scalopus_scope_id, exit, id);
+  else
+  {
+    auto boolean = std::make_shared<std::atomic_bool>( true );  // default each thread to enabled.
+    thread_state_[tid] = boolean;
+    return boolean;
+  }
+  return nullptr;
 }
-}  // namespace lttng
+
+bool TraceConfigurator::getThreadState()
+{
+  return *getThreadStatePtr();
+}
+
+bool TraceConfigurator::setThreadState(bool new_state)
+{
+  return getThreadStatePtr()->exchange(new_state);
+}
+
+TraceConfigurator::AtomicBoolPtr TraceConfigurator::getProcessStatePtr() const
+{
+  return process_state_;
+}
+
+bool TraceConfigurator::getProcessState() const
+{
+  return *process_state_;
+}
+
+bool TraceConfigurator::setProcessState(bool new_state)
+{
+  return process_state_->exchange(new_state);
+}
+
+std::map<unsigned long, TraceConfigurator::AtomicBoolPtr> TraceConfigurator::getThreadMap() const
+{
+  std::lock_guard<decltype(threads_map_mutex_)> lock(threads_map_mutex_);
+  return thread_state_;
+}
+
+TraceConfigurator& TraceConfigurator::getInstance()
+{
+  static TraceConfigurator instance;
+  return instance;
+}
+
 }  // namespace scalopus

@@ -31,6 +31,7 @@
 #include <iostream>
 
 #include <scalopus_tracing/internal/scope_tracepoint.h>
+#include <scalopus_tracing/trace_configurator.h>
 #include "scalopus_tracing/native_tracepoint.h"
 #include "tracepoint_collector_native.h"
 
@@ -58,6 +59,12 @@ static int64_t nativeGetChrono()
 void scope_entry(const unsigned int id)
 {
   static thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
+  static auto& process_state = *(TraceConfigurator::getInstance().getProcessStatePtr());
+  static thread_local auto& thread_state = *(TraceConfigurator::getInstance().getThreadStatePtr());
+  if (!(process_state.load() && thread_state.load()))
+  {
+    return;
+  }
   // @TODO Do something with overrun, count lost events?
   buffer.push(tracepoint_collector_types::ScopeTraceEvent{ nativeGetChrono(), id, TracePointCollectorNative::ENTRY });
 }
@@ -65,6 +72,12 @@ void scope_entry(const unsigned int id)
 void scope_exit(const unsigned int id)
 {
   static thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
+  static auto& process_state = *(TraceConfigurator::getInstance().getProcessStatePtr());
+  static thread_local auto& thread_state = *(TraceConfigurator::getInstance().getThreadStatePtr());
+  if (!(process_state.load() && thread_state.load()))
+  {
+    return;
+  }
   // @TODO Do something with overrun, count lost events?
   buffer.push(tracepoint_collector_types::ScopeTraceEvent{ nativeGetChrono(), id, TracePointCollectorNative::EXIT });
 }
