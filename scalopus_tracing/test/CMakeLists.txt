@@ -59,3 +59,11 @@ target_include_directories(cbor_serializer
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/native/
 )
 add_test(test_cbor_serializer cbor_serializer)
+
+add_executable(tracepoint_enable_disable test_tracepoint_enable_disable.cpp)
+target_link_libraries(tracepoint_enable_disable
+  PRIVATE
+    Scalopus::scalopus_tracing_native
+    Scalopus::scalopus_tracing_consumer
+)
+add_test(test_tracepoint_enable_disable tracepoint_enable_disable)

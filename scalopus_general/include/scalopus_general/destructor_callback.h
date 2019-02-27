@@ -48,6 +48,7 @@ public:
   {
     callback_();
   }
+
 private:
   std::function<void()> callback_;
 };

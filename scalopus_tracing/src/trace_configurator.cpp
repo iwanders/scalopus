@@ -27,15 +27,14 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <scalopus_tracing/trace_configurator.h>
 #include <scalopus_general/destructor_callback.h>
+#include <scalopus_tracing/trace_configurator.h>
 
 namespace scalopus
 {
-
 TraceConfigurator::TraceConfigurator()
 {
-  process_state_ = std::make_shared<std::atomic_bool>( true );  // default to enabled.
+  process_state_ = std::make_shared<std::atomic_bool>(true);  // default to enabled.
 }
 
 TraceConfigurator::AtomicBoolPtr TraceConfigurator::getThreadStatePtr()
@@ -43,19 +42,16 @@ TraceConfigurator::AtomicBoolPtr TraceConfigurator::getThreadStatePtr()
   auto tid = static_cast<unsigned long>(pthread_self());
 
   // Register a destructor callback such that the thread gets removed from the map when the thread exits.
-  thread_local DestructorCallback cleanup{[this, tid]()
-  {
-    removeThread(tid);
-  }};
+  thread_local DestructorCallback cleanup{ [this, tid]() { removeThread(tid); } };
   std::lock_guard<decltype(threads_map_mutex_)> lock(threads_map_mutex_);
   auto it = thread_state_.find(tid);
   if (it != thread_state_.end())
   {
-    return thread_state_[tid];   // atomic bool already existed.
+    return thread_state_[tid];  // atomic bool already existed.
   }
   else
   {
-    auto boolean = std::make_shared<std::atomic_bool>( true );  // default each thread to enabled.
+    auto boolean = std::make_shared<std::atomic_bool>(true);  // default each thread to enabled.
     thread_state_[tid] = boolean;
     return boolean;
   }

@@ -34,5 +34,6 @@
 #include <scalopus_tracing/endpoint_native_trace_sender.h>
 #include <scalopus_tracing/endpoint_trace_mapping.h>
 #include <scalopus_tracing/scope_tracing.h>
+#include <scalopus_tracing/trace_configurator.h>
 
 #endif  // SCALOPUS_TRACING_TRACING_H

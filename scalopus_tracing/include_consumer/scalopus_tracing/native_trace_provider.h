@@ -47,7 +47,7 @@ public:
   using WeakPtr = std::weak_ptr<NativeTraceProvider>;
 
   /**
-   * @brief Create the lttng provider.
+   * @brief Create the provider.
    * @param manager The endpoint manager that provides the endpoints to resolve the trace id's.
    */
   NativeTraceProvider(EndpointManager::Ptr manager);

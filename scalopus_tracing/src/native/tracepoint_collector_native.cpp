@@ -45,10 +45,7 @@ tracepoint_collector_types::ScopeBufferPtr TracePointCollectorNative::getBuffer(
 {
   const auto tid = static_cast<unsigned long>(pthread_self());
   // Register a destructor callback such that the thread gets removed from the map when the thread exits.
-  thread_local DestructorCallback cleanup{[this, tid]()
-  {
-    erase(tid);
-  }};
+  thread_local DestructorCallback cleanup{ [this, tid]() { erase(tid); } };
 
   if (exists(tid))
   {

@@ -31,9 +31,9 @@
 #define SCALOPUS_TRACE_CONFIGURATOR_H
 
 #include <atomic>
+#include <map>
 #include <memory>
 #include <mutex>
-#include <map>
 
 namespace scalopus
 {
@@ -91,7 +91,7 @@ public:
 private:
   AtomicBoolPtr process_state_;  //!< Process wide enable / disable flag.
 
-  mutable std::mutex threads_map_mutex_;  //!< Mutex for the threads_enabled_ map.
+  mutable std::mutex threads_map_mutex_;                 //!< Mutex for the threads_enabled_ map.
   std::map<unsigned long, AtomicBoolPtr> thread_state_;  //!< Enable / disable per thread.
 
   /**
