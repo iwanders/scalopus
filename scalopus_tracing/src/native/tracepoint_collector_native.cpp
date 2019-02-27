@@ -28,8 +28,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "tracepoint_collector_native.h"
+#include <scalopus_general/destructor_callback.h>
 
-#include <iostream>
 namespace scalopus
 {
 const uint8_t TracePointCollectorNative::ENTRY = 1;
@@ -43,7 +43,13 @@ TracePointCollectorNative& TracePointCollectorNative::getInstance()
 
 tracepoint_collector_types::ScopeBufferPtr TracePointCollectorNative::getBuffer()
 {
-  auto tid = static_cast<unsigned long>(pthread_self());
+  const auto tid = static_cast<unsigned long>(pthread_self());
+  // Register a destructor callback such that the thread gets removed from the map when the thread exits.
+  thread_local DestructorCallback cleanup{[this, tid]()
+  {
+    erase(tid);
+  }};
+
   if (exists(tid))
   {
     // Buffer already existed for this thread.

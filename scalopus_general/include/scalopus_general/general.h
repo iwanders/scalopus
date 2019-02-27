@@ -33,5 +33,6 @@
 #include <scalopus_general/endpoint_introspect.h>
 #include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_general/thread_naming.h>
+#include <scalopus_general/destructor_callback.h>
 
 #endif  // SCALOPUS_GENERAL_GENERAL_H

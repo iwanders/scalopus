@@ -93,6 +93,11 @@ private:
 
   mutable std::mutex threads_map_mutex_;  //!< Mutex for the threads_enabled_ map.
   std::map<unsigned long, AtomicBoolPtr> thread_state_;  //!< Enable / disable per thread.
+
+  /**
+   * @brief Method to be called when a thread is removed.
+   */
+  void removeThread(unsigned long thread_id);
 };
 }  // namespace scalopus
 

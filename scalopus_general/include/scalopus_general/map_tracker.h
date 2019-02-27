@@ -76,6 +76,15 @@ public:
     return mapping_.find(k) != mapping_.end();
   }
 
+  /**
+   * @brief Remove an entry from the mapping.
+   */
+  void erase(const Key& key)
+  {
+    std::unique_lock<decltype(mutex_)> lock(mutex_);
+    mapping_.erase(key);
+  }
+
 private:
   std::map<Key, Value> mapping_;
   mutable std::shared_timed_mutex mutex_;  //! Mutex for the mapping container.

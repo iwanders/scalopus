@@ -27,31 +27,30 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "scalopus_general/internal/thread_name_tracker.h"
-#include <scalopus_general/destructor_callback.h>
+#ifndef SCALOPUS_DESTRUCTOR_CALLBACK_H
+#define SCALOPUS_DESTRUCTOR_CALLBACK_H
+
+#include <functional>
 
 namespace scalopus
 {
-ThreadNameTracker& ThreadNameTracker::getInstance()
+/**
+ * @brief Object that calls a function on destruction.
+ */
+struct DestructorCallback
 {
-  static ThreadNameTracker instance;
-  return instance;
-}
-
-void ThreadNameTracker::setCurrentName(const std::string& name)
-{
-  const auto tid = static_cast<unsigned long>(pthread_self());
-  // Register a destructor callback such that the thread gets removed from the map when the thread exits.
-  thread_local DestructorCallback cleanup{[this, tid]()
+public:
+  DestructorCallback(std::function<void()>&& fun) : callback_(fun)
   {
-    erase(tid);
-  }};
-  setThreadName(tid, name);
-}
+  }
 
-void ThreadNameTracker::setThreadName(unsigned long thread_id, const std::string& name)
-{
-  insert(thread_id, name);
-}
-
+  ~DestructorCallback()
+  {
+    callback_();
+  }
+private:
+  std::function<void()> callback_;
+};
 }  // namespace scalopus
+
+#endif  // SCALOPUS_DESTRUCTOR_CALLBACK_H

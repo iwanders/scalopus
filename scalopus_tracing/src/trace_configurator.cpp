@@ -28,6 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <scalopus_tracing/trace_configurator.h>
+#include <scalopus_general/destructor_callback.h>
 
 namespace scalopus
 {
@@ -39,8 +40,14 @@ TraceConfigurator::TraceConfigurator()
 
 TraceConfigurator::AtomicBoolPtr TraceConfigurator::getThreadStatePtr()
 {
-  std::lock_guard<decltype(threads_map_mutex_)> lock(threads_map_mutex_);
   auto tid = static_cast<unsigned long>(pthread_self());
+
+  // Register a destructor callback such that the thread gets removed from the map when the thread exits.
+  thread_local DestructorCallback cleanup{[this, tid]()
+  {
+    removeThread(tid);
+  }};
+  std::lock_guard<decltype(threads_map_mutex_)> lock(threads_map_mutex_);
   auto it = thread_state_.find(tid);
   if (it != thread_state_.end())
   {
@@ -53,6 +60,11 @@ TraceConfigurator::AtomicBoolPtr TraceConfigurator::getThreadStatePtr()
     return boolean;
   }
   return nullptr;
+}
+void TraceConfigurator::removeThread(unsigned long thread_id)
+{
+  std::lock_guard<decltype(threads_map_mutex_)> lock(threads_map_mutex_);
+  thread_state_.erase(thread_id);
 }
 
 bool TraceConfigurator::getThreadState()
