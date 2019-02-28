@@ -43,3 +43,8 @@ target_link_libraries(readme_example Scalopus::scalopus_tracing_native)
 add_executable(embedded_catapult_server src/embedded_catapult_server.cpp)
 target_compile_options(embedded_catapult_server PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_link_libraries(embedded_catapult_server Scalopus::scalopus_catapult Scalopus::scalopus_tracing_native)
+
+# Showcase example for enable and disabling tracepoints.
+add_executable(showcase_toggle_tracepoints src/showcase_toggle_tracepoints.cpp)
+target_compile_options(showcase_toggle_tracepoints PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+target_link_libraries(showcase_toggle_tracepoints Scalopus::scalopus_tracing_native)

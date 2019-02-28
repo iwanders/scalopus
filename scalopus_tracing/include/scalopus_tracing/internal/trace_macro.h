@@ -71,4 +71,10 @@
   {                                                                                                                    \
   } while (0)
 
+#define TRACING_CONFIG_THREAD_PROCESS_STATE_RAII(is_process, new_state)                                                \
+  scalopus::TraceConfigurationRAII SCALOPUS_MAKE_UNIQUE(scalopus_config_id_)(is_process, new_state);                   \
+  do                                                                                                                   \
+  {                                                                                                                    \
+  } while (0)
+
 #endif  // SCALOPUS_TRACING_INTERNAL_SCOPE_TRACING_H

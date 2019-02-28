@@ -27,7 +27,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "scalopus_tracing/scope_tracing.h"
+#include "scalopus_tracing/tracing.h"
 
 int main(int /* argc */, char** /* argv */)
 {
@@ -45,6 +45,12 @@ int main(int /* argc */, char** /* argv */)
   TRACE_SCOPE_END("zz");
   TRACE_SCOPE_END("zz");
 
+  TRACING_CONFIG_THREAD_STATE_RAII(true);
+  TRACING_CONFIG_THREAD_STATE_RAII(true);
+
+  TRACING_CONFIG_PROCESS_STATE_RAII(true);
+  TRACING_CONFIG_PROCESS_STATE_RAII(true);
+
   // Check if the macro's don't expand to shadowed variables.
   {
     TRACE_PRETTY_FUNCTION();
@@ -57,6 +63,12 @@ int main(int /* argc */, char** /* argv */)
     TRACE_SCOPE_START("zz");
     TRACE_SCOPE_END("zz");
     TRACE_SCOPE_END("zz");
+
+    TRACING_CONFIG_THREAD_STATE_RAII(true);
+    TRACING_CONFIG_THREAD_STATE_RAII(true);
+
+    TRACING_CONFIG_PROCESS_STATE_RAII(true);
+    TRACING_CONFIG_PROCESS_STATE_RAII(true);
   }
   return 0;
 }

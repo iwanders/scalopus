@@ -6,6 +6,7 @@ add_library(scalopus_scope_tracing SHARED
   src/scope_trace_tracker.cpp
   src/endpoint_trace_mapping.cpp
   src/trace_configurator.cpp
+  src/trace_configuration_raii.cpp
   src/native/tracepoint_collector_native.cpp
   src/native/endpoint_native_trace_sender.cpp
 )

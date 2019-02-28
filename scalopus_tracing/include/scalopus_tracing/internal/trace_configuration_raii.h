@@ -27,13 +27,28 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef SCALOPUS_TRACING_TRACING_H
-#define SCALOPUS_TRACING_TRACING_H
+#ifndef SCALOPUS_TRACING_TRACE_CONFIGURATION_RAII_H
+#define SCALOPUS_TRACING_TRACE_CONFIGURATION_RAII_H
 
-#include <scalopus_general/general.h>
-#include <scalopus_tracing/endpoint_native_trace_sender.h>
-#include <scalopus_tracing/endpoint_trace_mapping.h>
-#include <scalopus_tracing/trace_configurator.h>
-#include <scalopus_tracing/trace_macro.h>
+namespace scalopus
+{
+/**
+ * @brief RAII object to change the tracing configuration.
+ */
+class TraceConfigurationRAII
+{
+  bool is_process_{ false };
+  bool previous_state_;
 
-#endif  // SCALOPUS_TRACING_TRACING_H
+public:
+  TraceConfigurationRAII(const bool is_process, const bool new_state);
+
+  /**
+   * @brief Destructor, reverts back to the previous value.
+   */
+  ~TraceConfigurationRAII();
+};
+
+}  // namespace scalopus
+
+#endif  // SCALOPUS_TRACING_TRACE_CONFIGURATION_RAII_H

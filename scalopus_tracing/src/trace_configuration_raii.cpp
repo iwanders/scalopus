@@ -27,31 +27,35 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef SCALOPUS_TRACING_SCOPE_TRACING_H
-#define SCALOPUS_TRACING_SCOPE_TRACING_H
+#include <scalopus_tracing/internal/trace_configuration_raii.h>
+#include <scalopus_tracing/trace_configurator.h>
 
-#include <scalopus_tracing/internal/scope_trace_raii.h>
-#include <scalopus_tracing/internal/scope_trace_tracker.h>
-#include <scalopus_tracing/internal/scope_tracing.h>
-#include <scalopus_tracing/internal/compile_time_crc.hpp>
+namespace scalopus
+{
+TraceConfigurationRAII::TraceConfigurationRAII(const bool is_process, const bool new_state) : is_process_(is_process)
+{
+  TraceConfigurator& configurator = TraceConfigurator::getInstance();
+  if (is_process_)
+  {
+    previous_state_ = configurator.setProcessState(new_state);
+  }
+  else
+  {
+    previous_state_ = configurator.setThreadState(new_state);
+  }
+}
 
-/**
- * Public Macros
- * Tracked tracepoints store the actual tracepoint by ID, the name is tracked by the trace point tracking singleton.
- * The ID must be unique per tracing session, it can be automatically generated with the filename and line number.
- */
+TraceConfigurationRAII::~TraceConfigurationRAII()
+{
+  TraceConfigurator& configurator = TraceConfigurator::getInstance();
+  if (is_process_)
+  {
+    configurator.setProcessState(previous_state_);
+  }
+  else
+  {
+    configurator.setThreadState(previous_state_);
+  }
+}
 
-// Macro to create a tracker RAII tracepoint. The ID is automatically generated with the last part of the filename and
-// the line number.
-#define TRACE_SCOPE_RAII(name) TRACE_SCOPE_RAII_ID(name, SCALOPUS_TRACKED_TRACE_ID_CREATOR())
-
-// Macro to create a traced RAII tracepoint using __PRETTY_FUNCTION__ as name.
-#define TRACE_PRETTY_FUNCTION() TRACE_SCOPE_RAII_ID(__PRETTY_FUNCTION__, SCALOPUS_TRACKED_TRACE_ID_CREATOR())
-
-// Macro to explicitly emit a start scope, needs to be paired with TRACE_SCOPE_END(name) with the same name.
-#define TRACE_SCOPE_START(name) TRACE_SCOPE_START_NAMED_ID(name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))
-
-// Macro to explicitly emit a start scope, needs to be paired with TRACE_SCOPE_START(name) with the same name.
-#define TRACE_SCOPE_END(name) TRACE_SCOPE_END_NAMED_ID(name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))
-
-#endif  // SCALOPUS_TRACING_SCOPE_TRACING_H
+}  // namespace scalopus

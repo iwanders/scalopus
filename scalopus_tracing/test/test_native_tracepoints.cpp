@@ -117,7 +117,7 @@ int main(int /* argc */, char** /* argv */)
   test(result[0]["tid"].get<unsigned long>(), pthread_self());
   test(result[1]["tid"].get<unsigned long>(), pthread_self());
   std::int64_t difference = result[1]["ts"].get<std::int64_t>() - result[0]["ts"].get<std::int64_t>();
-  std::int64_t expected = 100 * 1000;  // 100 ms
+  std::int64_t expected = 100 * 1000;        // 100 ms
   std::int64_t allow_difference = 1 * 1000;  // 1 ms
 
   test_less(std::abs(expected - difference), allow_difference);
