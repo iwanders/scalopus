@@ -29,6 +29,7 @@
 */
 #include <scalopus_transport/transport_loopback.h>
 #include <iostream>
+#include <numeric>
 #include "scalopus_tracing/native_trace_provider.h"
 #include "scalopus_tracing/tracing.h"
 
@@ -38,6 +39,16 @@ void test(const A& a, const B& b)
   if (a != b)
   {
     std::cerr << "a (" << a << ") != b (" << b << ")" << std::endl;
+    exit(1);
+  }
+}
+
+template <typename A, typename B>
+void test_less(const A& a, const B& b)
+{
+  if (a > b)
+  {
+    std::cerr << "a (" << a << ") > b (" << b << ")" << std::endl;
     exit(1);
   }
 }
@@ -98,9 +109,18 @@ int main(int /* argc */, char** /* argv */)
   auto result = source->finishInterval();
   test(result.size(), 2u);  // expect two tracepoints.
 
-  // confirm name.
+  // Confirm values in the tracepoint.
   test(result[0]["name"], "main");
   test(result[1]["name"], "main");
+  test(result[0]["ph"], "B");
+  test(result[1]["ph"], "E");
+  test(result[0]["tid"].get<unsigned long>(), pthread_self());
+  test(result[1]["tid"].get<unsigned long>(), pthread_self());
+  std::int64_t difference = result[1]["ts"].get<std::int64_t>() - result[0]["ts"].get<std::int64_t>();
+  std::int64_t expected = 100 * 1000;  // 100 ms
+  std::int64_t allow_difference = 1 * 1000;  // 1 ms
+
+  test_less(std::abs(expected - difference), allow_difference);
 
   // Disable this threads' tracepoints
   scalopus::TraceConfigurator::getInstance().setThreadState(false);
