@@ -202,9 +202,8 @@ target_include_directories(scalopus_tracing_consumer
 )
 add_library(Scalopus::scalopus_tracing_consumer ALIAS scalopus_tracing_consumer)
 target_link_libraries(scalopus_tracing_consumer
-  PRIVATE
-    Scalopus::scalopus_scope_tracing
   PUBLIC
+    Scalopus::scalopus_scope_tracing
     Scalopus::scalopus_general
     Scalopus::scalopus_lttng_babeltrace
     Scalopus::scalopus_consumer

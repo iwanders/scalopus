@@ -60,8 +60,8 @@ int main(int /* argc */, char** /* argv */)
   // This is what we need to match.
   json events;
   events["pid"] = std::uint64_t{ 1337 };
-  events["events"] =
-      EventMap{ { 141414, EventContainer{ { 1549943736559416, 20, 30 }, { 1549943736559417, 655351, 60 } } } };
+  events["events"] = EventMap{ { 141414, EventContainer{ ScopeTraceEvent{ 1549943736559416, 20, 30 },
+                                                         ScopeTraceEvent{ 1549943736559417, 655351, 60 } } } };
   const auto json_events_as_cbor = json::to_cbor(events);
   std::cout << cbor::hexdump(json_events_as_cbor) << std::endl;
 
@@ -74,8 +74,9 @@ int main(int /* argc */, char** /* argv */)
 
   // Create the 'map' with a vector of tuples.
   std::vector<std::tuple<unsigned long, EventContainer>> faux_event_map;
-  faux_event_map.push_back(
-      { 141414, EventContainer{ { 1549943736559416, 20, 30 }, { 1549943736559417, 655351, 60 } } });
+  faux_event_map.push_back(decltype(faux_event_map)::value_type{
+      141414,
+      EventContainer{ ScopeTraceEvent{ 1549943736559416, 20, 30 }, ScopeTraceEvent{ 1549943736559417, 655351, 60 } } });
   my_event_data["events"] = cbor::cbor_object::make(faux_event_map);
 
   // Serialize the map of cbor entries into the data.
