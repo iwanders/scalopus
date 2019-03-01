@@ -39,3 +39,7 @@ expect this use case to be particularly useful, but it's possible.
 This results in a binary that will connect to all discovered servers and obtain the data provided through the introspect
 , process info and trace mapping endpoints. The binary outputs human readable text to `stderr` while it is working, at
 the end it outputs the data it collected as pretty printed json to `stdout`.
+
+## `showcase_toggle_tracepoints.cpp`
+This showcase how one could use the `TRACING_CONFIG_THREAD_STATE_RAII` macro to disable tracepoints conditionally
+depending on the code path taken.

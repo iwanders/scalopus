@@ -10,7 +10,7 @@ The currently supported tracepoints are scope entry and exit tracepoints. These 
 [Trace Event Format][trace_event_format] that's displayed in the trace viewer.
 
 The tracepoint macro's themselves can be found in
-[scope_tracing.h](/scalopus_tracing/include/scalopus_tracing/scope_tracing.h), the following are available:
+[scope_tracing.h](/scalopus_tracing/include/scalopus_tracing/trace_macro.h), the following are available:
 
 - `TRACE_SCOPE_RAII("name")` Places a [RAII][RAII] tracepoint in this scope, duration starts on custruction and ends
   when the tracepoint goes out of scope. Name of the duration is provided by the argument, trace id is based on line
@@ -91,6 +91,17 @@ we get a unique trace id. The 32 bit CRC polynomial `crc-32` from Python's crcmo
 was then modified to use a C++14 constexpr for loop. By wrapping the output of this into the template parameter of
 `std::integral_constant` we know for sure that it is a compile time constant value.
 
+### TraceConfigurator
+Tracepoints can be enabled and disabled on a per process and per thread basis, this is done through the
+`TraceConfigurator` singleton, [trace_configurator.h](/scalopus_tracing/include/scalopus_tracing/trace_configurator.h).
+Besides interacting with the singleton directly, two convenient macro's are provided that set the requested state and
+revert it back to the original state using a RAII object. This allows disabling traces in lower scopes for example and
+automatically reverting back to enable the tracepoints when the scope is exited.
+
+- `TRACING_CONFIG_THREAD_STATE_RAII(boolean)` Enables or disable tracepoints from this thread for this scope and
+  enclosed scopes. When the RAII object goes out of scope it reverts to the previous state.
+- `TRACING_CONFIG_PROCESS_STATE_RAII(boolean)` Enables or disable tracepoints from this process for this scope and
+  enclosed scopes. When the RAII object goes out of scope it reverts to the previous state.
 
 ## Backends
 
