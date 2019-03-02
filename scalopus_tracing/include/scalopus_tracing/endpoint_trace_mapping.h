@@ -43,7 +43,7 @@ class EndpointTraceMapping : public Endpoint
 {
 public:
   using Ptr = std::shared_ptr<EndpointTraceMapping>;
-  constexpr static const char* name = "scope_tracing";
+  static const char* name;  // "scope_tracing" defined in object file.
   using TraceIdMap = std::map<unsigned int /* trace_id */, std::string /* name */>;
   using ProcessTraceMap = std::map<int /* pid */, TraceIdMap /* trace_map */>;
 

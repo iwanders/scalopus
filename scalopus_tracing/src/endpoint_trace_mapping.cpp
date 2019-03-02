@@ -39,6 +39,8 @@ namespace scalopus
 {
 using json = nlohmann::json;
 
+const char* EndpointTraceMapping::name = "scope_tracing";
+
 std::string EndpointTraceMapping::getName() const
 {
   return name;
