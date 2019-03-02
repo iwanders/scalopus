@@ -31,6 +31,9 @@
 #include <iostream>
 namespace scalopus
 {
+
+const char* EndpointNativeTraceReceiver::name = "native_trace_receiver";
+
 EndpointNativeTraceReceiver::EndpointNativeTraceReceiver(ReceiveFunction&& receiver) : receiver_{ receiver }
 {
 }

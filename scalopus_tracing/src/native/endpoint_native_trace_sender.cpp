@@ -41,6 +41,8 @@ namespace scalopus
 using json = nlohmann::json;
 using EventMap = std::map<unsigned long, tracepoint_collector_types::EventContainer>;
 
+const char* EndpointNativeTraceSender::name = "native_trace_sender";
+
 EndpointNativeTraceSender::EndpointNativeTraceSender()
 {
   // Start the worker thread.

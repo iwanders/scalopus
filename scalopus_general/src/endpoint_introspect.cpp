@@ -35,6 +35,8 @@ namespace scalopus
 {
 using json = nlohmann::json;
 
+const char* EndpointIntrospect::name = "introspect";
+
 std::string EndpointIntrospect::getName() const
 {
   return name;

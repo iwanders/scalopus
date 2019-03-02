@@ -40,6 +40,8 @@ namespace scalopus
 {
 using json = nlohmann::json;
 
+const char* EndpointProcessInfo::name = "process_info";
+
 std::string EndpointProcessInfo::getName() const
 {
   return name;

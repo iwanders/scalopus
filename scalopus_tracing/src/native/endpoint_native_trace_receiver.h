@@ -42,7 +42,7 @@ class EndpointNativeTraceReceiver : public Endpoint
 public:
   using Ptr = std::shared_ptr<EndpointNativeTraceReceiver>;
   using ReceiveFunction = std::function<void(const Data&)>;
-  constexpr static const char* name = "native_trace_receiver";
+  static const char* name;
 
   EndpointNativeTraceReceiver(ReceiveFunction&& receiver);
 

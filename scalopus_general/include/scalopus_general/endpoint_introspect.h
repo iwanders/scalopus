@@ -39,7 +39,7 @@ class EndpointIntrospect : public Endpoint
 {
 public:
   using Ptr = std::shared_ptr<EndpointIntrospect>;
-  constexpr static const char* name = "introspect";
+  static const char* name;
 
   /**
    * @brief Provide a list of endpoint names supported by the remote endpoint.

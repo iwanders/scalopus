@@ -43,7 +43,7 @@ class EndpointProcessInfo : public Endpoint
 {
 public:
   using Ptr = std::shared_ptr<EndpointProcessInfo>;
-  constexpr static const char* name = "process_info";
+  static const char* name;
 
   //! Struct used to represent the data from the endpoint.
   struct ProcessInfo
