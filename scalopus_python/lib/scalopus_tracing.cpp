@@ -73,7 +73,7 @@ void add_scalopus_tracing(py::module& m)
   endpoint_native_trace_sender.def(py::init<>());
 
   tracing.def("setTraceName", [](const unsigned int id, const std::string& name) {
-    ScopeTraceTracker::getInstance().insert(id, name);
+    StaticStringTracker::getInstance().insert(id, name);
   });
 
   tracing.def("getThreadState", []() {

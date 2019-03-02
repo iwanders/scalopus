@@ -28,7 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <scalopus_tracing/endpoint_trace_mapping.h>
-#include <scalopus_tracing/internal/scope_trace_tracker.h>
+#include <scalopus_tracing/internal/static_string_tracker.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <cstring>
@@ -48,7 +48,7 @@ std::string EndpointTraceMapping::getName() const
 
 bool EndpointTraceMapping::handle(Transport& /* server */, const Data& request, Data& response)
 {
-  ProcessTraceMap mapping = { { ::getpid(), scalopus::ScopeTraceTracker::getInstance().getMap() } };
+  ProcessTraceMap mapping = { { ::getpid(), scalopus::StaticStringTracker::getInstance().getMap() } };
   // cool, we have the mappings... now we need to serialize this...
 
   if (request.front() == 'm')

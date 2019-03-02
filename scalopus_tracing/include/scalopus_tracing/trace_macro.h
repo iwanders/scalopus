@@ -31,7 +31,7 @@
 #define SCALOPUS_TRACING_SCOPE_TRACING_H
 
 #include <scalopus_tracing/internal/scope_trace_raii.h>
-#include <scalopus_tracing/internal/scope_trace_tracker.h>
+#include <scalopus_tracing/internal/static_string_tracker.h>
 #include <scalopus_tracing/internal/trace_configuration_raii.h>
 #include <scalopus_tracing/internal/trace_macro.h>
 #include <scalopus_tracing/internal/compile_time_crc.hpp>

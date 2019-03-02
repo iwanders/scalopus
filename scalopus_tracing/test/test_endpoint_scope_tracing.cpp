@@ -60,7 +60,7 @@ int main(int /* argc */, char** /* argv */)
 
   for (const auto& id_name : test_mapping)
   {
-    scalopus::ScopeTraceTracker::getInstance().insert(id_name.first, id_name.second);
+    scalopus::StaticStringTracker::getInstance().insert(id_name.first, id_name.second);
   }
 
   // Create the endpoint.

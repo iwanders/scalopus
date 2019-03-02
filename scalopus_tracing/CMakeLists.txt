@@ -3,7 +3,7 @@ set(SCALOPUS_TRACING_EXPORTS "")
 include(FindThreads)
 
 add_library(scalopus_scope_tracing SHARED
-  src/scope_trace_tracker.cpp
+  src/static_string_tracker.cpp
   src/endpoint_trace_mapping.cpp
   src/trace_configurator.cpp
   src/trace_configuration_raii.cpp

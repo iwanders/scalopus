@@ -133,7 +133,7 @@ int main(int argc, char** argv)
   {
     std::stringstream scope_name;
     scope_name << "level 0x" << std::hex << i;
-    scalopus::ScopeTraceTracker::getInstance().insert(i, scope_name.str());
+    scalopus::StaticStringTracker::getInstance().insert(i, scope_name.str());
   }
 
   // Create the threads

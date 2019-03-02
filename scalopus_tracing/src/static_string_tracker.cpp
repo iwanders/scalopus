@@ -27,33 +27,14 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef SCALOPUS_TRACING_SCOPE_TRACE_TRACKER_H
-#define SCALOPUS_TRACING_SCOPE_TRACE_TRACKER_H
-
-#include <scalopus_general/map_tracker.h>
-#include <map>
-#include <mutex>
-#include <shared_mutex>
-#include <string>
+#include <scalopus_tracing/internal/static_string_tracker.h>
 
 namespace scalopus
 {
-/**
- * @brief A singleton class that keeps track of the mapping between the ID's stored in the trace and the user-provided
-          name for them.
- */
-class ScopeTraceTracker : public MapTracker<unsigned int, std::string>
+StaticStringTracker& StaticStringTracker::getInstance()
 {
-private:
-  ScopeTraceTracker() = default;
+  static StaticStringTracker instance;
+  return instance;
+}
 
-public:
-  /**
-   * @brief Static method through which the singleton instance can be retrieved.
-   * @return Returns the singleton instance of the ScopeTraceTracker object.
-   */
-  static ScopeTraceTracker& getInstance();
-};
 }  // namespace scalopus
-
-#endif  // SCALOPUS_TRACING_SCOPE_TRACE_TRACKER_H
