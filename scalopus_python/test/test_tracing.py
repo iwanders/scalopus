@@ -28,6 +28,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import scalopus
+scalopus.lib.lib.test_helpers.clearTraceNames()
 import time
 import os
 import unittest

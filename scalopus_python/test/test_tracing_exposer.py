@@ -46,6 +46,7 @@ class TracingTesterWithExposer(unittest.TestCase):
     def setUp(self):
         self.factory = scalopus.transport.TransportLoopbackFactory()
         self.exposer = scalopus.common.DefaultExposer("MyPythonProcess", self.factory)
+        scalopus.lib.lib.test_helpers.clearTraceNames()
 
     def test_tracing(self):
         trace_point = scalopus.tracing.TraceContext("MyTraceContext", trace_id=1337)

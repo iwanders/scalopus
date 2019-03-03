@@ -34,6 +34,7 @@ import time
 
 import scalopus
 import scalopus.tracing as tracing
+scalopus.lib.lib.test_helpers.clearTraceNames()
 
 overload_called = False
 class PythonSource(scalopus.interface.TraceEventSource):
@@ -53,8 +54,9 @@ class PythonSource(scalopus.interface.TraceEventSource):
         overload_called = True
         return []
 
-    def __del__(self):
-        print("Delete is called on: {}".format(id(self)))
+    # Having a custom destructor here with a print seems to cause deadlock with GCC only.
+    #def __del__(self):
+    #   print("Delete is called on: {}".format(id(self)))
 
 class PythonProvider(scalopus.interface.TraceEventProvider):
     def __init__(self):

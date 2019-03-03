@@ -29,6 +29,7 @@
 */
 #include <pybind11/stl.h>
 #include <scalopus_catapult/catapult_server.h>
+#include <scalopus_tracing/tracing.h>
 #include "json_util.h"
 #include "scalopus_catapult.h"
 
@@ -102,5 +103,10 @@ void add_python_test_helpers(py::module& m)
   subclass_spawner.def("call", &PythonSubclasserSpawner::call);
   subclass_spawner.def("stage_destroy", &PythonSubclasserSpawner::stage_destroy);
   subclass_spawner.def("join", &PythonSubclasserSpawner::join);
+
+  test_helpers.def("clearTraceNames", []() {
+    ScopeTraceTracker::getInstance().clear();
+  });
+
 }
 }  // namespace scalopus

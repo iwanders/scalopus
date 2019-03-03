@@ -85,6 +85,15 @@ public:
     mapping_.erase(key);
   }
 
+  /**
+   * @brief Clear the entire mapping.
+   */
+  void clear()
+  {
+    std::unique_lock<decltype(mutex_)> lock(mutex_);
+    mapping_.clear();
+  }
+
 private:
   std::map<Key, Value> mapping_;
   mutable std::shared_timed_mutex mutex_;  //! Mutex for the mapping container.
