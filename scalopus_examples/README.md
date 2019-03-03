@@ -43,3 +43,7 @@ the end it outputs the data it collected as pretty printed json to `stdout`.
 ## `showcase_toggle_tracepoints.cpp`
 This showcase how one could use the `TRACING_CONFIG_THREAD_STATE_RAII` macro to disable tracepoints conditionally
 depending on the code path taken.
+
+## `showcase_marker_events.cpp`
+This is an example of the marker events that span the global, process or thread scopes.
+![Marker events](/doc/marker_event.png "Global and process marker events.")

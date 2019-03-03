@@ -109,17 +109,32 @@ std::vector<json> NativeTraceSource::finishInterval()
         // Finally, we can create a trace type that can be used by devtools.
         json entry;
         entry["ts"] = static_cast<double>(timestamp_ns_since_epoch) / 1e3;
-        entry["cat"] = "PERF";
         entry["tid"] = tid;
         entry["pid"] = pid;
+        entry["cat"] = "PERF";
         entry["name"] = provider->getScopeName(mapping, pid, trace_id);
-        if (type == TracePointCollectorNative::ENTRY)
+        if (type == TracePointCollectorNative::SCOPE_ENTRY)
         {
           entry["ph"] = "B";
         }
-        else if (type == TracePointCollectorNative::EXIT)
+        else if (type == TracePointCollectorNative::SCOPE_EXIT)
         {
           entry["ph"] = "E";
+        }
+        else if (type == TracePointCollectorNative::MARK_GLOBAL)
+        {
+          entry["ph"] = "i";
+          entry["s"] = "g";
+        }
+        else if (type == TracePointCollectorNative::MARK_PROCESS)
+        {
+          entry["ph"] = "i";
+          entry["s"] = "p";
+        }
+        else if (type == TracePointCollectorNative::MARK_THREAD)
+        {
+          entry["ph"] = "i";
+          entry["s"] = "t";
         }
         res.push_back(entry);
       }

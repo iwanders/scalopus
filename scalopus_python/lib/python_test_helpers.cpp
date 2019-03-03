@@ -104,9 +104,6 @@ void add_python_test_helpers(py::module& m)
   subclass_spawner.def("stage_destroy", &PythonSubclasserSpawner::stage_destroy);
   subclass_spawner.def("join", &PythonSubclasserSpawner::join);
 
-  test_helpers.def("clearTraceNames", []() {
-    ScopeTraceTracker::getInstance().clear();
-  });
-
+  test_helpers.def("clearTraceNames", []() { StaticStringTracker::getInstance().clear(); });
 }
 }  // namespace scalopus

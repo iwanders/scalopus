@@ -108,13 +108,28 @@ std::vector<json> LttngSource::convertEvents()
       // Populate the name
       entry["name"] = provider_->getScopeName(mapping, static_cast<int>(event.pid()), id);
 
-      if (event.name() == "entry")
+      if (event.name() == "scope_entry")
       {
         entry["ph"] = "B";
       }
-      else if (event.name() == "exit")
+      else if (event.name() == "scope_exit")
       {
         entry["ph"] = "E";
+      }
+      else if (event.name() == "mark_event_global")
+      {
+        entry["ph"] = "i";
+        entry["s"] = "g";
+      }
+      else if (event.name() == "mark_event_process")
+      {
+        entry["ph"] = "i";
+        entry["s"] = "p";
+      }
+      else if (event.name() == "mark_event_thread")
+      {
+        entry["ph"] = "i";
+        entry["s"] = "t";
       }
       result.push_back(entry);
     }

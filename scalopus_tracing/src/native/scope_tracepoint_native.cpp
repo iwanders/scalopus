@@ -40,4 +40,9 @@ void scope_exit(const unsigned int id)
   native::scope_exit(id);
 }
 
+void mark_event(const unsigned int id, const MarkLevel mark_level)
+{
+  native::mark_event(id, mark_level);
+}
+
 }  // namespace scalopus

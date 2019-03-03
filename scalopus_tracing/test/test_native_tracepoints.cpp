@@ -177,9 +177,19 @@ int main(int /* argc */, char** /* argv */)
   }
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   result = source->finishInterval();
-  test(result.size(), 2u);  // Expect no tracepoints.
+  test(result.size(), 2u);
   test(result[0]["name"], "process_enabled");
   test(result[1]["name"], "process_enabled");
+
+  source->startInterval();
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  {
+    TRACE_MARK_EVENT_GLOBAL("global_event");
+  }
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  result = source->finishInterval();
+  test(result.size(), 1u);
+  test(result[0]["name"], "global_event");
 
   return 0;
 }

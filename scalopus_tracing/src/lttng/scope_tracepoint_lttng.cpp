@@ -41,4 +41,9 @@ void scope_exit(const unsigned int id)
   lttng::scope_exit(id);
 }
 
+void mark_event(const unsigned int id, const MarkLevel mark_level)
+{
+  lttng::mark_event(id, mark_level);
+}
+
 }  // namespace scalopus

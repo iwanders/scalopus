@@ -38,13 +38,18 @@
 TRACEPOINT_EVENT_CLASS(scalopus_scope_id, scope_id_class, TP_ARGS(unsigned int, id_),
                        TP_FIELDS(ctf_integer(unsigned int, id, id_)))
 
-TRACEPOINT_EVENT_INSTANCE(scalopus_scope_id, scope_id_class, entry, TP_ARGS(unsigned int, id_))
+TRACEPOINT_EVENT_INSTANCE(scalopus_scope_id, scope_id_class, scope_entry, TP_ARGS(unsigned int, id_))
+TRACEPOINT_LOGLEVEL(scalopus_scope_id, scope_entry, TRACE_DEBUG_FUNCTION)
 
-TRACEPOINT_LOGLEVEL(scalopus_scope_id, entry, TRACE_DEBUG_FUNCTION)
+TRACEPOINT_EVENT_INSTANCE(scalopus_scope_id, scope_id_class, scope_exit, TP_ARGS(unsigned int, id_))
+TRACEPOINT_LOGLEVEL(scalopus_scope_id, scope_exit, TRACE_DEBUG_FUNCTION)
 
-TRACEPOINT_EVENT_INSTANCE(scalopus_scope_id, scope_id_class, exit, TP_ARGS(unsigned int, id_))
-
-TRACEPOINT_LOGLEVEL(scalopus_scope_id, exit, TRACE_DEBUG_FUNCTION)
+TRACEPOINT_EVENT_INSTANCE(scalopus_scope_id, scope_id_class, mark_event_global, TP_ARGS(unsigned int, id_))
+TRACEPOINT_LOGLEVEL(scalopus_scope_id, mark_event_global, TRACE_DEBUG_FUNCTION)
+TRACEPOINT_EVENT_INSTANCE(scalopus_scope_id, scope_id_class, mark_event_process, TP_ARGS(unsigned int, id_))
+TRACEPOINT_LOGLEVEL(scalopus_scope_id, mark_event_process, TRACE_DEBUG_FUNCTION)
+TRACEPOINT_EVENT_INSTANCE(scalopus_scope_id, scope_id_class, mark_event_thread, TP_ARGS(unsigned int, id_))
+TRACEPOINT_LOGLEVEL(scalopus_scope_id, mark_event_thread, TRACE_DEBUG_FUNCTION)
 
 #endif /* _TRACEPOINT_scalopus_scope_id_H */
 

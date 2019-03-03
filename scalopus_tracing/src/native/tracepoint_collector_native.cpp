@@ -32,8 +32,11 @@
 
 namespace scalopus
 {
-const uint8_t TracePointCollectorNative::ENTRY = 1;
-const uint8_t TracePointCollectorNative::EXIT = 2;
+const uint8_t TracePointCollectorNative::SCOPE_ENTRY = 1;
+const uint8_t TracePointCollectorNative::SCOPE_EXIT = 2;
+const uint8_t TracePointCollectorNative::MARK_GLOBAL = 3;
+const uint8_t TracePointCollectorNative::MARK_PROCESS = 4;
+const uint8_t TracePointCollectorNative::MARK_THREAD = 5;
 
 TracePointCollectorNative& TracePointCollectorNative::getInstance()
 {

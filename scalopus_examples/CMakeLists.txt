@@ -27,6 +27,10 @@ if(TARGET Scalopus::scalopus_tracing_lttng)
   add_executable(random_callstacks_lttng src/random_callstacks.cpp)
   target_compile_options(random_callstacks_lttng PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
   target_link_libraries(random_callstacks_lttng Scalopus::scalopus_tracing_lttng)
+
+  add_executable(showcase_marker_events_lttng src/showcase_marker_events.cpp)
+  target_compile_options(showcase_marker_events_lttng PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+  target_link_libraries(showcase_marker_events_lttng Scalopus::scalopus_tracing_lttng)
 endif()
 
 # Example that tries to retrieve as much information from discovered servers as possible.
@@ -48,3 +52,8 @@ target_link_libraries(embedded_catapult_server Scalopus::scalopus_catapult Scalo
 add_executable(showcase_toggle_tracepoints src/showcase_toggle_tracepoints.cpp)
 target_compile_options(showcase_toggle_tracepoints PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_link_libraries(showcase_toggle_tracepoints Scalopus::scalopus_tracing_native)
+
+# Showcase example for the marker events
+add_executable(showcase_marker_events src/showcase_marker_events.cpp)
+target_compile_options(showcase_marker_events PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+target_link_libraries(showcase_marker_events Scalopus::scalopus_tracing_native)

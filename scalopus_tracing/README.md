@@ -21,6 +21,11 @@ The tracepoint macro's themselves can be found in
   name and the provided name.
 - `TRACE_SCOPE_END("name")` Ends the duration started by the `TRACE_SCOPE_START` call with the same name. Trace id is
   based on the filename and the provided name. So this must be in the same file as its counterpart `TRACE_SCOPE_START`.
+- `TRACE_MARK_EVENT_GLOBAL("name")` Sends a global marker event, this is visualised as a bar that goes across all
+  the processes in the trace. This can be useful for events that affect multiple processes.
+- `TRACE_MARK_EVENT_PROCESS("name")` Sends a process marker event, this is visualised as a bar that goes across all
+  threads of the emitting process. This can be useful for process-level events which affect multiple threads.
+- `TRACE_MARK_EVENT_THREAD("name")` Sends a thread marker event, this is basically an infinitesimally short scope. 
 
 
 Fictitous code to demo their respective use cases:
@@ -48,6 +53,7 @@ void my_function()
     foo();
     x = bar();
   }
+  TRACE_MARK_EVENT_PROCESS("Calling Buz!");
   buz(x);
 }
 ```

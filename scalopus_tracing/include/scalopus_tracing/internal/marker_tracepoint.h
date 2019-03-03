@@ -27,19 +27,27 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "scalopus_tracing/nop_tracepoint.h"
+#ifndef SCALOPUS_TRACING_MARK_TRACEPOINT_H
+#define SCALOPUS_TRACING_MARK_TRACEPOINT_H
+
 namespace scalopus
 {
-void scope_entry(const unsigned int /* id */)
+/**
+ * @brief Enum that specifies the level of the marker events.
+ */
+enum class MarkLevel
 {
-}
+  GLOBAL,
+  PROCESS,
+  THREAD
+};
 
-void scope_exit(const unsigned int /* id */)
-{
-}
-
-void mark_event(const unsigned int /* id */, const MarkLevel /* mark_level */)
-{
-}
-
+/**
+ * @brief Emits a mark event.
+ * @param id The tracepoint id to relate it to a human readable string.
+ * @param mark_level The level of the marker event, GLOBAL, PROCESS or THREAD.
+ */
+void mark_event(const unsigned int id, const MarkLevel mark_level);
 }  // namespace scalopus
+
+#endif  // SCALOPUS_TRACING_SCOPE_TRACEPOINT_H

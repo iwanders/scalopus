@@ -61,4 +61,9 @@
 // Macro to set the configuration of this process' traces for this and any lower scopes; reverts to previous value.
 #define TRACING_CONFIG_PROCESS_STATE_RAII(boolean) TRACING_CONFIG_THREAD_PROCESS_STATE_RAII(true, boolean)
 
+// Macro to set global marker event.
+#define TRACE_MARK_EVENT_GLOBAL(name) TRACE_MARK_EVENT_NAMED_ID(GLOBAL, name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))
+#define TRACE_MARK_EVENT_PROCESS(name) TRACE_MARK_EVENT_NAMED_ID(PROCESS, name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))
+#define TRACE_MARK_EVENT_THREAD(name) TRACE_MARK_EVENT_NAMED_ID(THREAD, name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))
+
 #endif  // SCALOPUS_TRACING_SCOPE_TRACING_H

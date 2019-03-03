@@ -45,6 +45,19 @@ int main(int /* argc */, char** /* argv */)
   TRACE_SCOPE_END("zz");
   TRACE_SCOPE_END("zz");
 
+  TRACING_CONFIG_THREAD_STATE_RAII(true);
+  TRACING_CONFIG_THREAD_STATE_RAII(true);
+
+  TRACING_CONFIG_PROCESS_STATE_RAII(true);
+  TRACING_CONFIG_PROCESS_STATE_RAII(true);
+
+  TRACE_MARK_EVENT_GLOBAL("foo");
+  TRACE_MARK_EVENT_GLOBAL("foo");
+  TRACE_MARK_EVENT_PROCESS("bar");
+  TRACE_MARK_EVENT_PROCESS("bar");
+  TRACE_MARK_EVENT_THREAD("buz");
+  TRACE_MARK_EVENT_THREAD("buz");
+
   // Check if the macro's don't expand to shadowed variables.
   {
     TRACE_PRETTY_FUNCTION();
@@ -57,6 +70,19 @@ int main(int /* argc */, char** /* argv */)
     TRACE_SCOPE_START("zz");
     TRACE_SCOPE_END("zz");
     TRACE_SCOPE_END("zz");
+
+    TRACING_CONFIG_THREAD_STATE_RAII(true);
+    TRACING_CONFIG_THREAD_STATE_RAII(true);
+
+    TRACING_CONFIG_PROCESS_STATE_RAII(true);
+    TRACING_CONFIG_PROCESS_STATE_RAII(true);
+
+    TRACE_MARK_EVENT_GLOBAL("foo");
+    TRACE_MARK_EVENT_GLOBAL("foo");
+    TRACE_MARK_EVENT_PROCESS("bar");
+    TRACE_MARK_EVENT_PROCESS("bar");
+    TRACE_MARK_EVENT_THREAD("buz");
+    TRACE_MARK_EVENT_THREAD("buz");
   }
   return 0;
 }

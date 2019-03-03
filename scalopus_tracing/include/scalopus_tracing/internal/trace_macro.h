@@ -31,6 +31,8 @@
 #define SCALOPUS_TRACING_INTERNAL_SCOPE_TRACING_H
 
 #include <scalopus_general/internal/helper_macros.h>
+#include <scalopus_tracing/internal/marker_tracepoint.h>
+#include <scalopus_tracing/internal/scope_tracepoint.h>
 #include <scalopus_tracing/internal/compile_time_crc.hpp>
 
 // Create a unique ID based on the crc32 of the filename and the line number.
@@ -73,6 +75,13 @@
 
 #define TRACING_CONFIG_THREAD_PROCESS_STATE_RAII(is_process, new_state)                                                \
   scalopus::TraceConfigurationRAII SCALOPUS_MAKE_UNIQUE(scalopus_config_id_)(is_process, new_state);                   \
+  do                                                                                                                   \
+  {                                                                                                                    \
+  } while (0)
+
+#define TRACE_MARK_EVENT_NAMED_ID(level, name, id)                                                                     \
+  TRACE_TRACKED_MAPPING_REGISTER_ONCE(name, id, SCALOPUS_MAKE_UNIQUE(scalopus_trace_id_))                              \
+  scalopus::mark_event(id, scalopus::MarkLevel::level);                                                                \
   do                                                                                                                   \
   {                                                                                                                    \
   } while (0)

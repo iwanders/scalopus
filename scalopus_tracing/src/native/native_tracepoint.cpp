@@ -30,6 +30,7 @@
 #include <time.h>
 #include <iostream>
 
+#include <scalopus_tracing/internal/marker_tracepoint.h>
 #include <scalopus_tracing/internal/scope_tracepoint.h>
 #include <scalopus_tracing/trace_configurator.h>
 #include "scalopus_tracing/native_tracepoint.h"
@@ -66,7 +67,8 @@ void scope_entry(const unsigned int id)
     return;
   }
   // @TODO Do something with overrun, count lost events?
-  buffer.push(tracepoint_collector_types::ScopeTraceEvent{ nativeGetChrono(), id, TracePointCollectorNative::ENTRY });
+  buffer.push(
+      tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id, TracePointCollectorNative::SCOPE_ENTRY });
 }
 
 void scope_exit(const unsigned int id)
@@ -79,7 +81,36 @@ void scope_exit(const unsigned int id)
     return;
   }
   // @TODO Do something with overrun, count lost events?
-  buffer.push(tracepoint_collector_types::ScopeTraceEvent{ nativeGetChrono(), id, TracePointCollectorNative::EXIT });
+  buffer.push(
+      tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id, TracePointCollectorNative::SCOPE_EXIT });
 }
+
+void mark_event(const unsigned int id, const MarkLevel mark_level)
+{
+  static thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
+  static auto& process_state = *(TraceConfigurator::getInstance().getProcessStatePtr());
+  static thread_local auto& thread_state = *(TraceConfigurator::getInstance().getThreadStatePtr());
+  if (!(process_state.load() && thread_state.load()))
+  {
+    return;
+  }
+  // @TODO Do something with overrun, count lost events?
+  switch (mark_level)
+  {
+    case MarkLevel::GLOBAL:
+      buffer.push(tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id,
+                                                                TracePointCollectorNative::MARK_GLOBAL });
+      break;
+    case MarkLevel::PROCESS:
+      buffer.push(tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id,
+                                                                TracePointCollectorNative::MARK_PROCESS });
+      break;
+    case MarkLevel::THREAD:
+      buffer.push(tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id,
+                                                                TracePointCollectorNative::MARK_THREAD });
+      break;
+  }
+}
+
 }  // namespace native
 }  // namespace scalopus

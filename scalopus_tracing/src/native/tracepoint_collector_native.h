@@ -41,9 +41,9 @@ namespace tracepoint_collector_types
 //! Timepoint of that clock.
 using TimePoint = uint64_t;
 //! Trace event as it is stored in the ringbuffer.
-using ScopeTraceEvent = std::tuple<TimePoint, unsigned int, uint8_t>;
+using StaticTraceEvent = std::tuple<TimePoint, unsigned int, uint8_t>;
 //! The container that backs the ringbuffer.
-using EventContainer = std::vector<ScopeTraceEvent>;
+using EventContainer = std::vector<StaticTraceEvent>;
 //! The single producer single consumer ringbuffer with the event container.
 using ScopeBuffer = SPSCRingBuffer<EventContainer>;
 //! Pointer type to the ringbuffer.
@@ -68,8 +68,11 @@ private:
   std::size_t ringbuffer_size_{ 10000 };
 
 public:
-  static const uint8_t ENTRY;  // If initialised here and made constexpr clang drops it during linking :(
-  static const uint8_t EXIT;
+  static const uint8_t SCOPE_ENTRY;  // If initialised here and made constexpr clang drops it during linking :(
+  static const uint8_t SCOPE_EXIT;
+  static const uint8_t MARK_GLOBAL;
+  static const uint8_t MARK_PROCESS;
+  static const uint8_t MARK_THREAD;
 
   /**
    * @brief Static method through which the singleton instance can be retrieved.

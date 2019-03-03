@@ -29,12 +29,14 @@
 */
 #ifndef SCALOPUS_TRACING_LTTNG_TRACEPOINT_H
 #define SCALOPUS_TRACING_LTTNG_TRACEPOINT_H
+#include <scalopus_tracing/internal/marker_tracepoint.h>
 namespace scalopus
 {
 namespace lttng
 {
 void scope_entry(const unsigned int id);
 void scope_exit(const unsigned int id);
+void mark_event(const unsigned int id, const MarkLevel mark_level);
 }  // namespace lttng
 }  // namespace scalopus
 #endif  // SCALOPUS_TRACING_LTTNG_TRACEPOINT_H

@@ -29,6 +29,7 @@
 */
 #define TRACEPOINT_DEFINE
 #define TRACEPOINT_CREATE_PROBES
+#include <scalopus_tracing/internal/marker_tracepoint.h>
 #include <scalopus_tracing/internal/scope_tracepoint.h>
 #include <scalopus_tracing/trace_configurator.h>
 #include "lttng/scope_tracepoint_lttng_definition.h"
@@ -45,7 +46,7 @@ void scope_entry(const unsigned int id)
   {
     return;
   }
-  tracepoint(scalopus_scope_id, entry, id);
+  tracepoint(scalopus_scope_id, scope_entry, id);
 }
 
 void scope_exit(const unsigned int id)
@@ -56,7 +57,30 @@ void scope_exit(const unsigned int id)
   {
     return;
   }
-  tracepoint(scalopus_scope_id, exit, id);
+  tracepoint(scalopus_scope_id, scope_exit, id);
 }
+
+void mark_event(const unsigned int id, const MarkLevel mark_level)
+{
+  static auto& process_state = *(TraceConfigurator::getInstance().getProcessStatePtr());
+  static thread_local auto& thread_state = *(TraceConfigurator::getInstance().getThreadStatePtr());
+  if (!(process_state.load() && thread_state.load()))
+  {
+    return;
+  }
+  switch (mark_level)
+  {
+    case MarkLevel::GLOBAL:
+      tracepoint(scalopus_scope_id, mark_event_global, id);
+      break;
+    case MarkLevel::PROCESS:
+      tracepoint(scalopus_scope_id, mark_event_process, id);
+      break;
+    case MarkLevel::THREAD:
+      tracepoint(scalopus_scope_id, mark_event_thread, id);
+      break;
+  }
+}
+
 }  // namespace lttng
 }  // namespace scalopus
