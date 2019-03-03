@@ -119,5 +119,42 @@ class TracingTester(unittest.TestCase):
                 self.assertLess(entry["ts"], previous_time + 0.1 * (1.0 + buffer) *1e6)
                 previous_time = entry["ts"]
 
+        # check enabling/disabling of trace points
+        self.native_source.startInterval() # start the recording interval on the native source.
+
+        # Extra thread
+        there_trace_point = scalopus.tracing.TraceContext("OtherTraceContext", trace_id=1338)
+        def extra_work():
+            time.sleep(0.1)
+            for i in range(2):
+                with there_trace_point:
+                    time.sleep(0.1)
+            time.sleep(0.5)
+
+        extra_thread = threading.Thread(target=extra_work)
+        extra_thread.start()
+
+        # Work in "main" thread
+        here_trace_point = scalopus.tracing.TraceContext("MyTraceContext", trace_id=1337)
+        time.sleep(0.1)
+        for i in range(3):
+            with here_trace_point:
+                time.sleep(0.1)
+            time.sleep(0.1)
+
+        with scalopus.tracing.ThreadStateSwitcher(False):
+            for i in range(3):
+                with here_trace_point:
+                    time.sleep(0.1)
+                time.sleep(0.1)
+
+        extra_thread.join()
+
+        self.native_source.stopInterval()
+        data = self.native_source.finishInterval()
+        # Expect 10 events: 2 start+end pairs from the work thread, 3 start+end pairs from the main thread
+        self.assertEqual(len(data), 10)
+
+
 if __name__ == '__main__':
     unittest.main()

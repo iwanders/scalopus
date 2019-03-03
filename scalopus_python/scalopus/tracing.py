@@ -161,3 +161,44 @@ def traced(f_or_name=None):
     # invoke the registerer or return it depending on whether the given argument
     # is callable or not
     return registerer(f) if callable(f) else registerer
+
+
+class ThreadStateSwitcher:
+    """Context manager to switch the thread state to the target state.
+
+    To use this context manager:
+
+        >>> with ThreadStateSwitcher(False):
+        ...     work_func()
+
+    There is also a convenience decorator available named `suppressed` which
+    wraps a function in a switcher that temporarily sets the thread state to
+    false.
+    """
+    def __init__(self, target_state):
+        self.target_state = target_state
+        self.old_states = None
+
+    def enter(self):
+        self.__enter__()
+
+    def exit(self):
+        self.__exit__(None, None, None)
+
+    def __enter__(self):
+        self.old_state = setThreadState(self.target_state)
+
+    def __exit__(self, context_type, context_value, context_traceback):
+        setThreadState(self.old_state)
+
+
+def suppressed(f):
+    """Convenience decorator that suppresses all trace points in the function
+    and anything called from it.
+    """
+    supress_traces = ThreadStateSwitcher(False)
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        with supress_traces:
+            return f(*args, **kwargs)
+    return wrapper

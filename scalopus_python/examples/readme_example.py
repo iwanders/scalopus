@@ -38,6 +38,12 @@ import scalopus.tracing as tracing
 def fooBarBuz():
     time.sleep(0.2)
 
+@tracing.suppressed
+def d():
+    time.sleep(0.2)
+    fooBarBuz()
+    time.sleep(0.2)
+
 @tracing.traced
 def c():
     time.sleep(0.2)
@@ -51,6 +57,7 @@ def b():
     time.sleep(0.2)
     print(" b")
     c()
+    d()
     time.sleep(0.2)
 
 @tracing.traced
@@ -59,6 +66,7 @@ def a():
     time.sleep(0.2)
     b()
     time.sleep(0.2)
+
 
 if __name__ == "__main__":
     exposer = scalopus.common.DefaultExposer(process_name=sys.argv[0])
@@ -73,3 +81,7 @@ if __name__ == "__main__":
         with tracing.trace_section("My Section"):
             time.sleep(0.1)
             a()
+        # Do some extra things, but suppress trace points
+        with tracing.ThreadStateSwitcher(False):
+            fooBarBuz()
+            time.sleep(0.1)
