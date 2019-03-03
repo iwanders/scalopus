@@ -84,6 +84,6 @@ if __name__ == "__main__":
             time.sleep(0.1)
             a()
         # Do some extra things, but suppress trace points
-        with tracing.ConfigThreadStateSwitcher(False):
+        with tracing.ThreadStateSwitcher(False):
             fooBarBuz()
             time.sleep(0.1)
