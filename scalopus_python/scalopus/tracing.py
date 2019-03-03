@@ -163,12 +163,12 @@ def traced(f_or_name=None):
     return registerer(f) if callable(f) else registerer
 
 
-class ThreadStateSwitcher:
+class ConfigThreadStateSwitcher:
     """Context manager to switch the thread state to the target state.
 
     To use this context manager:
 
-        >>> with ThreadStateSwitcher(False):
+        >>> with ConfigThreadStateSwitcher(False):
         ...     work_func()
 
     There is also a convenience decorator available named `suppressed` which
@@ -196,7 +196,7 @@ def suppressed(f):
     """Convenience decorator that suppresses all trace points in the function
     and anything called from it.
     """
-    supress_traces = ThreadStateSwitcher(False)
+    supress_traces = ConfigThreadStateSwitcher(False)
     @wraps(f)
     def wrapper(*args, **kwargs):
         with supress_traces:

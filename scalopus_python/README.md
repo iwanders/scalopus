@@ -48,7 +48,7 @@ some helpers to allow decorating functions and tracing a `with` context:
   `scalopus.tracing.trace_section`.
 - `traced`: This is a decorator that wraps your function in a trace context. The function name is used as the
   trace name, unless an explicit name is given. Exposed as `scalopus.tracing.traced`.
-- `ThreadStateSwitcher`: This is a context manager and decorator that switches a thread's tracing
+- `ConfigThreadStateSwitcher`: This is a context manager and decorator that switches a thread's tracing
 state to the target state within its scope.
 - `suppressed`: This is a decrator that wraps your function in a thread state switcher that
 supresses all trace points within it, and anything it calls.
@@ -77,7 +77,7 @@ with tracing.trace_section("My Section"):
     b()
 
 # No traces will be generated within the scope of the suppressed block
-with tracing.ThreadStateSwitcher(False):
+with tracing.ConfigThreadStateSwitcher(False):
     a()
 ```
 For tracing Python code the [readme_example](/scalopus_python/examples/readme_example.py) is a good starting point.

@@ -143,7 +143,7 @@ class TracingTester(unittest.TestCase):
                 time.sleep(0.1)
             time.sleep(0.1)
 
-        with scalopus.tracing.ThreadStateSwitcher(False):
+        with scalopus.tracing.ConfigThreadStateSwitcher(False):
             for i in range(3):
                 with here_trace_point:
                     time.sleep(0.1)
