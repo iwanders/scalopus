@@ -57,6 +57,11 @@ void add_scalopus_tracing(py::module& m)
   py::module tracing = m.def_submodule("tracing", "The tracing specific components.");
   tracing.def("uniqueTraceId", &uniqueTraceId);
 
+  py::enum_<MarkLevel>(tracing, "MarkLevel")
+      .value("GLOBAL", MarkLevel::GLOBAL)
+      .value("PROCESS", MarkLevel::PROCESS)
+      .value("THREAD", MarkLevel::THREAD);
+
   py::class_<EndpointTraceMapping, EndpointTraceMapping::Ptr, Endpoint> endpoint_trace_mapping(tracing,
                                                                                                "EndpointTraceMapping");
   endpoint_trace_mapping.def(py::init<>());
@@ -97,6 +102,7 @@ void add_scalopus_tracing(py::module& m)
   py::module lttng = tracing.def_submodule("lttng", "The lttng specific components.");
   lttng.def("scope_entry", &lttng::scope_entry);
   lttng.def("scope_exit", &lttng::scope_exit);
+  lttng.def("mark_event", &lttng::mark_event);
 
   py::class_<LttngProvider, LttngProvider::Ptr, TraceEventProvider> lttng_provider(lttng, "LttngProvider");
   lttng_provider.def(py::init<std::string, EndpointManager::Ptr>());
@@ -104,11 +110,13 @@ void add_scalopus_tracing(py::module& m)
 
   native.def("scope_entry", &native::scope_entry);
   native.def("scope_exit", &native::scope_exit);
+  native.def("mark_event", &native::mark_event);
 
   // Add the nop tracepoints for completeness.
   py::module nop = tracing.def_submodule("nop", "The nop specific components.");
   nop.def("scope_entry", &nop::scope_entry);
   nop.def("scope_exit", &nop::scope_exit);
+  nop.def("mark_event", &nop::mark_event);
 
   // Add the providers.
 

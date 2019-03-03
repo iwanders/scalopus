@@ -27,6 +27,7 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "scalopus_tracing/nop_tracepoint.h"
 namespace scalopus
 {
 namespace nop
@@ -38,5 +39,10 @@ void scope_entry(const unsigned int /* id */)
 void scope_exit(const unsigned int /* id */)
 {
 }
+
+void mark_event(const unsigned int /* id */, const MarkLevel /* mark_level */)
+{
+}
+
 }  // namespace nop
 }  // namespace scalopus

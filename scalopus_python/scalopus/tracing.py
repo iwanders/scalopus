@@ -38,6 +38,7 @@ getThreadState = tracing.getThreadState
 setThreadState = tracing.setThreadState
 getProcessState = tracing.getProcessState
 setProcessState = tracing.setProcessState
+MarkLevel = tracing.MarkLevel
 EndpointTraceMapping = tracing.EndpointTraceMapping
 EndpointNativeTraceSender = tracing.native.EndpointNativeTraceSender
 NativeTraceProvider = tracing.native.NativeTraceProvider
@@ -65,37 +66,6 @@ def setBackend(new_backend):
     """
     global tracing_backend
     tracing_backend = new_backend 
-
-class TraceContextHelper(object):
-    """This is a helper to allow quick lookups of already created trace context managers.
-    """
-    def __init__(self, prefix=''):
-        """Create the trace context helper.
-
-        :param prefix: This prefix is prepended to the names given to the sections.
-        :type prefix: str
-        """
-        self.prefix = prefix
-
-    def __getattr__(self, name):
-        """Get the trace context if it exists, otherwise create it.
-
-        :param name: The name of the trace context to retrieve or create.
-        :type name: str
-        """
-        ctx = TraceContext(self.prefix + name)
-        setattr(self, name, ctx)
-        return ctx
-
-    def __call__(self, name):
-        """Create 
-
-        :param name: The name of the trace context to retrieve or create.
-        :type name: str
-        """
-        return getattr(self, name)
-
-trace_section = TraceContextHelper()
 
 class TraceContext(object):
     """This provides a traced context, tracing the duration of a with statements.
@@ -127,6 +97,57 @@ class TraceContext(object):
         """Exit the with statement, this emits the exit tracepoint.
         """
         tracing_backend.scope_exit(self.trace_id)
+
+class TraceContextHelper(object):
+    """This is a helper to allow quick lookups of already created trace context managers.
+    """
+    def __init__(self, prefix=''):
+        """Create the trace context helper.
+
+        :param prefix: This prefix is prepended to the names given to the sections.
+        :type prefix: str
+        """
+        self.ctx_type = TraceContext
+        self.prefix = prefix
+
+    def __getattr__(self, name):
+        """Get the trace context if it exists, otherwise create it.
+
+        :param name: The name of the trace context to retrieve or create.
+        :type name: str
+        """
+        ctx = self.ctx_type(self.prefix + name)
+        setattr(self, name, ctx)
+        return ctx
+
+    def __call__(self, name):
+        """Create 
+
+        :param name: The name of the trace context to retrieve or create.
+        :type name: str
+        """
+        return getattr(self, name)
+
+trace_section = TraceContextHelper()
+
+class MarkerEvent(TraceContext):
+    """This helper allows emitting marker events instead of scope traces.
+    """
+    def mark_event(self, level):
+        """Emits a trace event at the provided level"""
+        tracing_backend.mark_event(self.trace_id, level)
+    def global_(self):
+        """Emits a marker event at global level"""
+        self.mark_event(tracing.MarkLevel.GLOBAL)
+    def process(self):
+        """Emits a marker event at process level"""
+        self.mark_event(tracing.MarkLevel.PROCESS)
+    def thread(self):
+        """Emits a marker event at thread level"""
+        self.mark_event(tracing.MarkLevel.THREAD)
+
+trace_mark = TraceContextHelper()
+trace_mark.ctx_type = MarkerEvent
 
 def traced(f_or_name=None):
     """Decorator to trace the entire function execution. This decorator can be

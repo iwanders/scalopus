@@ -57,6 +57,7 @@ def b():
     time.sleep(0.2)
     print(" b")
     c()
+    tracing.trace_mark("between c and d").global_()
     d()
     time.sleep(0.2)
 
@@ -64,6 +65,7 @@ def b():
 def a():
     print("a")
     time.sleep(0.2)
+    tracing.trace_mark.between_a_and_b.process()
     b()
     time.sleep(0.2)
 
@@ -82,6 +84,6 @@ if __name__ == "__main__":
             time.sleep(0.1)
             a()
         # Do some extra things, but suppress trace points
-        with tracing.ThreadStateSwitcher(False):
+        with tracing.ConfigThreadStateSwitcher(False):
             fooBarBuz()
             time.sleep(0.1)
