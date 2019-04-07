@@ -34,7 +34,7 @@ https://pybind11.readthedocs.io/en/master/advanced/classes.html#overriding-virtu
 Note that a direct __init__ constructor should be called, and super() should
 not be used. For simple cases of linear inheritance, super() may work, but
 once you begin mixing Python and C++ multiple inheritance, things will fall
-apart due to differences between Python’s MRO and C++’s mechanisms.
+apart due to differences between Python's MRO and C++'s mechanisms.
 """
 class Endpoint(lib.interface.Endpoint):
     """Endpoint base class for Python endpoints.
