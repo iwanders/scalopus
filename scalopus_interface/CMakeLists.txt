@@ -5,6 +5,7 @@ add_library(scalopus_interface SHARED
   src/transport.cpp
   src/transport_factory.cpp
 )
+target_compile_features(scalopus_interface PUBLIC cxx_relaxed_constexpr)
 target_compile_options(scalopus_interface PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 
 target_include_directories(scalopus_interface

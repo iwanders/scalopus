@@ -43,6 +43,7 @@ if (SCALOPUS_BUILD_TRACING_LTTNG)
     add_library(scalopus_tracepoint_lttng SHARED
       src/lttng/lttng_tracepoint.cpp
     )
+    target_compile_features(scalopus_tracepoint_lttng PRIVATE cxx_relaxed_constexpr)
     target_compile_options(scalopus_tracepoint_lttng PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
     target_include_directories(scalopus_tracepoint_lttng
       PUBLIC 
@@ -130,6 +131,7 @@ list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracing_native)
 add_library(scalopus_tracepoint_nop SHARED
   src/nop/nop_tracepoint.cpp
 )
+target_compile_features(scalopus_tracepoint_nop PRIVATE cxx_relaxed_constexpr)
 target_compile_options(scalopus_tracepoint_nop PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_include_directories(scalopus_tracepoint_nop
   PUBLIC 
