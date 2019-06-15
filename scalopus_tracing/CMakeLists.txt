@@ -170,6 +170,7 @@ add_library(scalopus_lttng_babeltrace SHARED
   src/lttng/babeltrace_tool.cpp
   src/lttng/babeltrace_parser.cpp)
 target_compile_options(scalopus_lttng_babeltrace PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+target_compile_features(scalopus_lttng_babeltrace PUBLIC cxx_relaxed_constexpr)
 target_link_libraries(scalopus_lttng_babeltrace
   PRIVATE
     Threads::Threads
