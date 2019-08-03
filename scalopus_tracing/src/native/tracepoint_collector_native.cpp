@@ -38,9 +38,12 @@ const uint8_t TracePointCollectorNative::MARK_GLOBAL = 3;
 const uint8_t TracePointCollectorNative::MARK_PROCESS = 4;
 const uint8_t TracePointCollectorNative::MARK_THREAD = 5;
 
-TracePointCollectorNative& TracePointCollectorNative::getInstance()
+TracePointCollectorNative::Ptr TracePointCollectorNative::getInstance()
 {
-  static TracePointCollectorNative instance;
+  // https://stackoverflow.com/questions/8147027/
+  // Trick to allow make_shared with a private constructor.
+  struct make_shared_enabler : public TracePointCollectorNative {};
+  static TracePointCollectorNative::Ptr instance{std::make_shared<make_shared_enabler>()};
   return instance;
 }
 
@@ -48,7 +51,15 @@ tracepoint_collector_types::ScopeBufferPtr TracePointCollectorNative::getBuffer(
 {
   const auto tid = static_cast<unsigned long>(pthread_self());
   // Register a destructor callback such that the thread gets removed from the map when the thread exits.
-  thread_local DestructorCallback cleanup{ [this, tid]() { erase(tid); } };
+  auto instance_pointer = getInstance();
+  thread_local DestructorCallback cleanup{ [instance = TracePointCollectorNative::WeakPtr(instance_pointer), tid]() {
+      auto ptr = instance.lock();
+      if (ptr != nullptr)
+      {
+        ptr->erase(tid);
+      }
+    }
+  };
 
   if (exists(tid))
   {

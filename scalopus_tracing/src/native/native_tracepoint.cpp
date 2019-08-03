@@ -59,41 +59,44 @@ static int64_t nativeGetChrono()
 
 void scope_entry(const unsigned int id)
 {
-  thread_local auto configurator_ptr = TraceConfigurator::getInstance();
-  thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
-  static auto& process_state = *(configurator_ptr->getProcessStatePtr());
-  thread_local auto& thread_state = *(configurator_ptr->getThreadStatePtr());
-  if (!(process_state.load() && thread_state.load()))
+  static auto configurator_ptr = TraceConfigurator::getInstance();
+  thread_local auto buffer_ptr = TracePointCollectorNative::getInstance();
+  thread_local auto buffer = buffer_ptr->getBuffer();
+  static auto process_state = configurator_ptr->getProcessStatePtr();
+  thread_local auto thread_state = configurator_ptr->getThreadStatePtr();
+  if (!(process_state->load() && thread_state->load()))
   {
     return;
   }
   // @TODO Do something with overrun, count lost events?
-  buffer.push(
+  buffer->push(
       tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id, TracePointCollectorNative::SCOPE_ENTRY });
 }
 
 void scope_exit(const unsigned int id)
 {
-  thread_local auto configurator_ptr = TraceConfigurator::getInstance();
-  thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
-  static auto& process_state = *(configurator_ptr->getProcessStatePtr());
-  thread_local auto& thread_state = *(configurator_ptr->getThreadStatePtr());
-  if (!(process_state.load() && thread_state.load()))
+  static auto configurator_ptr = TraceConfigurator::getInstance();
+  thread_local auto buffer_ptr = TracePointCollectorNative::getInstance();
+  thread_local auto buffer = buffer_ptr->getBuffer();
+  static auto process_state = configurator_ptr->getProcessStatePtr();
+  thread_local auto thread_state = configurator_ptr->getThreadStatePtr();
+  if (!(process_state->load() && thread_state->load()))
   {
     return;
   }
   // @TODO Do something with overrun, count lost events?
-  buffer.push(
+  buffer->push(
       tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id, TracePointCollectorNative::SCOPE_EXIT });
 }
 
 void mark_event(const unsigned int id, const MarkLevel mark_level)
 {
-  thread_local auto configurator_ptr = TraceConfigurator::getInstance();
-  thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
-  static auto& process_state = *(configurator_ptr->getProcessStatePtr());
-  thread_local auto& thread_state = *(configurator_ptr->getThreadStatePtr());
-  if (!(process_state.load() && thread_state.load()))
+  static auto configurator_ptr = TraceConfigurator::getInstance();
+  thread_local auto buffer_ptr = TracePointCollectorNative::getInstance();
+  thread_local auto buffer = buffer_ptr->getBuffer();
+  static auto process_state = configurator_ptr->getProcessStatePtr();
+  thread_local auto thread_state = configurator_ptr->getThreadStatePtr();
+  if (!(process_state->load() && thread_state->load()))
   {
     return;
   }
@@ -101,15 +104,15 @@ void mark_event(const unsigned int id, const MarkLevel mark_level)
   switch (mark_level)
   {
     case MarkLevel::GLOBAL:
-      buffer.push(tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id,
+      buffer->push(tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id,
                                                                 TracePointCollectorNative::MARK_GLOBAL });
       break;
     case MarkLevel::PROCESS:
-      buffer.push(tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id,
+      buffer->push(tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id,
                                                                 TracePointCollectorNative::MARK_PROCESS });
       break;
     case MarkLevel::THREAD:
-      buffer.push(tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id,
+      buffer->push(tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id,
                                                                 TracePointCollectorNative::MARK_THREAD });
       break;
   }

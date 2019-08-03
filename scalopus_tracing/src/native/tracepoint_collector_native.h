@@ -59,6 +59,9 @@ class TracePointCollectorNative : public MapTracker<unsigned long, tracepoint_co
 {
 private:
   TracePointCollectorNative() = default;
+  TracePointCollectorNative(const TracePointCollectorNative&) = delete;
+  TracePointCollectorNative& operator=(const TracePointCollectorNative&) = delete;
+  TracePointCollectorNative& operator=(TracePointCollectorNative&&) = delete;
 
   /**
    * @brief The size of each thread's ringbuffer.
@@ -68,6 +71,9 @@ private:
   std::size_t ringbuffer_size_{ 10000 };
 
 public:
+  using Ptr = std::shared_ptr<TracePointCollectorNative>;
+  using WeakPtr = std::weak_ptr<TracePointCollectorNative>;
+
   static const uint8_t SCOPE_ENTRY;  // If initialised here and made constexpr clang drops it during linking :(
   static const uint8_t SCOPE_EXIT;
   static const uint8_t MARK_GLOBAL;
@@ -78,7 +84,7 @@ public:
    * @brief Static method through which the singleton instance can be retrieved.
    * @return Returns the singleton instance of the object.
    */
-  static TracePointCollectorNative& getInstance();
+  static TracePointCollectorNative::Ptr getInstance();
 
   /**
    * @brief Called by each thread to obtain the ringbuffer in which it should store the trace events.

@@ -40,10 +40,10 @@ namespace lttng
 {
 void scope_entry(const unsigned int id)
 {
-  thread_local auto configurator_ptr = TraceConfigurator::getInstance();
-  static auto& process_state = *(configurator_ptr->getProcessStatePtr());
-  thread_local auto& thread_state = *(configurator_ptr->getThreadStatePtr());
-  if (!(process_state.load() && thread_state.load()))
+  static auto configurator_ptr = TraceConfigurator::getInstance();
+  static auto process_state = configurator_ptr->getProcessStatePtr();
+  thread_local auto thread_state = configurator_ptr->getThreadStatePtr();
+  if (!(process_state->load() && thread_state->load()))
   {
     return;
   }
@@ -52,10 +52,10 @@ void scope_entry(const unsigned int id)
 
 void scope_exit(const unsigned int id)
 {
-  thread_local auto configurator_ptr = TraceConfigurator::getInstance();
-  static auto& process_state = *(configurator_ptr->getProcessStatePtr());
-  thread_local auto& thread_state = *(configurator_ptr->getThreadStatePtr());
-  if (!(process_state.load() && thread_state.load()))
+  static auto configurator_ptr = TraceConfigurator::getInstance();
+  static auto process_state = configurator_ptr->getProcessStatePtr();
+  thread_local auto thread_state = configurator_ptr->getThreadStatePtr();
+  if (!(process_state->load() && thread_state->load()))
   {
     return;
   }
@@ -64,10 +64,10 @@ void scope_exit(const unsigned int id)
 
 void mark_event(const unsigned int id, const MarkLevel mark_level)
 {
-  thread_local auto configurator_ptr = TraceConfigurator::getInstance();
-  static auto& process_state = *(configurator_ptr->getProcessStatePtr());
-  thread_local auto& thread_state = *(configurator_ptr->getThreadStatePtr());
-  if (!(process_state.load() && thread_state.load()))
+  static auto configurator_ptr = TraceConfigurator::getInstance();
+  static auto process_state = configurator_ptr->getProcessStatePtr();
+  thread_local auto thread_state = configurator_ptr->getThreadStatePtr();
+  if (!(process_state->load() && thread_state->load()))
   {
     return;
   }

@@ -78,7 +78,8 @@ static Data process_events(const EventMap& tid_event_map)
 void EndpointNativeTraceSender::work()
 {
   // The collector is a singleton, just retrieve it once.
-  const auto& collector = TracePointCollectorNative::getInstance();
+  const auto collector_ptr = TracePointCollectorNative::getInstance();
+  const auto& collector = *collector_ptr;
   while (running_)
   {
     auto tid_buffers = collector.getMap();
