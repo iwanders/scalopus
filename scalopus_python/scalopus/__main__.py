@@ -115,6 +115,9 @@ def run_discover(args):
                 print(doffset + "  {}    \"{}\"".format(thread_id, thread_name))
         print()
 
+def run_trace_configure(args):
+    pass
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -154,6 +157,10 @@ if __name__ == "__main__":
                                             "processes and show short info"
                                             " about them.")
     discover_parser.set_defaults(func=run_discover)
+
+    trace_configure_parser = subparsers.add_parser("trace_configure", help="Configure "
+                                            " a processes' trace state.")
+    trace_configure_parser.set_defaults(func=run_trace_configure)
 
     args = parser.parse_args()
 

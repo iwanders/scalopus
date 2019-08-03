@@ -181,6 +181,7 @@ void add_scalopus_interface(py::module& m)
   py::class_<Transport, Transport::Ptr> transport_interface(interface, "Transport");
   transport_interface.def("addEndpoint", &Transport::addEndpoint, py::keep_alive<1, 2>());
   transport_interface.def("isConnected", &Transport::isConnected);
+  transport_interface.def("getAddress", &Transport::getAddress);
   transport_interface.def("broadcast", &Transport::broadcast);
   transport_interface.def("request", [](Transport& transport, const std::string& name, const py::object& outgoing) {
     return std::make_shared<PendingResponse>(transport.request(name, pyToData(outgoing)));

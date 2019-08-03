@@ -115,6 +115,7 @@ bool TransportUnix::connect(std::size_t pid)
   std::stringstream ss;
   ss << "" << pid << "_scalopus";
   std::strncpy(socket_config.sun_path + 1, ss.str().c_str(), sizeof(socket_config.sun_path) - 2);
+  client_pid_ = pid;
 
   std::size_t path_length = sizeof(socket_config.sun_family) + strlen(socket_config.sun_path + 1) + 1;
   if (::connect(client_fd_, reinterpret_cast<sockaddr*>(&socket_config), static_cast<unsigned int>(path_length)) == -1)
@@ -406,7 +407,14 @@ bool TransportUnix::processMsg(const protocol::Msg& request, protocol::Msg& resp
 
 Destination::Ptr TransportUnix::getAddress()
 {
-  return std::make_shared<DestinationUnix>(::getpid());
+  if (server_fd_ != 0)
+  {
+    return std::make_shared<DestinationUnix>(::getpid());
+  }
+  else
+  {
+    return std::make_shared<DestinationUnix>(client_pid_);
+  }
 }
 
 // Methods for the factory
