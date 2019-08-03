@@ -30,6 +30,7 @@
 
 #include <scalopus_general/general_provider.h>
 #include <scalopus_tracing/endpoint_native_trace_sender.h>
+#include <scalopus_tracing/endpoint_trace_configurator.h>
 #include <scalopus_tracing/lttng_provider.h>
 #include <scalopus_tracing/native_trace_provider.h>
 #include <scalopus_transport/transport_unix.h>
@@ -99,6 +100,11 @@ int main(int argc, char** argv)
 
   // Add endpoint factory function for the process information.
   manager->addEndpointFactory<scalopus::EndpointProcessInfo>();
+
+  // Adding this endpoint, just to prevent it from complaining for now.
+  // In the future we could use this endpoint to toggle threads from the UI, but the UI's support for this is quite
+  // poor, and once a setting is seen it will be present indefinitely.
+  manager->addEndpointFactory<scalopus::EndpointTraceConfigurator>();
 
   auto native_trace_provider = std::make_shared<scalopus::NativeTraceProvider>(manager);
   manager->addEndpointFactory(scalopus::EndpointNativeTraceSender::name, native_trace_provider);

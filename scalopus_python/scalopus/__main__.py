@@ -27,7 +27,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import tracing, general, transport, common, interface, lib
+import scalopus
 
 import sys
 import argparse
@@ -35,22 +35,24 @@ import time
 
 def run_catapult_server(args):
     # Embedding catapult server
-    factory = transport.TransportUnixFactory()
-    poller = general.EndpointManagerPoll(factory)
-    native_provider = tracing.native.NativeTraceProvider(poller)
+    factory = scalopus.transport.TransportUnixFactory()
+    poller = scalopus.general.EndpointManagerPoll(factory)
+    native_provider = scalopus.tracing.native.NativeTraceProvider(poller)
 
-    poller.addEndpointFactory(tracing.EndpointNativeTraceSender.name,
+    poller.addEndpointFactory(scalopus.tracing.EndpointNativeTraceSender.name,
                               native_provider.factory)
-    poller.addEndpointFactory(tracing.EndpointTraceMapping.name,
-                              tracing.EndpointTraceMapping.factory)
-    poller.addEndpointFactory(general.EndpointProcessInfo.name,
-                              general.EndpointProcessInfo.factory)
+    poller.addEndpointFactory(scalopus.tracing.EndpointTraceMapping.name,
+                              scalopus.tracing.EndpointTraceMapping.factory)
+    poller.addEndpointFactory(scalopus.general.EndpointProcessInfo.name,
+                              scalopus.general.EndpointProcessInfo.factory)
+    poller.addEndpointFactory(scalopus.tracing.EndpointTraceConfigurator.name,
+                              scalopus.tracing.EndpointTraceConfigurator.factory)
 
     poller.startPolling(args.poll_interval)  # Start polling at interval.
 
-    catapult = lib.catapult.CatapultServer()
+    catapult = scalopus.lib.catapult.CatapultServer()
     catapult.addProvider(native_provider)
-    general_provider = general.GeneralProvider(poller)
+    general_provider = scalopus.general.GeneralProvider(poller)
     catapult.addProvider(general_provider)
 
     def logger(s):
@@ -62,8 +64,8 @@ def run_catapult_server(args):
     if (args.poll_log):
         poller.setLogger(logger)
 
-    if tracing.have_lttng:
-        lttng_provider = tracing.lttng.LttngProvider(args.lttng_session,
+    if scalopus.tracing.have_lttng:
+        lttng_provider = scalopus.tracing.lttng.LttngProvider(args.lttng_session,
                                                      poller)
         catapult.addProvider(lttng_provider)
 
@@ -75,6 +77,44 @@ def run_catapult_server(args):
             time.sleep(10)
     except KeyboardInterrupt:
         pass
+
+def run_discover(args):
+    factory = scalopus.transport.TransportUnixFactory()
+    poller = scalopus.general.EndpointManagerPoll(factory)
+    poller.addEndpointFactory(scalopus.general.EndpointProcessInfo.name,
+                              scalopus.general.EndpointProcessInfo.factory)
+    # Perform just one discovery round
+    poller.manage()
+
+    # Retrieve active endpoints
+    endpoints = poller.endpoints()
+
+    entries = []
+    for transport, endpoint_map in endpoints.items():
+        data = {}
+        for name, endpoint in endpoint_map.items():
+            if isinstance(endpoint, scalopus.general.EndpointProcessInfo):
+                pinfo = endpoint.processInfo()
+                data["pid"] = pinfo.pid
+                data["process_info"] = pinfo.to_dict()
+            if isinstance(endpoint, scalopus.general.EndpointIntrospect):
+                data["supported"] = endpoint.supported()
+        entries.append((data["pid"], data))
+
+    entries.sort()
+
+    for pid, data in entries:
+        print("PID: {pid: >6d}  \"{name}\"".format(**data["process_info"]))
+        doffset = " " * 13
+        print(doffset + "Endpoints: {}".format(
+              ("\n" + doffset + "  ").join([""] + sorted(data["supported"]))))
+        threads = data["process_info"]["threads"]
+        if (threads):
+            print(doffset + "Threads:")
+            for thread_id, thread_name in sorted(threads.items()):
+                print(doffset + "  {}    \"{}\"".format(thread_id, thread_name))
+        print()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -102,12 +142,18 @@ if __name__ == "__main__":
         dest="catapult_log", default=True, action="store_false",
         help="Disable log output for the catapult server.")
 
-    if tracing.have_lttng:
+    if scalopus.tracing.have_lttng:
         parser_catapult_server.add_argument("--lttng-session", type=str,
         default="scalopus_target_session",
         help="The lttng session name to connect to, defaults to %(default)s.")
 
     parser_catapult_server.set_defaults(func=run_catapult_server)
+
+
+    discover_parser = subparsers.add_parser("discover", help="Discover "
+                                            "processes and show short info"
+                                            " about them.")
+    discover_parser.set_defaults(func=run_discover)
 
     args = parser.parse_args()
 

@@ -33,6 +33,7 @@
 #include <scalopus_general/general.h>
 #include <scalopus_tracing/endpoint_native_trace_sender.h>
 #include <scalopus_tracing/endpoint_trace_mapping.h>
+#include <scalopus_tracing/endpoint_trace_configurator.h>
 #include <scalopus_tracing/trace_configurator.h>
 #include <scalopus_tracing/trace_macro.h>
 

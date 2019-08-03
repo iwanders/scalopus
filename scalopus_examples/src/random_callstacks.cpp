@@ -119,6 +119,7 @@ int main(int argc, char** argv)
   const auto server = factory->serve();
   server->addEndpoint(std::make_unique<scalopus::EndpointTraceMapping>());
   server->addEndpoint(std::make_unique<scalopus::EndpointIntrospect>());
+  server->addEndpoint(std::make_unique<scalopus::EndpointTraceConfigurator>());
   auto endpoint_process_info = std::make_shared<scalopus::EndpointProcessInfo>();
   endpoint_process_info->setProcessName(argv[0]);
   server->addEndpoint(endpoint_process_info);

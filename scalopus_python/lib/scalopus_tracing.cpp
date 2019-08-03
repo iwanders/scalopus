@@ -62,6 +62,7 @@ void add_scalopus_tracing(py::module& m)
       .value("PROCESS", MarkLevel::PROCESS)
       .value("THREAD", MarkLevel::THREAD);
 
+  // Start EndpointTraceMapping
   py::class_<EndpointTraceMapping, EndpointTraceMapping::Ptr, Endpoint> endpoint_trace_mapping(tracing,
                                                                                                "EndpointTraceMapping");
   endpoint_trace_mapping.def(py::init<>());
@@ -69,6 +70,24 @@ void add_scalopus_tracing(py::module& m)
   endpoint_trace_mapping.def_static("factory", &EndpointTraceMapping::factory);
   endpoint_trace_mapping.def_property_readonly_static("name",
                                                       [](py::object /* self */) { return EndpointTraceMapping::name; });
+  // End EndpointTraceMapping
+
+
+  // Start EndpointTraceConfigurator
+
+  py::class_<EndpointTraceConfigurator::TraceConfiguration> endpoint_tc_trace_conf(tracing, "TraceConfiguration");
+  endpoint_tc_trace_conf.def_readwrite("process_state", &EndpointTraceConfigurator::TraceConfiguration::process_state);
+  endpoint_tc_trace_conf.def_readwrite("thread_state", &EndpointTraceConfigurator::TraceConfiguration::thread_state);
+
+  py::class_<EndpointTraceConfigurator, EndpointTraceConfigurator::Ptr, Endpoint> endpoint_tc(tracing,
+                                                                                            "EndpointTraceConfigurator");
+  endpoint_tc.def(py::init<>());
+  endpoint_tc.def("setTraceState", &EndpointTraceConfigurator::setTraceState);
+  endpoint_tc.def("getTraceState", &EndpointTraceConfigurator::getTraceState);
+  endpoint_tc.def_property_readonly_static("name", [](py::object /* self */) { return EndpointTraceConfigurator::name; });
+  endpoint_tc.def_static("factory", &EndpointTraceConfigurator::factory);
+  // End EndpointTraceConfigurator
+
 
   py::module native = tracing.def_submodule("native", "The native specific components.");
   py::class_<EndpointNativeTraceSender, EndpointNativeTraceSender::Ptr, Endpoint> endpoint_native_trace_sender(
