@@ -59,9 +59,10 @@ static int64_t nativeGetChrono()
 
 void scope_entry(const unsigned int id)
 {
-  static thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
-  static auto& process_state = *(TraceConfigurator::getInstance().getProcessStatePtr());
-  static thread_local auto& thread_state = *(TraceConfigurator::getInstance().getThreadStatePtr());
+  thread_local auto configurator_ptr = TraceConfigurator::getInstance();
+  thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
+  static auto& process_state = *(configurator_ptr->getProcessStatePtr());
+  thread_local auto& thread_state = *(configurator_ptr->getThreadStatePtr());
   if (!(process_state.load() && thread_state.load()))
   {
     return;
@@ -73,9 +74,10 @@ void scope_entry(const unsigned int id)
 
 void scope_exit(const unsigned int id)
 {
-  static thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
-  static auto& process_state = *(TraceConfigurator::getInstance().getProcessStatePtr());
-  static thread_local auto& thread_state = *(TraceConfigurator::getInstance().getThreadStatePtr());
+  thread_local auto configurator_ptr = TraceConfigurator::getInstance();
+  thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
+  static auto& process_state = *(configurator_ptr->getProcessStatePtr());
+  thread_local auto& thread_state = *(configurator_ptr->getThreadStatePtr());
   if (!(process_state.load() && thread_state.load()))
   {
     return;
@@ -87,9 +89,10 @@ void scope_exit(const unsigned int id)
 
 void mark_event(const unsigned int id, const MarkLevel mark_level)
 {
-  static thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
-  static auto& process_state = *(TraceConfigurator::getInstance().getProcessStatePtr());
-  static thread_local auto& thread_state = *(TraceConfigurator::getInstance().getThreadStatePtr());
+  thread_local auto configurator_ptr = TraceConfigurator::getInstance();
+  thread_local auto& buffer = *(TracePointCollectorNative::getInstance().getBuffer());
+  static auto& process_state = *(configurator_ptr->getProcessStatePtr());
+  thread_local auto& thread_state = *(configurator_ptr->getThreadStatePtr());
   if (!(process_state.load() && thread_state.load()))
   {
     return;

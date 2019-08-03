@@ -82,20 +82,20 @@ void add_scalopus_tracing(py::module& m)
   });
 
   tracing.def("getThreadState", []() {
-    TraceConfigurator& configurator = TraceConfigurator::getInstance();
-    return configurator.getThreadState();
+    auto configurator = TraceConfigurator::getInstance();
+    return configurator->getThreadState();
   });
   tracing.def("setThreadState", [](bool new_state) {
-    TraceConfigurator& configurator = TraceConfigurator::getInstance();
-    return configurator.setThreadState(new_state);
+    auto configurator = TraceConfigurator::getInstance();
+    return configurator->setThreadState(new_state);
   });
   tracing.def("getProcessState", []() {
-    TraceConfigurator& configurator = TraceConfigurator::getInstance();
-    return configurator.getProcessState();
+    auto configurator = TraceConfigurator::getInstance();
+    return configurator->getProcessState();
   });
   tracing.def("setProcessState", [](bool new_state) {
-    TraceConfigurator& configurator = TraceConfigurator::getInstance();
-    return configurator.setProcessState(new_state);
+    auto configurator = TraceConfigurator::getInstance();
+    return configurator->setProcessState(new_state);
   });
 
 #ifdef SCALOPUS_TRACING_HAVE_LTTNG
