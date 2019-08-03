@@ -128,7 +128,7 @@ def run_trace_configure(args):
     # perform manipulations as requested.
     relevant_ids = set(args.id)
     new_trace_state = args.state == "on"
-    new_unmatched_trace_state = args.unmatched_process == "on"
+    new_unmatched_trace_state = args.unmatched_pid == "on"
 
     # Retrieve active endpoints
     endpoints = poller.endpoints()
@@ -148,7 +148,7 @@ def run_trace_configure(args):
             new_state.set_process_state = True
             new_state.process_state = new_trace_state
         else:
-            if args.unmatched_process:
+            if args.unmatched_pid:
                 new_state.set_process_state = True
                 new_state.process_state = new_unmatched_trace_state
                 
@@ -229,7 +229,7 @@ if __name__ == "__main__":
         help="Configure the trace state.")
     trace_configure_parser.add_argument('state', choices=['on', 'off'],
         default=None, nargs="?", help="Matched id's will be set to this state.")
-    trace_configure_parser.add_argument('-u','--unmatched-process',default=None,
+    trace_configure_parser.add_argument('-u','--unmatched-pid',default=None,
         choices=['on', 'off'], nargs="?",
         help="Set unmatched process id's state to this value.")
     trace_configure_parser.add_argument("id", nargs="*", type=int,
