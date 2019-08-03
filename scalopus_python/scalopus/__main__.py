@@ -228,7 +228,7 @@ if __name__ == "__main__":
     trace_configure_parser = subparsers.add_parser("trace_configure",
         help="Configure the trace state.")
     trace_configure_parser.add_argument('state', choices=['on', 'off'],
-                                        default=None, nargs="?")
+        default=None, nargs="?", help="Matched id's will be set to this state.")
     trace_configure_parser.add_argument('-u','--unmatched-process',default=None,
         choices=['on', 'off'], nargs="?",
         help="Set unmatched process id's state to this value.")
