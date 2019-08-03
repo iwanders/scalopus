@@ -52,7 +52,7 @@ void add_scalopus_general(py::module& m)
   endpoint_process_info_info.def_readwrite("name", &EndpointProcessInfo::ProcessInfo::name);
   endpoint_process_info_info.def_readwrite("pid", &EndpointProcessInfo::ProcessInfo::pid);
   endpoint_process_info_info.def_readwrite("threads", &EndpointProcessInfo::ProcessInfo::threads);
-  endpoint_process_info_info.def("to_dict", [](const EndpointProcessInfo::ProcessInfo& p){
+  endpoint_process_info_info.def("to_dict", [](const EndpointProcessInfo::ProcessInfo& p) {
     auto dict = py::dict();
     dict["name"] = p.name;
     dict["threads"] = p.threads;
