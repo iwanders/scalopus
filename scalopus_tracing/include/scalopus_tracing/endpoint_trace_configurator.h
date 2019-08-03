@@ -48,6 +48,7 @@ public:
   struct TraceConfiguration
   {
     bool process_state{ false };                 //!< Are traces for this process enabled?
+    bool set_process_state{ false };             //!< Are we setting the process state?
     std::map<unsigned long, bool> thread_state;  //!< Thread state, true = tracing enabled.
     bool cmd_success{ false };
 

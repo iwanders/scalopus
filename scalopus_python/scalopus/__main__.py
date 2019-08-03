@@ -116,8 +116,75 @@ def run_discover(args):
         print()
 
 def run_trace_configure(args):
-    pass
+    factory = scalopus.transport.TransportUnixFactory()
+    poller = scalopus.general.EndpointManagerPoll(factory)
+    poller.addEndpointFactory(scalopus.tracing.EndpointTraceConfigurator.name,
+                              scalopus.tracing.EndpointTraceConfigurator.factory)
+    poller.addEndpointFactory(scalopus.general.EndpointProcessInfo.name,
+                              scalopus.general.EndpointProcessInfo.factory)
+    # Perform just one discovery round
+    poller.manage()
 
+    # perform manipulations as requested.
+    relevant_ids = set(args.id)
+    new_trace_state = args.state == "on"
+    new_unmatched_trace_state = args.unmatched_process == "on"
+
+    # Retrieve active endpoints
+    endpoints = poller.endpoints()
+    entries = []
+    for transport, endpoint_map in endpoints.items():
+        data = {}
+        if not scalopus.tracing.EndpointTraceConfigurator.name in endpoint_map:
+            continue
+        
+        pinfo = endpoint_map[scalopus.general.EndpointProcessInfo.name].processInfo()
+        data["pid"] = pinfo.pid
+        data["process_info"] = pinfo.to_dict()
+
+        new_state = scalopus.tracing.EndpointTraceConfigurator.TraceConfiguration()
+
+        if (pinfo.pid in relevant_ids):
+            new_state.set_process_state = True
+            new_state.process_state = new_trace_state
+        else:
+            if args.unmatched_process:
+                new_state.set_process_state = True
+                new_state.process_state = new_unmatched_trace_state
+                
+
+        for thread_id, thread_name in pinfo.threads.items():
+            if thread_id in relevant_ids:
+                new_state.add_thread_entry(thread_id, new_trace_state)
+
+        state = endpoint_map[scalopus.tracing.EndpointTraceConfigurator.name].setTraceState(new_state)
+        if (not state.cmd_success):
+            print("Failed to retrieve state for transport: {}".format(transport.getAddress()))
+            continue
+        data["state"] = state.to_dict()
+
+        entries.append((data["pid"], data))
+    entries.sort()
+
+    def color_by_state(str, enabled):
+        if enabled:
+            return '\033[92m' + str + '\033[0m'
+        else:
+            return '\033[94m' + str + '\033[0m'
+
+    for pid, data in entries:
+        pid_str = color_by_state("{: >6d}".format(pid), data["state"]["process_state"])
+        print("PID: {}  \"{}\"".format(pid_str, data["process_info"]["name"]))
+        doffset = " " * 8
+        threads = data["process_info"]["threads"]
+        for thread_id, thread_name in sorted(threads.items()):
+            thread_idstr  = str(thread_id)
+            if thread_id in data["state"]["thread_state"]:
+                thread_idstr = color_by_state(thread_idstr, data["state"]["thread_state"][thread_id])
+            print(doffset + "  {}    \"{}\"".format(thread_idstr, thread_name))
+        print()
+
+        
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -158,8 +225,16 @@ if __name__ == "__main__":
                                             " about them.")
     discover_parser.set_defaults(func=run_discover)
 
-    trace_configure_parser = subparsers.add_parser("trace_configure", help="Configure "
-                                            " a processes' trace state.")
+    trace_configure_parser = subparsers.add_parser("trace_configure",
+        help="Configure the trace state.")
+    trace_configure_parser.add_argument('state', choices=['on', 'off'],
+                                        default=None, nargs="?")
+    trace_configure_parser.add_argument('-u','--unmatched-process',default=None,
+        choices=['on', 'off'], nargs="?",
+        help="Set unmatched process id's state to this value.")
+    trace_configure_parser.add_argument("id", nargs="*", type=int,
+        help="Process or thread ID to change.")
+    
     trace_configure_parser.set_defaults(func=run_trace_configure)
 
     args = parser.parse_args()
