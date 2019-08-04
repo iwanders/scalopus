@@ -68,6 +68,16 @@ public:
   }
 
   /**
+   * @brief Retrieve a key from the map, the caller is responsible for ensuring the key exists.
+   * @return The value stored for this key.
+   */
+  Value getKey(const Key& k) const
+  {
+    std::shared_lock<decltype(mutex_)> lock(mutex_);
+    return mapping_.at(k);
+  }
+
+  /**
    * @brief Return true if a key already exists, return false if the key doesn't exist.
    */
   bool exists(const Key& k) const
