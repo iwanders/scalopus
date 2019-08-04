@@ -43,7 +43,7 @@ void scope_entry(const unsigned int id)
   static auto configurator_ptr = TraceConfigurator::getInstance();
   static auto process_state = configurator_ptr->getProcessStatePtr();
   thread_local auto thread_state = configurator_ptr->getThreadStatePtr();
-  if (!(process_state->load() && thread_state->load()))
+  if (!process_state->load() || !thread_state->load())
   {
     return;
   }
@@ -55,7 +55,7 @@ void scope_exit(const unsigned int id)
   static auto configurator_ptr = TraceConfigurator::getInstance();
   static auto process_state = configurator_ptr->getProcessStatePtr();
   thread_local auto thread_state = configurator_ptr->getThreadStatePtr();
-  if (!(process_state->load() && thread_state->load()))
+  if (!process_state->load() || !thread_state->load())
   {
     return;
   }
@@ -67,7 +67,7 @@ void mark_event(const unsigned int id, const MarkLevel mark_level)
   static auto configurator_ptr = TraceConfigurator::getInstance();
   static auto process_state = configurator_ptr->getProcessStatePtr();
   thread_local auto thread_state = configurator_ptr->getThreadStatePtr();
-  if (!(process_state->load() && thread_state->load()))
+  if (!process_state->load() || !thread_state->load())
   {
     return;
   }

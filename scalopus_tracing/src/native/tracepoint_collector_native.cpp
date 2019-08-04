@@ -42,8 +42,10 @@ TracePointCollectorNative::Ptr TracePointCollectorNative::getInstance()
 {
   // https://stackoverflow.com/questions/8147027/
   // Trick to allow make_shared with a private constructor.
-  struct make_shared_enabler : public TracePointCollectorNative {};
-  static TracePointCollectorNative::Ptr instance{std::make_shared<make_shared_enabler>()};
+  struct make_shared_enabler : public TracePointCollectorNative
+  {
+  };
+  static TracePointCollectorNative::Ptr instance{ std::make_shared<make_shared_enabler>() };
   return instance;
 }
 
@@ -53,13 +55,12 @@ tracepoint_collector_types::ScopeBufferPtr TracePointCollectorNative::getBuffer(
   // Register a destructor callback such that the thread gets removed from the map when the thread exits.
   auto instance_pointer = getInstance();
   thread_local DestructorCallback cleanup{ [instance = TracePointCollectorNative::WeakPtr(instance_pointer), tid]() {
-      auto ptr = instance.lock();
-      if (ptr != nullptr)
-      {
-        ptr->erase(tid);
-      }
+    auto ptr = instance.lock();
+    if (ptr != nullptr)
+    {
+      ptr->erase(tid);
     }
-  };
+  } };
 
   if (exists(tid))
   {

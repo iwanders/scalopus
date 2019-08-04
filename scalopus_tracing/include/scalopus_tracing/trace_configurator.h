@@ -47,7 +47,7 @@ private:
   TraceConfigurator(const TraceConfigurator&) = delete;
   TraceConfigurator& operator=(const TraceConfigurator&) = delete;
   TraceConfigurator& operator=(TraceConfigurator&&) = delete;
-
+  TraceConfigurator(const TraceConfigurator&&) = delete;
 
 public:
   using Ptr = std::shared_ptr<TraceConfigurator>;

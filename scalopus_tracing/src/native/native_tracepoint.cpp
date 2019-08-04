@@ -64,7 +64,7 @@ void scope_entry(const unsigned int id)
   thread_local auto buffer = buffer_ptr->getBuffer();
   static auto process_state = configurator_ptr->getProcessStatePtr();
   thread_local auto thread_state = configurator_ptr->getThreadStatePtr();
-  if (!(process_state->load() && thread_state->load()))
+  if (!process_state->load() || !thread_state->load())
   {
     return;
   }
@@ -80,7 +80,7 @@ void scope_exit(const unsigned int id)
   thread_local auto buffer = buffer_ptr->getBuffer();
   static auto process_state = configurator_ptr->getProcessStatePtr();
   thread_local auto thread_state = configurator_ptr->getThreadStatePtr();
-  if (!(process_state->load() && thread_state->load()))
+  if (!process_state->load() || !thread_state->load())
   {
     return;
   }
@@ -96,7 +96,7 @@ void mark_event(const unsigned int id, const MarkLevel mark_level)
   thread_local auto buffer = buffer_ptr->getBuffer();
   static auto process_state = configurator_ptr->getProcessStatePtr();
   thread_local auto thread_state = configurator_ptr->getThreadStatePtr();
-  if (!(process_state->load() && thread_state->load()))
+  if (!process_state->load() || !thread_state->load())
   {
     return;
   }
@@ -105,15 +105,15 @@ void mark_event(const unsigned int id, const MarkLevel mark_level)
   {
     case MarkLevel::GLOBAL:
       buffer->push(tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id,
-                                                                TracePointCollectorNative::MARK_GLOBAL });
+                                                                 TracePointCollectorNative::MARK_GLOBAL });
       break;
     case MarkLevel::PROCESS:
       buffer->push(tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id,
-                                                                TracePointCollectorNative::MARK_PROCESS });
+                                                                 TracePointCollectorNative::MARK_PROCESS });
       break;
     case MarkLevel::THREAD:
       buffer->push(tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id,
-                                                                TracePointCollectorNative::MARK_THREAD });
+                                                                 TracePointCollectorNative::MARK_THREAD });
       break;
   }
 }
