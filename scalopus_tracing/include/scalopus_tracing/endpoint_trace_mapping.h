@@ -32,6 +32,7 @@
 
 #include <scalopus_interface/transport.h>
 #include <map>
+#include <unordered_map>
 #include <string>
 
 namespace scalopus
@@ -44,7 +45,7 @@ class EndpointTraceMapping : public Endpoint
 public:
   using Ptr = std::shared_ptr<EndpointTraceMapping>;
   static const char* name;  // "scope_tracing" defined in object file.
-  using TraceIdMap = std::map<unsigned int /* trace_id */, std::string /* name */>;
+  using TraceIdMap = std::unordered_map<unsigned int /* trace_id */, std::string /* name */>;
   using ProcessTraceMap = std::map<int /* pid */, TraceIdMap /* trace_map */>;
 
   /**

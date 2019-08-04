@@ -30,7 +30,7 @@
 #ifndef SCALOPUS_SCOPE_MAP_TRACKER_H
 #define SCALOPUS_SCOPE_MAP_TRACKER_H
 
-#include <map>
+#include <unordered_map>
 #include <shared_mutex>
 #include <string>
 
@@ -61,7 +61,7 @@ public:
    * @brief Function to retrieve the mapping between entry and exit ids and provided names.
    * @return Map that holds trace point id - trace name mapping.
    */
-  std::map<Key, Value> getMap() const
+  std::unordered_map<Key, Value> getMap() const
   {
     std::shared_lock<decltype(mutex_)> lock(mutex_);
     return mapping_;
@@ -95,7 +95,7 @@ public:
   }
 
 private:
-  std::map<Key, Value> mapping_;
+  std::unordered_map<Key, Value> mapping_;
   mutable std::shared_timed_mutex mutex_;  //! Mutex for the mapping container.
 
 protected:

@@ -32,6 +32,7 @@
 
 #include <scalopus_general/map_tracker.h>
 #include <chrono>
+#include <map>
 #include <vector>
 #include "spsc_ringbuffer.h"
 namespace scalopus
