@@ -68,10 +68,10 @@ public:
   }
 
   /**
-   * @brief Retrieve a key from the map, the caller is responsible for ensuring the key exists.
-   * @return The value stored for this key.
+   * @brief Retrieve a value from the map by key, the caller is responsible for ensuring the key exists.
+   * @return A copy of the value stored.
    */
-  Value getKey(const Key& k) const
+  Value getValue(const Key& k) const
   {
     std::shared_lock<decltype(mutex_)> lock(mutex_);
     return mapping_.at(k);

@@ -65,7 +65,7 @@ tracepoint_collector_types::ScopeBufferPtr TracePointCollectorNative::getBuffer(
   if (exists(tid))
   {
     // Buffer already existed for this thread.
-    return getKey(tid);
+    return getValue(tid);
   }
   else
   {
