@@ -52,7 +52,7 @@ public:
     std::map<unsigned long, bool> thread_state;  //!< Thread state, true = tracing enabled.
     bool cmd_success{ false };
 
-    operator bool()
+    operator bool() const
     {
       return cmd_success;
     }
