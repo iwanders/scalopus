@@ -41,8 +41,15 @@ TraceConfigurator::AtomicBoolPtr TraceConfigurator::getThreadStatePtr()
 {
   auto tid = static_cast<unsigned long>(pthread_self());
 
-  // Register a destructor callback such that the thread gets removed from the map when the thread exits.
-  thread_local DestructorCallback cleanup{ [this, tid]() { removeThread(tid); } };
+  //  Register a destructor callback such that the thread gets removed from the map when the thread exits.
+  auto instance_pointer = getInstance();
+  thread_local DestructorCallback cleanup{ [instance = TraceConfigurator::WeakPtr(instance_pointer), tid]() {
+    auto ptr = instance.lock();
+    if (ptr != nullptr)
+    {
+      ptr->removeThread(tid);
+    }
+  } };
   std::lock_guard<decltype(threads_map_mutex_)> lock(threads_map_mutex_);
   auto it = thread_state_.find(tid);
   if (it != thread_state_.end())
@@ -94,9 +101,14 @@ std::map<unsigned long, TraceConfigurator::AtomicBoolPtr> TraceConfigurator::get
   return thread_state_;
 }
 
-TraceConfigurator& TraceConfigurator::getInstance()
+TraceConfigurator::Ptr TraceConfigurator::getInstance()
 {
-  static TraceConfigurator instance;
+  // https://stackoverflow.com/questions/8147027/
+  // Trick to allow make_shared with a private constructor.
+  struct make_shared_enabler : public TraceConfigurator
+  {
+  };
+  static TraceConfigurator::Ptr instance{ std::make_shared<make_shared_enabler>() };
   return instance;
 }
 

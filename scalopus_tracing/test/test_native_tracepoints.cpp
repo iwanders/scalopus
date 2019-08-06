@@ -123,7 +123,7 @@ int main(int /* argc */, char** /* argv */)
   test_less(std::abs(expected - difference), allow_difference);
 
   // Disable this threads' tracepoints
-  scalopus::TraceConfigurator::getInstance().setThreadState(false);
+  scalopus::TraceConfigurator::getInstance()->setThreadState(false);
   source->startInterval();
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   // From another thread emit a tracepoint.
@@ -145,7 +145,7 @@ int main(int /* argc */, char** /* argv */)
   test(result[1]["name"], "different_thread");
 
   // Enable the tracepoints again.
-  scalopus::TraceConfigurator::getInstance().setThreadState(true);
+  scalopus::TraceConfigurator::getInstance()->setThreadState(true);
   source->startInterval();
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   {
@@ -158,7 +158,7 @@ int main(int /* argc */, char** /* argv */)
   test(result[1]["name"], "enabled");
 
   // Disable process state.
-  scalopus::TraceConfigurator::getInstance().setProcessState(false);
+  scalopus::TraceConfigurator::getInstance()->setProcessState(false);
   source->startInterval();
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   {
@@ -169,7 +169,7 @@ int main(int /* argc */, char** /* argv */)
   test(result.size(), 0u);  // Expect no tracepoints.
 
   // Finally check whether we can flip the process state back to true.
-  scalopus::TraceConfigurator::getInstance().setProcessState(true);
+  scalopus::TraceConfigurator::getInstance()->setProcessState(true);
   source->startInterval();
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   {

@@ -34,27 +34,27 @@ namespace scalopus
 {
 TraceConfigurationRAII::TraceConfigurationRAII(const bool is_process, const bool new_state) : is_process_(is_process)
 {
-  TraceConfigurator& configurator = TraceConfigurator::getInstance();
+  TraceConfigurator::Ptr configurator = TraceConfigurator::getInstance();
   if (is_process_)
   {
-    previous_state_ = configurator.setProcessState(new_state);
+    previous_state_ = configurator->setProcessState(new_state);
   }
   else
   {
-    previous_state_ = configurator.setThreadState(new_state);
+    previous_state_ = configurator->setThreadState(new_state);
   }
 }
 
 TraceConfigurationRAII::~TraceConfigurationRAII()
 {
-  TraceConfigurator& configurator = TraceConfigurator::getInstance();
+  TraceConfigurator::Ptr configurator = TraceConfigurator::getInstance();
   if (is_process_)
   {
-    configurator.setProcessState(previous_state_);
+    configurator->setProcessState(previous_state_);
   }
   else
   {
-    configurator.setThreadState(previous_state_);
+    configurator->setThreadState(previous_state_);
   }
 }
 

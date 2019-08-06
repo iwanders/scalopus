@@ -44,14 +44,22 @@ class TraceConfigurator
 {
 private:
   TraceConfigurator();
+  TraceConfigurator(const TraceConfigurator&) = delete;
+  TraceConfigurator& operator=(const TraceConfigurator&) = delete;
+  TraceConfigurator& operator=(TraceConfigurator&&) = delete;
+  TraceConfigurator(const TraceConfigurator&&) = delete;
 
 public:
+  using Ptr = std::shared_ptr<TraceConfigurator>;
+  using WeakPtr = std::weak_ptr<TraceConfigurator>;
   using AtomicBoolPtr = std::shared_ptr<std::atomic_bool>;
+
+  virtual ~TraceConfigurator() = default;
   /**
    * @brief Static method through which the singleton instance can be retrieved.
    * @return Returns the singleton instance of the ScopeConfigurator object.
    */
-  static TraceConfigurator& getInstance();
+  static TraceConfigurator::Ptr getInstance();
 
   /**
    * @brief Retrieve the atomic boolean for the thread requesting it.

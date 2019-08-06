@@ -4,6 +4,7 @@ include(FindThreads)
 
 add_library(scalopus_scope_tracing SHARED
   src/static_string_tracker.cpp
+  src/endpoint_trace_configurator.cpp
   src/endpoint_trace_mapping.cpp
   src/trace_configurator.cpp
   src/trace_configuration_raii.cpp

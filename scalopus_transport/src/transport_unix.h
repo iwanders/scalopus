@@ -87,6 +87,7 @@ private:
   void work();          //!< Function for the worker thread.
   int server_fd_{ 0 };  //!< File descriptor from the server bind.
   int client_fd_{ 0 };  //!< File descriptor from connecting to a server.
+  std::size_t client_pid_{ 0 };
 
   bool running_{ false };  //!< Boolean to quit the worker thread.
 

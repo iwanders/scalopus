@@ -27,32 +27,52 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H
-#define SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H
+#ifndef SCALOPUS_TRACING_ENDPOINT_TRACE_CONFIGURATOR_H
+#define SCALOPUS_TRACING_ENDPOINT_TRACE_CONFIGURATOR_H
 
 #include <scalopus_interface/transport.h>
 #include <map>
-#include <unordered_map>
 #include <string>
 
 namespace scalopus
 {
 /**
- * @brief This class provides the mapping between scope tracing point id's and their names.
+ * @brief This endpoint provides the thread names and process name.
  */
-class EndpointTraceMapping : public Endpoint
+class EndpointTraceConfigurator : public Endpoint
 {
 public:
-  using Ptr = std::shared_ptr<EndpointTraceMapping>;
-  static const char* name;  // "scope_tracing" defined in object file.
-  using TraceIdMap = std::unordered_map<unsigned int /* trace_id */, std::string /* name */>;
-  using ProcessTraceMap = std::map<int /* pid */, TraceIdMap /* trace_map */>;
+  using Ptr = std::shared_ptr<EndpointTraceConfigurator>;
+  static const char* name;
+
+  struct TraceConfiguration
+  {
+    bool process_state{ false };                 //!< Are traces for this process enabled?
+    bool set_process_state{ false };             //!< Are we setting the process state?
+    std::map<unsigned long, bool> thread_state;  //!< Thread state, true = tracing enabled.
+    bool cmd_success{ false };
+
+    operator bool() const
+    {
+      return cmd_success;
+    }
+  };
 
   /**
-   * @brief This function should be called from the client side, it communicates with the endpoint at the connected
-   *        server side and retrieves its mappings.
+   * @brief Constructor for this endpoint.
    */
-  ProcessTraceMap mapping();
+  EndpointTraceConfigurator() = default;
+
+  //  ------   Client ------
+  /**
+   * @brief Set trace state, only modifies threads which are present in the map.
+   */
+  TraceConfiguration setTraceState(const TraceConfiguration& state) const;
+
+  /**
+   * @brief Get the current trace state.
+   */
+  TraceConfiguration getTraceState() const;
 
   /**
    * @brief Function to create a new instance of this class and assign the transport to it.
@@ -66,4 +86,4 @@ public:
 
 }  // namespace scalopus
 
-#endif  // SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H
+#endif  // SCALOPUS_TRACING_ENDPOINT_TRACE_CONFIGURATOR_H
