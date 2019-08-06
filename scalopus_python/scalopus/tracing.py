@@ -40,6 +40,7 @@ getProcessState = tracing.getProcessState
 setProcessState = tracing.setProcessState
 MarkLevel = tracing.MarkLevel
 EndpointTraceMapping = tracing.EndpointTraceMapping
+EndpointTraceConfigurator = tracing.EndpointTraceConfigurator
 EndpointNativeTraceSender = tracing.native.EndpointNativeTraceSender
 NativeTraceProvider = tracing.native.NativeTraceProvider
 

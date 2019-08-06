@@ -88,6 +88,18 @@ int main(int /* argc */, char** /* argv */)
         continue;
       }
 
+      if (name == scalopus::EndpointTraceConfigurator::name)
+      {
+        auto client = std::make_shared<scalopus::EndpointTraceConfigurator>();
+        client->setTransport(transport);
+        const auto state = client->getTraceState();
+        server_info[scalopus::EndpointTraceConfigurator::name] = { { "process_state", state.process_state },
+                                                                   { "thread_state", state.thread_state },
+                                                                   { "cmd_success", state.cmd_success } };
+        std::cerr << "  process_state:     " << state.process_state << std::endl;
+        continue;
+      }
+
       if (name == scalopus::EndpointTraceMapping::name)
       {
         auto client = std::make_shared<scalopus::EndpointTraceMapping>();
