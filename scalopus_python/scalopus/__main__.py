@@ -90,9 +90,9 @@ def run_discover(args):
     endpoints = poller.endpoints()
 
     entries = []
-    for transport, endpoint_map in endpoints.items():
+    for endpoint_map in endpoints.values():
         data = {}
-        for name, endpoint in endpoint_map.items():
+        for endpoint in endpoint_map.values():
             if isinstance(endpoint, scalopus.general.EndpointProcessInfo):
                 pinfo = endpoint.processInfo()
                 data["pid"] = pinfo.pid
@@ -103,13 +103,13 @@ def run_discover(args):
 
     entries.sort()
 
-    for pid, data in entries:
+    for _, data in entries:
         print("PID: {pid: >6d}  \"{name}\"".format(**data["process_info"]))
         doffset = " " * 13
         print(doffset + "Endpoints: {}".format(
               ("\n" + doffset + "  ").join([""] + sorted(data["supported"]))))
         threads = data["process_info"]["threads"]
-        if (threads):
+        if threads:
             print(doffset + "Threads:")
             for thread_id, thread_name in sorted(threads.items()):
                 print(doffset + "  {}    \"{}\"".format(thread_id, thread_name))
@@ -134,10 +134,10 @@ def run_trace_configure(args):
     endpoints = poller.endpoints()
     entries = []
     for transport, endpoint_map in endpoints.items():
-        data = {}
         if not scalopus.tracing.EndpointTraceConfigurator.name in endpoint_map:
             continue
-        
+
+        data = {}
         pinfo = endpoint_map[scalopus.general.EndpointProcessInfo.name].processInfo()
         data["pid"] = pinfo.pid
         data["process_info"] = pinfo.to_dict()
@@ -151,14 +151,13 @@ def run_trace_configure(args):
             if args.unmatched_pid:
                 new_state.set_process_state = True
                 new_state.process_state = new_unmatched_trace_state
-                
 
-        for thread_id, thread_name in pinfo.threads.items():
+        for thread_id in pinfo.threads.keys():
             if thread_id in relevant_ids:
                 new_state.add_thread_entry(thread_id, new_trace_state)
 
         state = endpoint_map[scalopus.tracing.EndpointTraceConfigurator.name].setTraceState(new_state)
-        if (not state.cmd_success):
+        if not state.cmd_success:
             print("Failed to retrieve state for transport: {}".format(transport.getAddress()))
             continue
         data["state"] = state.to_dict()
