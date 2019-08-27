@@ -1,30 +1,54 @@
-name: C/C++ Cmake
+name: Build and test
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  build:
-
+  build-latest:
+    name: Build and test latest
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Bootstrap
-      run: |
-        sudo apt-get install python3-setuptools
-    - uses: actions/checkout@v1
-      with:
-        submodules: true
-    - name: mkdir build
-      run: mkdir build
-    - name: cmake ..
-      run: |
-        cd build
-        cmake ..
-    - name: make
-      run: |
-        cd build
-        make
-    - name: ctest .
-      run: |
-        cd build
-        ctest -VV .
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+      - name: Bootstrap
+        run: |
+          sudo apt-get install python3-setuptools
+      - name: mkdir build
+        run: mkdir build
+      - name: cmake ..
+        run: |
+          cd build
+          cmake  -D SCALOPUS_USE_PYTHON2=off -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+      - name: make
+        run: |
+          cd build
+          make
+      - name: ctest .
+        run: |
+          cd build
+          ctest -VV .
+
+  build-1604:
+    name: Build and test 16.04
+    runs-on:  ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+      - name: Bootstrap
+        run: |
+          sudo apt-get install python3-setuptools
+      - name: mkdir build
+        run: mkdir build
+      - name: cmake ..
+        run: |
+          cd build
+          cmake  -D SCALOPUS_USE_PYTHON2=off -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+      - name: make
+        run: |
+          cd build
+          make
+      - name: ctest .
+        run: |
+          cd build
+          ctest -VV .
