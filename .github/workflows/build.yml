@@ -1,0 +1,30 @@
+name: C/C++ Cmake
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Bootstrap
+      run: |
+        sudo apt-get install python3-setuptools
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: mkdir build
+      run: mkdir build
+    - name: cmake ..
+      run: |
+        cd build
+        cmake ..
+    - name: make
+      run: |
+        cd build
+        make
+    - name: ctest .
+      run: |
+        cd build
+        ctest -VV .
