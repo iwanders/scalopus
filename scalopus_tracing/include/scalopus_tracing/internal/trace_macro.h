@@ -31,6 +31,7 @@
 #define SCALOPUS_TRACING_INTERNAL_SCOPE_TRACING_H
 
 #include <scalopus_general/internal/helper_macros.h>
+#include <scalopus_tracing/internal/counter_tracepoint.h>
 #include <scalopus_tracing/internal/marker_tracepoint.h>
 #include <scalopus_tracing/internal/scope_tracepoint.h>
 #include <scalopus_tracing/internal/compile_time_crc.hpp>
@@ -85,5 +86,15 @@
   do                                                                                                                   \
   {                                                                                                                    \
   } while (0)
+
+#define TRACE_COUNTER_EVENT_NAMED_ID(value, name, series_name, id)                                                     \
+  TRACE_TRACKED_MAPPING_REGISTER_ONCE(name, id, SCALOPUS_MAKE_UNIQUE(scalopus_trace_id_))                              \
+  scalopus::counter_event(id, series_name, value);                                                                     \
+  do                                                                                                                   \
+  {                                                                                                                    \
+  } while (0)
+
+#define TRACE_COUNTER_SERIES_EVENT_NAMED(name, series_name, value)                                                     \
+  TRACE_COUNTER_EVENT_NAMED_ID(value, name, series_name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))
 
 #endif  // SCALOPUS_TRACING_INTERNAL_SCOPE_TRACING_H

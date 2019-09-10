@@ -85,5 +85,17 @@ void mark_event(const unsigned int id, const MarkLevel mark_level)
   }
 }
 
+void counter_event(const unsigned int id, const std::string& name, const unsigned int value)
+{
+  static auto configurator_ptr = TraceConfigurator::getInstance();
+  static auto process_state = configurator_ptr->getProcessStatePtr();
+  thread_local auto thread_state = configurator_ptr->getThreadStatePtr();
+  if (!process_state->load() || !thread_state->load())
+  {
+    return;
+  }
+  tracepoint(scalopus_scope_id, counter_event, id, name.c_str(), value);
+}
+
 }  // namespace lttng
 }  // namespace scalopus

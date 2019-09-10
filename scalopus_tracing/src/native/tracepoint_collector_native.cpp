@@ -37,6 +37,7 @@ const uint8_t TracePointCollectorNative::SCOPE_EXIT = 2;
 const uint8_t TracePointCollectorNative::MARK_GLOBAL = 3;
 const uint8_t TracePointCollectorNative::MARK_PROCESS = 4;
 const uint8_t TracePointCollectorNative::MARK_THREAD = 5;
+const uint8_t TracePointCollectorNative::COUNTER = 6;
 
 TracePointCollectorNative::Ptr TracePointCollectorNative::getInstance()
 {

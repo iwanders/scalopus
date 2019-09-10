@@ -138,6 +138,11 @@ std::vector<json> NativeTraceSource::finishInterval()
           entry["ph"] = "i";
           entry["s"] = "t";
         }
+        else if (type == TracePointCollectorNative::COUNTER)
+        {
+          entry["ph"] = "C";
+          entry["args"] = std::get<3>(event);
+        }
         res.push_back(entry);
       }
     }
