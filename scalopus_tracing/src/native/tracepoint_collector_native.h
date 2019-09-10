@@ -33,6 +33,8 @@
 #include <scalopus_general/map_tracker.h>
 #include <chrono>
 #include <map>
+#include <nlohmann/json.hpp>
+#include <string>
 #include <vector>
 #include "spsc_ringbuffer.h"
 namespace scalopus
@@ -42,7 +44,7 @@ namespace tracepoint_collector_types
 //! Timepoint of that clock.
 using TimePoint = uint64_t;
 //! Trace event as it is stored in the ringbuffer.
-using StaticTraceEvent = std::tuple<TimePoint, unsigned int, uint8_t>;
+using StaticTraceEvent = std::tuple<TimePoint, unsigned int, uint8_t, nlohmann::json>;
 //! The container that backs the ringbuffer.
 using EventContainer = std::vector<StaticTraceEvent>;
 //! The single producer single consumer ringbuffer with the event container.
@@ -50,7 +52,9 @@ using ScopeBuffer = SPSCRingBuffer<EventContainer>;
 //! Pointer type to the ringbuffer.
 using ScopeBufferPtr = std::shared_ptr<ScopeBuffer>;
 //! The (grouped by thread) events composed of native types that we can serialize to binary for transfer.
-using ThreadedEvents = std::map<unsigned long, std::vector<std::tuple<TimePoint, unsigned int, uint8_t>>>;
+using ThreadedEvents = std::map<unsigned long, EventContainer>;
+//! NamedCounter that represents a named counter event with its value.
+using NamedCounter = std::tuple<std::string, unsigned int>;
 }  // namespace tracepoint_collector_types
 
 /**
@@ -80,6 +84,7 @@ public:
   static const uint8_t MARK_GLOBAL;
   static const uint8_t MARK_PROCESS;
   static const uint8_t MARK_THREAD;
+  static const uint8_t COUNTER;
 
   /**
    * @brief Static method through which the singleton instance can be retrieved.

@@ -27,26 +27,20 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "scalopus_tracing/nop_tracepoint.h"
+#ifndef SCALOPUS_TRACING_COUNTER_TRACEPOINT_H
+#define SCALOPUS_TRACING_COUNTER_TRACEPOINT_H
+
+#include <string>
+
 namespace scalopus
 {
-namespace nop
-{
-void scope_entry(const unsigned int /* id */)
-{
-}
-
-void scope_exit(const unsigned int /* id */)
-{
-}
-
-void mark_event(const unsigned int /* id */, const MarkLevel /* mark_level */)
-{
-}
-
-void counter_event(const unsigned int /* id */, const std::string& /* name */, const unsigned int /* value */)
-{
-}
-
-}  // namespace nop
+/**
+ * @brief Emits a counter event.
+ * @param id The tracepoint id to relate it to a human readable string.
+ * @param counter_name The counter name.
+ * @param counter_value The counter value.
+ */
+void counter_event(const unsigned int id, const std::string& counter_name, const unsigned int counter_value);
 }  // namespace scalopus
+
+#endif  // SCALOPUS_TRACING_COUNTER_TRACEPOINT_H

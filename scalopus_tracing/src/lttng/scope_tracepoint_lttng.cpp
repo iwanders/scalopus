@@ -46,4 +46,9 @@ void mark_event(const unsigned int id, const MarkLevel mark_level)
   lttng::mark_event(id, mark_level);
 }
 
+void counter_event(const unsigned int id, const std::string& name, const unsigned int value)
+{
+  lttng::counter_event(id, name, value);
+}
+
 }  // namespace scalopus
