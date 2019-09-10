@@ -141,6 +141,12 @@ std::vector<json> NativeTraceSource::finishInterval()
     }
   }
 
+  // Sort res by "ts" because sometimes the "E"nd events are out of order wrt the "B"egin, leading to unfinished scope
+  // events.
+  std::stable_sort(res.begin(), res.end(), [](const json& lhs, const json& rhs) {
+    return lhs.at("ts").get<double>() < rhs.at("ts").get<double>();
+  });
+
   return res;
 }
 
