@@ -74,6 +74,7 @@ public:
   }
   void join()
   {
+    py::gil_scoped_release release;
     if (thread_running_)
     {
       thread_.join();
