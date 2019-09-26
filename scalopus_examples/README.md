@@ -47,3 +47,7 @@ depending on the code path taken.
 ## `showcase_marker_events.cpp`
 This is an example of the marker events that span the global, process or thread scopes.
 ![Marker events](/doc/marker_event.png "Global and process marker events.")
+
+## `showcase_count_events.cpp`
+This allows displaying graphs at the top of the process.
+![Count events](/doc/count_events.png "Two counters, one with two series in it.")

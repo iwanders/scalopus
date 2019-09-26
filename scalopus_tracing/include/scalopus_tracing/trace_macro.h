@@ -69,6 +69,6 @@
 // Macro to set a counter series value.
 #define TRACE_COUNT_SERIES(name, series_name, value) TRACE_COUNT_SERIES_EVENT_NAMED(name "/" series_name, value)
 
-// Macro to set a counter value (series name same as counter name).
-#define TRACE_COUNT(name, value) TRACE_COUNT_SERIES(name, name, value)
+// Macro to set a counter value, just one series called 'count'.
+#define TRACE_COUNT(name, value) TRACE_COUNT_SERIES(name, "", value)
 #endif  // SCALOPUS_TRACING_SCOPE_TRACING_H

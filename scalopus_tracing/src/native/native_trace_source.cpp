@@ -177,9 +177,10 @@ std::vector<json> NativeTraceSource::finishInterval()
       auto values = entry.at("args").get<SeriesMap>();
       auto pid = entry.at("pid").get<int>();
       const auto& name = entry.at("name").get<std::string>();
-      values.insert(counte_all_series[pid][name].begin(), counte_all_series[pid][name].end());  // add future keys to this entry
-      entry["args"] = values;            // update values to include the series used in the future.
-      counte_all_series[pid][name] = values;  // store most recent value in the map.
+      values.insert(counte_all_series[pid][name].begin(),
+                    counte_all_series[pid][name].end());  // add future keys to this entry
+      entry["args"] = values;                             // update values to include the series used in the future.
+      counte_all_series[pid][name] = values;              // store most recent value in the map.
     }
   }
 
