@@ -69,6 +69,13 @@ public:
    */
   static std::string getScopeName(const ProcessTraceMap& mapping, const int pid, const unsigned int trace_id);
 
+
+  /**
+   * @brief Splits a string associated to a counter id into the counter and series name.
+   * @param trace_string The string that was associated to the trace_id of this counter event.
+   * @return The counter name and the series name in the counter.
+   */
+  static std::pair<std::string, std::string> splitCounterSeriesName(const std::string& trace_string);
 private:
   EndpointManager::WeakPtr manager_;  //!< Manager for connections.
 

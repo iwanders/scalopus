@@ -49,16 +49,16 @@ using TimePoint = uint64_t;
 using TraceId = std::uint32_t;
 using TraceType = std::uint8_t;
 using DynamicDataType = std::unique_ptr<Data>;
-using StaticTraceEvent = std::tuple<TimePoint, TraceId, TraceType, DynamicDataType>;
-/*
+
 struct StaticTraceEvent
 {
   TimePoint time_point{ 0 };
-  TraceId trace_type{ 0 };
-  TraceType trace_id{ 0 };
+  TraceId trace_id{ 0 };
+  TraceType trace_type{ 0 };
   DynamicDataType dynamic_data{ nullptr };
 };
-// using arrays.
+
+// (de)serialization of the StaticTraceEvent struct.
 template <typename Data>
 cbor::result to_cbor(const StaticTraceEvent& b, Data& data)
 {
@@ -66,14 +66,14 @@ cbor::result to_cbor(const StaticTraceEvent& b, Data& data)
   {
     cbor::result res = data.openArray(3);
     res += to_cbor(b.time_point, data);
-    res += to_cbor(b.trace_type, data);
     res += to_cbor(b.trace_id, data);
+    res += to_cbor(b.trace_type, data);
     return res;
   }
   cbor::result res = data.openArray(4);
   res += to_cbor(b.time_point, data);
-  res += to_cbor(b.trace_type, data);
   res += to_cbor(b.trace_id, data);
+  res += to_cbor(b.trace_type, data);
   res += to_cbor(b.dynamic_data, data);
   return res;
 }
@@ -81,22 +81,28 @@ cbor::result to_cbor(const StaticTraceEvent& b, Data& data)
 template <typename Data>
 cbor::result from_cbor(StaticTraceEvent& b, Data& data)
 {
-  cbor::result res;
-  if (data.isArray())
+  cbor::result res = data.expectArray();
+  if (!res)
   {
-    auto length = data.readLength();
-    res += from_cbor(b.time_point, data);
-    res += from_cbor(b.trace_type, data);
-    res += from_cbor(b.trace_id, data);
-    if (length == 4)
-    {
-      res += to_cbor(b.dynamic_data, data);
-    }
     return res;
   }
-  return false;
+
+  std::size_t length;
+  res += data.readLength(length);
+  if (!res)
+  {
+    return res;
+  }
+  res += from_cbor(b.time_point, data);
+  res += from_cbor(b.trace_id, data);
+  res += from_cbor(b.trace_type, data);
+  if (length >= 4)
+  {
+    res += from_cbor(b.dynamic_data, data);
+  }
+  return res;
 }
-*/
+/**/
 //! The container that backs the ringbuffer.
 using EventContainer = std::vector<StaticTraceEvent>;
 //! The single producer single consumer ringbuffer with the event container.

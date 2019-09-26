@@ -54,12 +54,12 @@ static uint64_t nativeGetTime()
 }
 */
 
-static int64_t nativeGetChrono()
+static tracepoint_collector_types::TimePoint nativeGetChrono()
 {
   using Clock = std::chrono::high_resolution_clock;
   auto now_ns = std::chrono::time_point_cast<std::chrono::nanoseconds>(Clock::now());
   auto epoch = std::chrono::duration_cast<std::chrono::nanoseconds>(now_ns.time_since_epoch());
-  return epoch.count();
+  return static_cast<tracepoint_collector_types::TimePoint>(epoch.count());
 }
 
 void scope_entry(const unsigned int id)

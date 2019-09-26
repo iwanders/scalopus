@@ -88,6 +88,11 @@ std::vector<json> NativeTraceSource::finishInterval()
     recorded_data_.swap(data);
   }
 
+  // Map for the counter states.
+  using SeriesMap = std::map<std::string, std::int64_t>;
+  using CounterMap = std::map<std::string, SeriesMap>;
+  CounterMap counter_values;
+
   // Now, we start converting the chunks of data we obtain into trace events.
   for (const auto& dptr : data)
   {
@@ -104,9 +109,9 @@ std::vector<json> NativeTraceSource::finishInterval()
       const auto& tid = thread_events.first;
       for (const auto& event : thread_events.second)
       {
-        const auto& timestamp_ns_since_epoch = std::get<0>(event);
-        const auto& trace_id = std::get<1>(event);
-        const auto& type = std::get<2>(event);
+        const auto& timestamp_ns_since_epoch = event.time_point;
+        const auto& trace_id = event.trace_id;
+        const auto& type = event.trace_type;
 
         // Finally, we can create a trace type that can be used by devtools.
         json entry;
@@ -114,7 +119,8 @@ std::vector<json> NativeTraceSource::finishInterval()
         entry["tid"] = tid;
         entry["pid"] = pid;
         entry["cat"] = "PERF";
-        entry["name"] = provider->getScopeName(mapping, pid, trace_id);
+        const auto trace_id_string = provider->getScopeName(mapping, pid, trace_id);
+        entry["name"] = trace_id_string;  // Overwritten for counters later on.
         if (type == TracePointCollectorNative::SCOPE_ENTRY)
         {
           entry["ph"] = "B";
@@ -141,10 +147,13 @@ std::vector<json> NativeTraceSource::finishInterval()
         else if (type == TracePointCollectorNative::COUNTER)
         {
           entry["ph"] = "C";
+          auto counter_series = NativeTraceProvider::splitCounterSeriesName(trace_id_string);
+          entry["name"] = counter_series.first;
           std::int64_t z;
-          cbor::from_cbor(z, *std::get<3>(event));
-          entry["args"] = {{"count", z}};
-          //entry["args"] = std::get<3>(event);
+          cbor::from_cbor(z, *event.dynamic_data);
+          // Update the current counters.
+          counter_values[counter_series.first][counter_series.second] = z;
+          entry["args"] = counter_values[counter_series.first];
         }
         res.push_back(entry);
       }
@@ -156,6 +165,21 @@ std::vector<json> NativeTraceSource::finishInterval()
   std::stable_sort(res.begin(), res.end(), [](const json& lhs, const json& rhs) {
     return lhs.at("ts").get<double>() < rhs.at("ts").get<double>();
   });
+
+  // Need a reverse iteration here, to populate all counters with all series seen in the entire interval.
+  CounterMap counte_all_series;
+  for (auto it = res.rbegin(); it < res.rend(); it++)
+  {
+    auto& entry = *it;
+    if (entry.at("ph").get<std::string>() == "C")
+    {
+      auto values = entry.at("args").get<SeriesMap>();
+      const auto& name = entry.at("name").get<std::string>();
+      values.insert(counte_all_series[name].begin(), counte_all_series[name].end());  // add future keys to this entry
+      entry["args"] = values;  // update values to include the series used in the future.
+      counte_all_series[name] = values;  // store most recent value in the map.
+    }
+  }
 
   return res;
 }
