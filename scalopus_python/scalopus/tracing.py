@@ -147,8 +147,15 @@ class MarkerEvent(TraceContext):
         """Emits a marker event at thread level"""
         self.mark_event(tracing.MarkLevel.THREAD)
 
-trace_mark = TraceContextHelper()
-trace_mark.ctx_type = MarkerEvent
+class CountEvent(TraceContext):
+    """This helper allows emitting count events instead of scope traces.
+    """
+    def count(self, value):
+        """Emits a count event with the provided value"""
+        tracing_backend.count_event(self.trace_id, value)
+
+trace_count = TraceContextHelper()
+trace_count.ctx_type = CountEvent
 
 def traced(f_or_name=None):
     """Decorator to trace the entire function execution. This decorator can be

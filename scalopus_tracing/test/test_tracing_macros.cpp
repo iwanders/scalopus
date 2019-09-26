@@ -58,12 +58,12 @@ int main(int /* argc */, char** /* argv */)
   TRACE_MARK_EVENT_THREAD("buz");
   TRACE_MARK_EVENT_THREAD("buz");
 
-  TRACE_COUNTER_SERIES("Alpha", "Bravo", 3);
-  TRACE_COUNTER_SERIES("Alpha", "Bravo", 5);
+  TRACE_COUNT_SERIES("Alpha", "Bravo", 3);
+  TRACE_COUNT_SERIES("Alpha", "Bravo", 5);
 
-  TRACE_COUNTER("Alpha", 3);
-  TRACE_COUNTER("Alpha", 3);
-  TRACE_COUNTER("Bravo", 3);
+  TRACE_COUNT("Alpha", 3);
+  TRACE_COUNT("Alpha", 3);
+  TRACE_COUNT("Bravo", 3);
 
   // Check if the macro's don't expand to shadowed variables.
   {
@@ -91,12 +91,12 @@ int main(int /* argc */, char** /* argv */)
     TRACE_MARK_EVENT_THREAD("buz");
     TRACE_MARK_EVENT_THREAD("buz");
 
-    TRACE_COUNTER_SERIES("Alpha", "Bravo", 3);
-    TRACE_COUNTER_SERIES("Alpha", "Bravo", 5);
+    TRACE_COUNT_SERIES("Alpha", "Bravo", 3);
+    TRACE_COUNT_SERIES("Alpha", "Bravo", 5);
 
-    TRACE_COUNTER("Alpha", 3);
-    TRACE_COUNTER("Alpha", 3);
-    TRACE_COUNTER("Bravo", 3);
+    TRACE_COUNT("Alpha", 3);
+    TRACE_COUNT("Alpha", 3);
+    TRACE_COUNT("Bravo", 3);
   }
   return 0;
 }

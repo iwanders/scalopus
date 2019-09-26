@@ -29,7 +29,7 @@
 */
 #ifndef SCALOPUS_TRACING_NOP_TRACEPOINT_H
 #define SCALOPUS_TRACING_NOP_TRACEPOINT_H
-#include <scalopus_tracing/internal/counter_tracepoint.h>
+#include <scalopus_tracing/internal/count_tracepoint.h>
 #include <scalopus_tracing/internal/marker_tracepoint.h>
 namespace scalopus
 {
@@ -40,7 +40,7 @@ void scope_exit(const unsigned int id);
 
 void mark_event(const unsigned int id, const MarkLevel mark_level);
 
-void counter_event(const unsigned int id, const std::string& name, const unsigned int value);
+void count_event(const unsigned int id, const std::int64_t value);
 }  // namespace nop
 }  // namespace scalopus
 #endif  // SCALOPUS_TRACING_NOP_TRACEPOINT_H

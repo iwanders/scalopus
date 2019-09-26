@@ -137,6 +137,7 @@ void add_scalopus_tracing(py::module& m)
   lttng.def("scope_entry", &lttng::scope_entry);
   lttng.def("scope_exit", &lttng::scope_exit);
   lttng.def("mark_event", &lttng::mark_event);
+  lttng.def("count_event", &lttng::count_event);
 
   py::class_<LttngProvider, LttngProvider::Ptr, TraceEventProvider> lttng_provider(lttng, "LttngProvider");
   lttng_provider.def(py::init<std::string, EndpointManager::Ptr>());
@@ -145,12 +146,14 @@ void add_scalopus_tracing(py::module& m)
   native.def("scope_entry", &native::scope_entry);
   native.def("scope_exit", &native::scope_exit);
   native.def("mark_event", &native::mark_event);
+  native.def("count_event", &native::count_event);
 
   // Add the nop tracepoints for completeness.
   py::module nop = tracing.def_submodule("nop", "The nop specific components.");
   nop.def("scope_entry", &nop::scope_entry);
   nop.def("scope_exit", &nop::scope_exit);
   nop.def("mark_event", &nop::mark_event);
+  nop.def("count_event", &nop::count_event);
 
   // Add the providers.
 
