@@ -30,9 +30,9 @@
 #ifndef SCALOPUS_SCOPE_MAP_TRACKER_H
 #define SCALOPUS_SCOPE_MAP_TRACKER_H
 
-#include <unordered_map>
 #include <shared_mutex>
 #include <string>
+#include <unordered_map>
 
 namespace scalopus
 {

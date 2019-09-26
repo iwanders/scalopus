@@ -29,8 +29,8 @@
 */
 #ifndef SCALOPUS_TRACING_LTTNG_TRACEPOINT_H
 #define SCALOPUS_TRACING_LTTNG_TRACEPOINT_H
-#include <scalopus_tracing/internal/marker_tracepoint.h>
 #include <scalopus_tracing/internal/counter_tracepoint.h>
+#include <scalopus_tracing/internal/marker_tracepoint.h>
 namespace scalopus
 {
 namespace lttng

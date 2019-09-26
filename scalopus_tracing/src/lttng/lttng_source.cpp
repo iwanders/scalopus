@@ -167,7 +167,7 @@ std::vector<json> LttngSource::convertEvents()
       auto values = entry.at("args").get<SeriesMap>();
       const auto& name = entry.at("name").get<std::string>();
       values.insert(counte_all_series[name].begin(), counte_all_series[name].end());  // add future keys to this entry
-      entry["args"] = values;  // update values to include the series used in the future.
+      entry["args"] = values;            // update values to include the series used in the future.
       counte_all_series[name] = values;  // store most recent value in the map.
     }
   }

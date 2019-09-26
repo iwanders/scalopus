@@ -30,8 +30,8 @@
 #include <time.h>
 #include <iostream>
 
-#include <nlohmann/json.hpp>
 #include <cbor/stl.h>
+#include <nlohmann/json.hpp>
 
 #include <scalopus_tracing/internal/marker_tracepoint.h>
 #include <scalopus_tracing/internal/scope_tracepoint.h>
@@ -135,8 +135,9 @@ void counter_event(const unsigned int id, const std::int64_t value)
     return;
   }
 
-  buffer->push(tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id, TracePointCollectorNative::COUNTER,
-                                                             std::make_unique<Data>(cbor::cbor_object{value}.serialized()) });
+  buffer->push(
+      tracepoint_collector_types::StaticTraceEvent{ nativeGetChrono(), id, TracePointCollectorNative::COUNTER,
+                                                    std::make_unique<Data>(cbor::cbor_object{ value }.serialized()) });
 }
 
 }  // namespace native

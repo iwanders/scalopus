@@ -32,8 +32,8 @@
 
 #include <scalopus_interface/transport.h>
 #include <map>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 namespace scalopus
 {
