@@ -94,7 +94,7 @@ std::vector<json> NativeTraceSource::finishInterval()
     // First, we parse the bson we got and convert it to events.
     std::map<std::string, cbor::cbor_object> parsed;
     cbor::from_cbor(parsed, *dptr);
-    int pid = static_cast<int>(parsed.at("pid").get<unsigned long>());
+    const int pid = static_cast<int>(parsed.at("pid").get<unsigned long>());
     tracepoint_collector_types::ThreadedEvents events;
     parsed.at("events").get_to(events);
 
