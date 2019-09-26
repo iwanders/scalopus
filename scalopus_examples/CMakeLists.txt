@@ -31,6 +31,11 @@ if(TARGET Scalopus::scalopus_tracing_lttng)
   add_executable(showcase_marker_events_lttng src/showcase_marker_events.cpp)
   target_compile_options(showcase_marker_events_lttng PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
   target_link_libraries(showcase_marker_events_lttng Scalopus::scalopus_tracing_lttng)
+
+  add_executable(showcase_counters_lttng src/showcase_counters.cpp)
+  target_compile_options(showcase_counters_lttng PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+  target_link_libraries(showcase_counters_lttng Scalopus::scalopus_tracing_lttng)
+
 endif()
 
 # Example that tries to retrieve as much information from discovered servers as possible.
@@ -62,3 +67,4 @@ target_link_libraries(showcase_marker_events Scalopus::scalopus_tracing_native)
 add_executable(showcase_counters src/showcase_counters.cpp)
 target_compile_options(showcase_counters PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_link_libraries(showcase_counters Scalopus::scalopus_tracing_native)
+

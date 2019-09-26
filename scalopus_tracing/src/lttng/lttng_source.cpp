@@ -78,6 +78,11 @@ std::vector<json> LttngSource::convertEvents()
   std::vector<json> result;
   result.reserve(events_.size());
 
+  // Map for the counter states.
+  using SeriesMap = std::map<std::string, std::int64_t>;
+  using CounterMap = std::map<std::string, SeriesMap>;
+  CounterMap counter_values;
+
   provider_->updateMapping();
   const auto mapping = provider_->getMapping();
   for (auto& event : events_)
@@ -106,7 +111,8 @@ std::vector<json> LttngSource::convertEvents()
       }
 
       // Populate the name
-      entry["name"] = provider_->getScopeName(mapping, static_cast<int>(event.pid()), id);
+      const auto trace_id_string = provider_->getScopeName(mapping, static_cast<int>(event.pid()), id);
+      entry["name"] = trace_id_string;  // Overwritten for counters later on.
 
       if (event.name() == "scope_entry")
       {
@@ -131,7 +137,38 @@ std::vector<json> LttngSource::convertEvents()
         entry["ph"] = "i";
         entry["s"] = "t";
       }
+      else if (event.name() == "counter_event")
+      {
+        entry["ph"] = "C";
+        auto counter_series = LttngProvider::splitCounterSeriesName(trace_id_string);
+        entry["name"] = counter_series.first;
+        std::int64_t z = static_cast<std::int64_t>(event.eventData().at("value"));
+        // Update the current counters.
+        counter_values[counter_series.first][counter_series.second] = z;
+        entry["args"] = counter_values[counter_series.first];
+      }
       result.push_back(entry);
+    }
+  }
+
+  // Sort res by "ts" because sometimes the "E"nd events are out of order wrt the "B"egin, leading to unfinished scope
+  // events.
+  std::stable_sort(result.begin(), result.end(), [](const json& lhs, const json& rhs) {
+    return lhs.at("ts").get<double>() < rhs.at("ts").get<double>();
+  });
+
+  // Need a reverse iteration here, to populate all counters with all series seen in the entire interval.
+  CounterMap counte_all_series;
+  for (auto it = result.rbegin(); it < result.rend(); it++)
+  {
+    auto& entry = *it;
+    if (entry.at("ph").get<std::string>() == "C")
+    {
+      auto values = entry.at("args").get<SeriesMap>();
+      const auto& name = entry.at("name").get<std::string>();
+      values.insert(counte_all_series[name].begin(), counte_all_series[name].end());  // add future keys to this entry
+      entry["args"] = values;  // update values to include the series used in the future.
+      counte_all_series[name] = values;  // store most recent value in the map.
     }
   }
 

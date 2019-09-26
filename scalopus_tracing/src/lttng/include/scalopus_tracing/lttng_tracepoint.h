@@ -38,7 +38,7 @@ namespace lttng
 void scope_entry(const unsigned int id);
 void scope_exit(const unsigned int id);
 void mark_event(const unsigned int id, const MarkLevel mark_level);
-void counter_event(const unsigned int id, const std::string& name, const unsigned int value);
+void counter_event(const unsigned int id, const std::int64_t value);
 }  // namespace lttng
 }  // namespace scalopus
 #endif  // SCALOPUS_TRACING_LTTNG_TRACEPOINT_H
