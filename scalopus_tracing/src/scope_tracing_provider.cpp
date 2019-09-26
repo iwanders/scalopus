@@ -96,4 +96,21 @@ std::string ScopeTracingProvider::getScopeName(const ProcessTraceMap& mapping, c
   return z.str();
 }
 
+std::pair<std::string, std::string> ScopeTracingProvider::splitCounterSeriesName(const std::string& trace_string)
+{
+  std::pair<std::string, std::string> res;
+  auto index = trace_string.find("/");
+  if ((index != std::string::npos) && (index + 1 < trace_string.size()))
+  {
+    res.first = trace_string.substr(0, index);
+    res.second = std::string{std::next(trace_string.begin(), static_cast<long>(index + 1)), trace_string.end()};
+  }
+  else
+  {
+    res.first = trace_string;
+    res.second = "count";
+  }
+  return res;
+}
+
 }  // namespace scalopus

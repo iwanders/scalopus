@@ -30,60 +30,12 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
+#include <cmath>
 
 #include <scalopus_tracing/tracing.h>
 #include <scalopus_transport/transport_unix.h>
 
-// This example shows how to use the marker events.
-
-int x = 0;
-
-// In this function we enable tracepoints again, ensuring the function's TRACE_PRETTY_FUNCTION can always be seen.
-void fooBarBuz()
-{
-  // Here we enable tracepoints again, this ensures that this function always shows up.
-  TRACE_PRETTY_FUNCTION();
-  TRACE_COUNTER_SERIES("counter", "series_name", x++);
-  TRACE_MARK_EVENT_THREAD("Event in fooBarBuz");
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  x = 0;
-  TRACE_COUNTER_SERIES("counter", "series_name", x);
-}
-
-// we will not see this function if arrived here through this_disables_tracepoints_and_calls_a.
-void c()
-{
-  TRACE_PRETTY_FUNCTION();
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  std::cout << "  c" << std::endl;
-  TRACE_COUNTER_SERIES("counter", "series_name", x++);
-  fooBarBuz();
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-}
-
-// we will not see this function if arrived here through this_disables_tracepoints_and_calls_a.
-void b()
-{
-  TRACE_MARK_EVENT_PROCESS("Event of process.");
-  TRACE_PRETTY_FUNCTION();
-  TRACE_COUNTER_SERIES("counter", "series_name", x++);
-  std::cout << " b" << std::endl;
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  c();
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  TRACE_SCOPE_END("void b()");
-}
-
-// we will not see this function if arrived here through this_disables_tracepoints_and_calls_a.
-void a()
-{
-  TRACE_PRETTY_FUNCTION();
-  std::cout << "a" << std::endl;
-  TRACE_COUNTER_SERIES("counter", "series_name", x++);
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  b();
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-}
+// This example shows how counters can be used.
 
 int main(int /* argc */, char** argv)
 {
@@ -103,11 +55,19 @@ int main(int /* argc */, char** argv)
   // Set the thread name.
   TRACE_THREAD_NAME("main");
 
+  double t{ 0 };
+  int steps{ 0 };
   while (true)
   {
-    TRACE_MARK_EVENT_GLOBAL("Global Event");
-    a();
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    steps++;
+    t += 0.1;
+    std::int64_t a = static_cast<std::int64_t>(100.0 * std::sin(t * 10.0) + 100.0);
+    std::int64_t b = static_cast<std::int64_t>(50.0 * std::sin(t * 2.0) + 50.0);
+    
+    TRACE_COUNTER_SERIES("sinusoids", "fast", b);
+    TRACE_COUNTER_SERIES("sinusoids", "slow", a);
+    TRACE_COUNTER("ramp", steps % 100);
   }
 
   return 0;
