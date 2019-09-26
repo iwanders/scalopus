@@ -62,11 +62,11 @@ int main(int /* argc */, char** argv)
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     steps++;
     t += 0.1;
-    std::int64_t a = static_cast<std::int64_t>(100.0 * std::sin(t * 10.0) + 100.0);
-    std::int64_t b = static_cast<std::int64_t>(50.0 * std::sin(t * 2.0) + 50.0);
+    std::int64_t slow = static_cast<std::int64_t>(100.0 * std::sin(t * 10.0) + 100.0);
+    std::int64_t fast = static_cast<std::int64_t>(50.0 * std::sin(t * 2.0) + 50.0);
 
-    TRACE_COUNT_SERIES("sinusoids", "fast", b);
-    TRACE_COUNT_SERIES("sinusoids", "slow", a);
+    TRACE_COUNT_SERIES("sinusoids", "slow", slow);
+    TRACE_COUNT_SERIES("sinusoids", "fast", fast);
     TRACE_COUNT("ramp", steps % 100);
   }
 

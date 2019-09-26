@@ -148,7 +148,7 @@ std::vector<json> NativeTraceSource::finishInterval()
         else if (type == TracePointCollectorNative::COUNTER)
         {
           entry["ph"] = "C";
-          auto counter_series = NativeTraceProvider::splitCounterSeriesName(trace_id_string);
+          const auto counter_series = NativeTraceProvider::splitCounterSeriesName(trace_id_string);
           entry["name"] = counter_series.first;
           std::int64_t z;
           cbor::from_cbor(z, *event.dynamic_data);
@@ -168,7 +168,7 @@ std::vector<json> NativeTraceSource::finishInterval()
   });
 
   // Need a reverse iteration here, to populate all counters with all series seen in the entire interval.
-  ProcessCounter counte_all_series;
+  ProcessCounter counter_all_series;
   for (auto it = res.rbegin(); it < res.rend(); it++)
   {
     auto& entry = *it;
@@ -177,10 +177,10 @@ std::vector<json> NativeTraceSource::finishInterval()
       auto values = entry.at("args").get<SeriesMap>();
       auto pid = entry.at("pid").get<int>();
       const auto& name = entry.at("name").get<std::string>();
-      values.insert(counte_all_series[pid][name].begin(),
-                    counte_all_series[pid][name].end());  // add future keys to this entry
-      entry["args"] = values;                             // update values to include the series used in the future.
-      counte_all_series[pid][name] = values;              // store most recent value in the map.
+      values.insert(counter_all_series[pid][name].begin(),
+                    counter_all_series[pid][name].end());  // add future keys to this entry
+      entry["args"] = values;                              // update values to include the series used in the future.
+      counter_all_series[pid][name] = values;              // store most recent value in the map.
     }
   }
 
