@@ -91,7 +91,8 @@ std::vector<json> NativeTraceSource::finishInterval()
   // Map for the counter states.
   using SeriesMap = std::map<std::string, std::int64_t>;
   using CounterMap = std::map<std::string, SeriesMap>;
-  CounterMap counter_values;
+  using ProcessCounter = std::map<int, CounterMap>;
+  ProcessCounter counter_values;
 
   // Now, we start converting the chunks of data we obtain into trace events.
   for (const auto& dptr : data)
@@ -152,8 +153,8 @@ std::vector<json> NativeTraceSource::finishInterval()
           std::int64_t z;
           cbor::from_cbor(z, *event.dynamic_data);
           // Update the current counters.
-          counter_values[counter_series.first][counter_series.second] = z;
-          entry["args"] = counter_values[counter_series.first];
+          counter_values[pid][counter_series.first][counter_series.second] = z;
+          entry["args"] = counter_values[pid][counter_series.first];
         }
         res.push_back(entry);
       }
@@ -167,17 +168,18 @@ std::vector<json> NativeTraceSource::finishInterval()
   });
 
   // Need a reverse iteration here, to populate all counters with all series seen in the entire interval.
-  CounterMap counte_all_series;
+  ProcessCounter counte_all_series;
   for (auto it = res.rbegin(); it < res.rend(); it++)
   {
     auto& entry = *it;
     if (entry.at("ph").get<std::string>() == "C")
     {
       auto values = entry.at("args").get<SeriesMap>();
+      auto pid = entry.at("pid").get<int>();
       const auto& name = entry.at("name").get<std::string>();
-      values.insert(counte_all_series[name].begin(), counte_all_series[name].end());  // add future keys to this entry
+      values.insert(counte_all_series[pid][name].begin(), counte_all_series[pid][name].end());  // add future keys to this entry
       entry["args"] = values;            // update values to include the series used in the future.
-      counte_all_series[name] = values;  // store most recent value in the map.
+      counte_all_series[pid][name] = values;  // store most recent value in the map.
     }
   }
 

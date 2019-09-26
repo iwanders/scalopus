@@ -66,7 +66,7 @@
 #define TRACE_MARK_EVENT_PROCESS(name) TRACE_MARK_EVENT_NAMED_ID(PROCESS, name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))
 #define TRACE_MARK_EVENT_THREAD(name) TRACE_MARK_EVENT_NAMED_ID(THREAD, name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))
 
-// Macro to set a counter series value. This is a single series counter, not a multi series counter.
+// Macro to set a counter series value.
 #define TRACE_COUNT_SERIES(name, series_name, value) TRACE_COUNT_SERIES_EVENT_NAMED(name "/" series_name, value)
 
 // Macro to set a counter value (series name same as counter name).
