@@ -31,7 +31,6 @@
 #include <iostream>
 
 #include <cbor/stl.h>
-#include <nlohmann/json.hpp>
 
 #include <scalopus_tracing/internal/marker_tracepoint.h>
 #include <scalopus_tracing/internal/scope_tracepoint.h>
@@ -43,7 +42,6 @@ namespace scalopus
 {
 namespace native
 {
-using json = nlohmann::json;
 
 /*
 static uint64_t nativeGetTime()

@@ -107,7 +107,6 @@ add_library(Scalopus::scalopus_tracepoint_native ALIAS scalopus_tracepoint_nativ
 target_link_libraries(scalopus_tracepoint_native
   PRIVATE
     Scalopus::scalopus_scope_tracing
-    nlohmann_json::nlohmann_json
     Cbor::cbor
 )
 list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracepoint_native)

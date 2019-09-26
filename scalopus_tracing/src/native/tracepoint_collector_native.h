@@ -35,7 +35,6 @@
 #include <scalopus_interface/types.h>
 #include <chrono>
 #include <map>
-#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 #include "spsc_ringbuffer.h"
