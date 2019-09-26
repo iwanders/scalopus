@@ -28,6 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_tracing/native_trace_source.h"
+#include <cbor/stl.h>
 #include <sstream>
 #include "tracepoint_collector_native.h"
 
@@ -91,8 +92,9 @@ std::vector<json> NativeTraceSource::finishInterval()
   for (const auto& dptr : data)
   {
     // First, we parse the bson we got and convert it to events.
-    const json parsed = json::from_cbor(*dptr);
-    int pid = parsed.at("pid").get<int>();
+    std::map<std::string, cbor::cbor_object> parsed;
+    cbor::from_cbor(parsed, *dptr);
+    int pid = static_cast<int>(parsed.at("pid").get<unsigned long>());
     tracepoint_collector_types::ThreadedEvents events;
     parsed.at("events").get_to(events);
 

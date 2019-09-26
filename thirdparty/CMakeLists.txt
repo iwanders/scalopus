@@ -40,3 +40,6 @@ else()
   add_subdirectory(thirdparty/pybind11)
 endif()
 
+set(CBOR_BUILD_TESTS OFF CACHE INTERNAL "")
+add_subdirectory(thirdparty/cbor)
+

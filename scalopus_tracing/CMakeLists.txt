@@ -28,6 +28,7 @@ target_link_libraries(scalopus_scope_tracing
     Scalopus::scalopus_general
   PRIVATE
     nlohmann_json::nlohmann_json
+    Cbor::cbor
 )
 list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_scope_tracing)
 
@@ -211,6 +212,8 @@ target_link_libraries(scalopus_tracing_consumer
     Scalopus::scalopus_general
     Scalopus::scalopus_lttng_babeltrace
     Scalopus::scalopus_consumer
+  PRIVATE
+    Cbor::cbor
 )
 set_property(TARGET scalopus_tracing_consumer PROPERTY POSITION_INDEPENDENT_CODE ON)
 list(APPEND SCALOPUS_TRACING_EXPORTS scalopus_tracing_consumer)

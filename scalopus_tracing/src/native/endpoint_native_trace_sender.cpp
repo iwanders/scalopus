@@ -33,7 +33,7 @@
 #include <cstring>
 #include <iostream>
 #include <nlohmann/json.hpp>
-#include "cbor.h"
+#include <cbor/stl.h>
 #include "tracepoint_collector_native.h"
 
 namespace scalopus
@@ -62,16 +62,11 @@ EndpointNativeTraceSender::~EndpointNativeTraceSender()
 static Data process_events(const EventMap& tid_event_map)
 {
   std::map<std::string, cbor::cbor_object> my_data;
-  my_data["pid"] = cbor::cbor_object::make(static_cast<unsigned long>(::getpid()));
+  my_data["pid"] = cbor::cbor_object{static_cast<unsigned long>(::getpid())};
+  my_data["events"] = cbor::cbor_object{tid_event_map};
 
-  std::vector<std::tuple<EventMap::key_type, EventMap::mapped_type>> event_entries;
-  for (const auto& tid_events : tid_event_map)
-  {
-    event_entries.emplace_back(tid_events.first, tid_events.second);
-  }
-  my_data["events"] = cbor::cbor_object::make(event_entries);
   Data output;
-  cbor::serialize(my_data, output);
+  cbor::to_cbor(my_data, output);
   return output;
 }
 
