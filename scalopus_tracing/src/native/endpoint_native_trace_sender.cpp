@@ -61,9 +61,11 @@ EndpointNativeTraceSender::~EndpointNativeTraceSender()
  */
 static Data process_events(const EventMap& tid_event_map)
 {
-  std::map<std::string, cbor::cbor_object> my_data;
-  my_data["pid"] = cbor::cbor_object{static_cast<unsigned long>(::getpid())};
-  my_data["events"] = cbor::cbor_object{tid_event_map};
+  const std::map<std::string, cbor::cbor_object> my_data
+  {
+    { "pid", cbor::cbor_object{ static_cast<unsigned long>(::getpid()) } },
+    { "events", cbor::cbor_object{ tid_event_map } }
+  };
 
   Data output;
   cbor::to_cbor(my_data, output);
