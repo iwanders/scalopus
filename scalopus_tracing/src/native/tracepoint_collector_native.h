@@ -30,12 +30,12 @@
 #ifndef SCALOPUS_TRACING_TRACEPOINT_COLLECTOR_NATIVE_H
 #define SCALOPUS_TRACING_TRACEPOINT_COLLECTOR_NATIVE_H
 
+#include <cbor/stl.h>
 #include <scalopus_general/map_tracker.h>
 #include <scalopus_interface/types.h>
 #include <chrono>
 #include <map>
 #include <nlohmann/json.hpp>
-#include <cbor/stl.h>
 #include <string>
 #include <vector>
 #include "spsc_ringbuffer.h"

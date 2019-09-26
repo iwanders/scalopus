@@ -28,9 +28,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <chrono>
+#include <cmath>
 #include <iostream>
 #include <thread>
-#include <cmath>
 
 #include <scalopus_tracing/tracing.h>
 #include <scalopus_transport/transport_unix.h>
@@ -64,7 +64,7 @@ int main(int /* argc */, char** argv)
     t += 0.1;
     std::int64_t a = static_cast<std::int64_t>(100.0 * std::sin(t * 10.0) + 100.0);
     std::int64_t b = static_cast<std::int64_t>(50.0 * std::sin(t * 2.0) + 50.0);
-    
+
     TRACE_COUNTER_SERIES("sinusoids", "fast", b);
     TRACE_COUNTER_SERIES("sinusoids", "slow", a);
     TRACE_COUNTER("ramp", steps % 100);

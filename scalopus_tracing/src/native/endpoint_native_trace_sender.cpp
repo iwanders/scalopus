@@ -28,12 +28,12 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_tracing/endpoint_native_trace_sender.h"
+#include <cbor/stl.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <cstring>
 #include <iostream>
 #include <nlohmann/json.hpp>
-#include <cbor/stl.h>
 #include "tracepoint_collector_native.h"
 
 namespace scalopus
@@ -61,8 +61,7 @@ EndpointNativeTraceSender::~EndpointNativeTraceSender()
  */
 static Data process_events(const EventMap& tid_event_map)
 {
-  const std::map<std::string, cbor::cbor_object> my_data
-  {
+  const std::map<std::string, cbor::cbor_object> my_data{
     { "pid", cbor::cbor_object{ static_cast<unsigned long>(::getpid()) } },
     { "events", cbor::cbor_object{ tid_event_map } }
   };
