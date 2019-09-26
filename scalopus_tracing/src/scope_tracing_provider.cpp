@@ -100,7 +100,7 @@ std::pair<std::string, std::string> ScopeTracingProvider::splitCounterSeriesName
 {
   std::pair<std::string, std::string> res;
   auto index = trace_string.find("/");
-  if ((index != std::string::npos) && (index + 1 < trace_string.size()))
+  if ((index != std::string::npos) && (index + 1 <= trace_string.size()))
   {
     res.first = trace_string.substr(0, index);
     res.second = std::string{ std::next(trace_string.begin(), static_cast<long>(index + 1)), trace_string.end() };
