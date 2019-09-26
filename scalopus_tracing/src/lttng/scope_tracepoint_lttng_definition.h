@@ -53,16 +53,13 @@ TRACEPOINT_LOGLEVEL(scalopus_scope_id, mark_event_thread, TRACE_DEBUG_FUNCTION)
 
 TRACEPOINT_EVENT_CLASS(scalopus_scope_id, counter_scope_id_class,
                        TP_ARGS(unsigned int, id_,
-                               const char*, name_,
-                               unsigned int, value_),
+                               std::int64_t, value_),
                        TP_FIELDS(ctf_integer(unsigned int, id, id_)
-                                 ctf_string(name, name_)
-                                 ctf_integer(unsigned int, value, value_)))
+                                 ctf_integer(std::int64_t, value, value_)))
 
 TRACEPOINT_EVENT_INSTANCE(scalopus_scope_id, counter_scope_id_class, counter_event,
                           TP_ARGS(unsigned int, id_,
-                                  const char*, name_,
-                                  unsigned int, value_))
+                                  std::int64_t, value_))
 TRACEPOINT_LOGLEVEL(scalopus_scope_id, counter_event, TRACE_DEBUG_FUNCTION)
 
 #endif /* _TRACEPOINT_scalopus_scope_id_H */

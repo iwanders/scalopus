@@ -85,7 +85,7 @@ void mark_event(const unsigned int id, const MarkLevel mark_level)
   }
 }
 
-void counter_event(const unsigned int id, const std::string& name, const unsigned int value)
+void counter_event(const unsigned int id, const std::int64_t value)
 {
   static auto configurator_ptr = TraceConfigurator::getInstance();
   static auto process_state = configurator_ptr->getProcessStatePtr();
@@ -94,7 +94,7 @@ void counter_event(const unsigned int id, const std::string& name, const unsigne
   {
     return;
   }
-  tracepoint(scalopus_scope_id, counter_event, id, name.c_str(), value);
+  tracepoint(scalopus_scope_id, counter_event, id, value);
 }
 
 }  // namespace lttng
