@@ -89,7 +89,7 @@
 
 #define TRACE_COUNT_EVENT_NAMED_ID(value, name, id)                                                                    \
   TRACE_TRACKED_MAPPING_REGISTER_ONCE(name, id, SCALOPUS_MAKE_UNIQUE(scalopus_trace_id_))                              \
-  scalopus::count_event(id, value);                                                                                    \
+  scalopus::count_event(id, static_cast<std::int64_t>(value));                                                         \
   do                                                                                                                   \
   {                                                                                                                    \
   } while (0)

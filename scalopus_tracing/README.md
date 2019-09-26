@@ -6,7 +6,7 @@ the `EndpointTraceMapping` endpoint. An example of how to use the trace macros i
 [readme_example.cpp](/scalopus_examples/src/readme_example.cpp).
 
 ## Provided tracepoints
-The currently supported tracepoints are scope entry and exit tracepoints. These are converted to duration events in the
+Various types of tracepoints are currently provided. These are converted to events in the
 [Trace Event Format][trace_event_format] that's displayed in the trace viewer.
 
 The tracepoint macro's themselves can be found in
@@ -26,6 +26,10 @@ The tracepoint macro's themselves can be found in
 - `TRACE_MARK_EVENT_PROCESS("name")` Sends a process marker event, this is visualised as a bar that goes across all
   threads of the emitting process. This can be useful for process-level events which affect multiple threads.
 - `TRACE_MARK_EVENT_THREAD("name")` Sends a thread marker event, this is basically an infinitesimally short scope. 
+- `TRACE_COUNT_SERIES("name", "series_name", value)` Sends a count event, for the `series_name` in the counter by
+  `name`. Value should be a (signed) integer. Catapult only displays positive values.
+- `TRACE_COUNT("name", value)` Sends a count event, counter name is equal to `name`, series will be `count`.
+  Value should be a (signed) integer. Catapult only displays positive values.
 
 
 Fictitous code to demo their respective use cases:
@@ -52,6 +56,7 @@ void my_function()
     TRACE_SCOPE_RAII("foo and bar");  // names can be reused, the trace_id is all that needs to be unique.
     foo();
     x = bar();
+    TRACE_COUNT("Value of X", x);
   }
   TRACE_MARK_EVENT_PROCESS("Calling Buz!");
   buz(x);
@@ -121,6 +126,8 @@ One can select at compile time against which backend to link. The backends merel
 ```cpp
 scalopus::scope_entry(const unsigned int id);
 scalopus::scope_exit(const unsigned int id);
+scalopus::mark_event(const unsigned int id, const MarkLevel mark_level);
+scalopus::count_event(const unsigned int id, const std::int64_t counter_value);
 ```
 
 You can select which tracepoints your target uses by default by linking against one of:
