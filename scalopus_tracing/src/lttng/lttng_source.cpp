@@ -137,12 +137,12 @@ std::vector<json> LttngSource::convertEvents()
         entry["ph"] = "i";
         entry["s"] = "t";
       }
-      else if (event.name() == "counter_event")
+      else if (event.name() == "count_event")
       {
         entry["ph"] = "C";
-        auto counter_series = LttngProvider::splitCounterSeriesName(trace_id_string);
+        const auto counter_series = LttngProvider::splitCounterSeriesName(trace_id_string);
         entry["name"] = counter_series.first;
-        std::int64_t z = static_cast<std::int64_t>(event.eventData().at("value"));
+        const std::int64_t z = static_cast<std::int64_t>(event.eventData().at("value"));
         // Update the current counters.
         counter_values[counter_series.first][counter_series.second] = z;
         entry["args"] = counter_values[counter_series.first];
@@ -158,7 +158,7 @@ std::vector<json> LttngSource::convertEvents()
   });
 
   // Need a reverse iteration here, to populate all counters with all series seen in the entire interval.
-  CounterMap counte_all_series;
+  CounterMap count_all_series;
   for (auto it = result.rbegin(); it < result.rend(); it++)
   {
     auto& entry = *it;
@@ -166,9 +166,9 @@ std::vector<json> LttngSource::convertEvents()
     {
       auto values = entry.at("args").get<SeriesMap>();
       const auto& name = entry.at("name").get<std::string>();
-      values.insert(counte_all_series[name].begin(), counte_all_series[name].end());  // add future keys to this entry
-      entry["args"] = values;            // update values to include the series used in the future.
-      counte_all_series[name] = values;  // store most recent value in the map.
+      values.insert(count_all_series[name].begin(), count_all_series[name].end());  // add future keys to this entry
+      entry["args"] = values;           // update values to include the series used in the future.
+      count_all_series[name] = values;  // store most recent value in the map.
     }
   }
 

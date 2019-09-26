@@ -42,7 +42,6 @@ namespace scalopus
 {
 namespace native
 {
-
 /*
 static uint64_t nativeGetTime()
 {
