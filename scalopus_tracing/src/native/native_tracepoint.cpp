@@ -123,7 +123,7 @@ void mark_event(const unsigned int id, const MarkLevel mark_level)
   }
 }
 
-void counter_event(const unsigned int id, const std::int64_t value)
+void count_event(const unsigned int id, const std::int64_t value)
 {
   static auto configurator_ptr = TraceConfigurator::getInstance();
   thread_local auto buffer_ptr = TracePointCollectorNative::getInstance();

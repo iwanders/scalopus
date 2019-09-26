@@ -14,7 +14,7 @@ if(TARGET Scalopus::scalopus_tracing_lttng)
   )
   add_test(test_endpoint_scope_tracing endpoint_scope_tracing)
 
-  add_executable(lttng_tracing_macros test_lttng_tracing_macros.cpp)
+  add_executable(lttng_tracing_macros test_tracing_macros.cpp)
   target_link_libraries(lttng_tracing_macros
     PRIVATE
       scalopus_tracing_lttng
@@ -37,7 +37,7 @@ target_include_directories(spsc_ringbuffer
 add_test(test_ringbuffer spsc_ringbuffer)
 
 
-add_executable(native_tracing_macros test_native_tracing_macros.cpp)
+add_executable(native_tracing_macros test_tracing_macros.cpp)
 target_link_libraries(native_tracing_macros
   PRIVATE
     Scalopus::scalopus_tracing_native

@@ -27,20 +27,20 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef SCALOPUS_TRACING_COUNTER_TRACEPOINT_H
-#define SCALOPUS_TRACING_COUNTER_TRACEPOINT_H
+#ifndef SCALOPUS_TRACING_COUNT_TRACEPOINT_H
+#define SCALOPUS_TRACING_COUNT_TRACEPOINT_H
 
-#include <string>
+#include <cstdint>
 
 namespace scalopus
 {
 /**
- * @brief Emits a counter event.
+ * @brief Emits a count event.
  * @param id The tracepoint id to relate it to a human readable string.
  * @param counter_name The counter name.
  * @param counter_value The counter value.
  */
-void counter_event(const unsigned int id, const std::int64_t counter_value);
+void count_event(const unsigned int id, const std::int64_t counter_value);
 }  // namespace scalopus
 
 #endif  // SCALOPUS_TRACING_COUNTER_TRACEPOINT_H
