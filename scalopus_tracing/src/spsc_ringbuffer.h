@@ -90,6 +90,7 @@ public:
     }
 
     container_[write_index] = std::move(v);  // move it into the container.
+    v.~ValueType();
 
     write_index_.store(next, std::memory_order_release);
 
@@ -112,6 +113,7 @@ public:
     }
 
     v = std::move(container_[read_index]);  // move the value from the container into the value type.
+    container_[read_index].~ValueType();
 
     std::size_t next = (read_index + 1) % max_size_;
     read_index_.store(next, std::memory_order_release);
@@ -134,6 +136,7 @@ public:
     for (std::size_t index = read_index; index < read_index + readable_count; index++)
     {
       *(output++) = std::move(container_[index % max_size_]);  // This deals with wrapping automatically.
+      container_[index % max_size_].~ValueType();
     }
     std::size_t next = (read_index + readable_count) % max_size_;
     read_index_.store(next, std::memory_order_release);
