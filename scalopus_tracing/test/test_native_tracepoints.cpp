@@ -191,5 +191,16 @@ int main(int /* argc */, char** /* argv */)
   test(result.size(), 1u);
   test(result[0]["name"], "global_event");
 
+  source->startInterval();
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  {
+    TRACE_COUNTER("counter", 5);
+  }
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  result = source->finishInterval();
+  test(result.size(), 1u);
+  test(result[0]["name"], "counter");
+  test(result[0]["ph"], "C");
+
   return 0;
 }
