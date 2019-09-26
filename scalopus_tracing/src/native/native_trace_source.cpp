@@ -141,7 +141,10 @@ std::vector<json> NativeTraceSource::finishInterval()
         else if (type == TracePointCollectorNative::COUNTER)
         {
           entry["ph"] = "C";
-          entry["args"] = std::get<3>(event);
+          std::int64_t z;
+          cbor::from_cbor(z, *std::get<3>(event));
+          entry["args"] = {{"count", z}};
+          //entry["args"] = std::get<3>(event);
         }
         res.push_back(entry);
       }

@@ -45,9 +45,9 @@ void mark_event(const unsigned int id, const MarkLevel mark_level)
   native::mark_event(id, mark_level);
 }
 
-void counter_event(const unsigned int id, const std::string& name, const unsigned int value)
+void counter_event(const unsigned int id, const std::int64_t value)
 {
-  native::counter_event(id, name, value);
+  native::counter_event(id, value);
 }
 
 }  // namespace scalopus

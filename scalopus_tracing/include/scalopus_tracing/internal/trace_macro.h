@@ -87,14 +87,14 @@
   {                                                                                                                    \
   } while (0)
 
-#define TRACE_COUNTER_EVENT_NAMED_ID(value, name, series_name, id)                                                     \
+#define TRACE_COUNTER_EVENT_NAMED_ID(value, name, id)                                                                  \
   TRACE_TRACKED_MAPPING_REGISTER_ONCE(name, id, SCALOPUS_MAKE_UNIQUE(scalopus_trace_id_))                              \
-  scalopus::counter_event(id, series_name, value);                                                                     \
+  scalopus::counter_event(id, value);                                                                                  \
   do                                                                                                                   \
   {                                                                                                                    \
   } while (0)
 
-#define TRACE_COUNTER_SERIES_EVENT_NAMED(name, series_name, value)                                                     \
-  TRACE_COUNTER_EVENT_NAMED_ID(value, name, series_name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))
+#define TRACE_COUNTER_SERIES_EVENT_NAMED(name, value)                                                                  \
+  TRACE_COUNTER_EVENT_NAMED_ID(value, name, SCALOPUS_TRACKED_TRACE_ID_STRING(name))
 
 #endif  // SCALOPUS_TRACING_INTERNAL_SCOPE_TRACING_H

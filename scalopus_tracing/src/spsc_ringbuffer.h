@@ -50,7 +50,7 @@ public:
    * @param container The container that's used internally by the ringbuffer to store the data.
    * @throws std::runtime_error If the container size is zero.
    */
-  SPSCRingBuffer(ContainerType&& container) : container_{ container }, max_size_{ container_.size() }
+  SPSCRingBuffer(ContainerType&& container) : container_{ std::move(container) }, max_size_{ container_.size() }
   {
     if (max_size_ == 0)
     {

@@ -57,3 +57,8 @@ target_link_libraries(showcase_toggle_tracepoints Scalopus::scalopus_tracing_nat
 add_executable(showcase_marker_events src/showcase_marker_events.cpp)
 target_compile_options(showcase_marker_events PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_link_libraries(showcase_marker_events Scalopus::scalopus_tracing_native)
+
+# Showcase example for the count events
+add_executable(showcase_counters src/showcase_counters.cpp)
+target_compile_options(showcase_counters PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+target_link_libraries(showcase_counters Scalopus::scalopus_tracing_native)

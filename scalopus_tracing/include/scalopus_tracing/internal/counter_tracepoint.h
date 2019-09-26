@@ -40,7 +40,7 @@ namespace scalopus
  * @param counter_name The counter name.
  * @param counter_value The counter value.
  */
-void counter_event(const unsigned int id, const std::string& counter_name, const unsigned int counter_value);
+void counter_event(const unsigned int id, const std::int64_t counter_value);
 }  // namespace scalopus
 
 #endif  // SCALOPUS_TRACING_COUNTER_TRACEPOINT_H
