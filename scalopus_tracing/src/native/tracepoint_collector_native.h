@@ -31,9 +31,11 @@
 #define SCALOPUS_TRACING_TRACEPOINT_COLLECTOR_NATIVE_H
 
 #include <scalopus_general/map_tracker.h>
+#include <scalopus_interface/types.h>
 #include <chrono>
 #include <map>
 #include <nlohmann/json.hpp>
+#include <cbor/stl.h>
 #include <string>
 #include <vector>
 #include "spsc_ringbuffer.h"
@@ -44,7 +46,57 @@ namespace tracepoint_collector_types
 //! Timepoint of that clock.
 using TimePoint = uint64_t;
 //! Trace event as it is stored in the ringbuffer.
-using StaticTraceEvent = std::tuple<TimePoint, unsigned int, uint8_t, nlohmann::json>;
+using TraceId = std::uint32_t;
+using TraceType = std::uint8_t;
+using DynamicDataType = std::unique_ptr<Data>;
+using StaticTraceEvent = std::tuple<TimePoint, TraceId, TraceType, DynamicDataType>;
+/*
+struct StaticTraceEvent
+{
+  TimePoint time_point{ 0 };
+  TraceId trace_type{ 0 };
+  TraceType trace_id{ 0 };
+  DynamicDataType dynamic_data{ nullptr };
+};
+// using arrays.
+template <typename Data>
+cbor::result to_cbor(const StaticTraceEvent& b, Data& data)
+{
+  if (b.dynamic_data == nullptr)
+  {
+    cbor::result res = data.openArray(3);
+    res += to_cbor(b.time_point, data);
+    res += to_cbor(b.trace_type, data);
+    res += to_cbor(b.trace_id, data);
+    return res;
+  }
+  cbor::result res = data.openArray(4);
+  res += to_cbor(b.time_point, data);
+  res += to_cbor(b.trace_type, data);
+  res += to_cbor(b.trace_id, data);
+  res += to_cbor(b.dynamic_data, data);
+  return res;
+}
+
+template <typename Data>
+cbor::result from_cbor(StaticTraceEvent& b, Data& data)
+{
+  cbor::result res;
+  if (data.isArray())
+  {
+    auto length = data.readLength();
+    res += from_cbor(b.time_point, data);
+    res += from_cbor(b.trace_type, data);
+    res += from_cbor(b.trace_id, data);
+    if (length == 4)
+    {
+      res += to_cbor(b.dynamic_data, data);
+    }
+    return res;
+  }
+  return false;
+}
+*/
 //! The container that backs the ringbuffer.
 using EventContainer = std::vector<StaticTraceEvent>;
 //! The single producer single consumer ringbuffer with the event container.

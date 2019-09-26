@@ -68,8 +68,8 @@
 
 // Macro to set a counter series value. This is a single series counter, not a multi series counter.
 #define TRACE_COUNTER_SERIES(name, series_name, value)                                                                 \
-  TRACE_COUNTER_SERIES_EVENT_NAMED(name "_" series_name, series_name, value)
+  TRACE_COUNTER_SERIES_EVENT_NAMED(name "/" series_name, value)
 
 // Macro to set a counter value (series name same as counter name).
-#define TRACE_COUNTER(name, value) TRACE_COUNTER_SERIES_NAMED(name, name, value)
+#define TRACE_COUNTER(name, value) TRACE_COUNTER_SERIES(name, name, value)
 #endif  // SCALOPUS_TRACING_SCOPE_TRACING_H
