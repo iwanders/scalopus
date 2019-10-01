@@ -183,7 +183,7 @@ def run_trace_configure(args):
             print(doffset + "  {}    \"{}\"".format(thread_idstr, thread_name))
         print()
 
-        
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -233,7 +233,7 @@ if __name__ == "__main__":
         help="Set unmatched process id's state to this value.")
     trace_configure_parser.add_argument("id", nargs="*", type=int,
         help="Process or thread ID to change.")
-    
+
     trace_configure_parser.set_defaults(func=run_trace_configure)
 
     args = parser.parse_args()
