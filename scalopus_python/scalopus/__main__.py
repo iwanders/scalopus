@@ -31,6 +31,7 @@ import scalopus
 
 import sys
 import argparse
+import json
 import time
 
 def run_catapult_server(args):
@@ -114,6 +115,47 @@ def run_discover(args):
             for thread_id, thread_name in sorted(threads.items()):
                 print(doffset + "  {}    \"{}\"".format(thread_id, thread_name))
         print()
+
+def run_record(args):
+    factory = scalopus.transport.TransportUnixFactory()
+
+    poller = scalopus.general.EndpointManagerPoll(factory)
+    native_provider = scalopus.tracing.native.NativeTraceProvider(poller)
+    general_provider = scalopus.general.GeneralProvider(poller)
+    poller.addEndpointFactory(scalopus.tracing.EndpointNativeTraceSender.name, native_provider.factory)
+    poller.addEndpointFactory(scalopus.tracing.EndpointTraceMapping.name, scalopus.tracing.EndpointTraceMapping.factory)
+    poller.addEndpointFactory(scalopus.general.EndpointProcessInfo.name, scalopus.general.EndpointProcessInfo.factory)
+    poller.startPolling(1.0)
+
+    native_source = native_provider.makeSource()
+    general_source = general_provider.makeSource()
+    native_source.startInterval()
+    general_source.startInterval()
+
+    try:
+        while True:
+            time.sleep(10)
+    except KeyboardInterrupt:
+        pass
+
+    native_source.stopInterval()
+    general_source.stopInterval()
+    poller.stopPolling()
+
+    print('[')
+
+    try:
+        data = native_source.finishInterval()
+        data.extend(general_source.finishInterval())
+
+        # print(data) prints strings with ', but Chrome's Catapult viewer only accepts ".
+        # python3 is also needed, so strings don't start with u, and integers don't end with L.
+        # print(json.dumps(data)) gets the job done, but it prints everything in a single line.
+        print(*[json.dumps(entry) for entry in data], sep=',\n', end='')
+    except RuntimeError:
+        pass
+
+    print(']', end='')
 
 def run_trace_configure(args):
     factory = scalopus.transport.TransportUnixFactory()
@@ -223,6 +265,9 @@ if __name__ == "__main__":
                                             "processes and show short info"
                                             " about them.")
     discover_parser.set_defaults(func=run_discover)
+
+    record_parser = subparsers.add_parser("record", help="Record traces and dump them in json format.")
+    record_parser.set_defaults(func=run_record)
 
     trace_configure_parser = subparsers.add_parser("trace_configure",
         help="Configure the trace state.")
