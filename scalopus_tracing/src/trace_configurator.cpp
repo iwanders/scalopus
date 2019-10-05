@@ -43,13 +43,13 @@ TraceConfigurator::AtomicBoolPtr TraceConfigurator::getThreadStatePtr()
 
   //  Register a destructor callback such that the thread gets removed from the map when the thread exits.
   auto instance_pointer = getInstance();
-  thread_local DestructorCallback cleanup{ [instance = TraceConfigurator::WeakPtr(instance_pointer), tid]() {
+  thread_local auto cleanup = DestructorCallback( [instance = TraceConfigurator::WeakPtr(instance_pointer), tid]() {
     auto ptr = instance.lock();
     if (ptr != nullptr)
     {
       ptr->removeThread(tid);
     }
-  } };
+  } );
   std::lock_guard<decltype(threads_map_mutex_)> lock(threads_map_mutex_);
   auto it = thread_state_.find(tid);
   if (it != thread_state_.end())
