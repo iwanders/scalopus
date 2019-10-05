@@ -34,24 +34,60 @@
 
 namespace scalopus
 {
+
 /**
- * @brief Object that calls a function on destruction.
+ * @brief Templated struct to wrap a callback function to be called on the objects' destruction.
  */
-struct DestructorCallback
+template <typename Callback>
+struct DestructorCallbackImpl
 {
 public:
-  DestructorCallback(std::function<void()>&& fun) : callback_(fun)
+  DestructorCallbackImpl(Callback&& fun) : callback_(fun)
   {
   }
 
-  ~DestructorCallback()
+  DestructorCallbackImpl(const Callback& fun) : callback_(fun)
   {
-    callback_();
+  }
+
+  // Call it from this void function to enforce the void() signature of the callback.
+  void destroyer()
+  {
+      return callback_();
+  }
+
+  ~DestructorCallbackImpl()
+  {
+    destroyer();
   }
 
 private:
-  std::function<void()> callback_;
+  Callback callback_;
 };
+
+/**
+ * @brief Creates an object that will call the provided callback function when it goes out of scope.
+ * @param callback The function that will be called when the returned object goes out of scope. Signature should be
+ *        void(void).
+ * @return An object that will invoke callback when it is destroyed.
+ */
+template <typename Callback>
+DestructorCallbackImpl<Callback> DestructorCallback(Callback&& callback)
+{
+    return DestructorCallbackImpl<Callback>(callback);
+}
+
+/**
+ * @brief Creates an object that will call the provided callback function when it goes out of scope.
+ * @param callback The function that will be called when the returned object goes out of scope. Signature should be
+ *        void(void).
+ * @return An object that will invoke callback when it is destroyed.
+ */
+template <typename Callback>
+DestructorCallbackImpl<Callback> DestructorCallback(const Callback& callback)
+{
+    return DestructorCallbackImpl<Callback>(callback);
+}
 }  // namespace scalopus
 
 #endif  // SCALOPUS_DESTRUCTOR_CALLBACK_H
