@@ -34,7 +34,6 @@
 
 namespace scalopus
 {
-
 /**
  * @brief Templated struct to wrap a callback function to be called on the objects' destruction.
  */
@@ -53,7 +52,7 @@ public:
   // Call it from this void function to enforce the void() signature of the callback.
   void destroyer()
   {
-      return callback_();
+    return callback_();
   }
 
   ~DestructorCallbackImpl()
@@ -74,7 +73,7 @@ private:
 template <typename Callback>
 DestructorCallbackImpl<Callback> DestructorCallback(Callback&& callback)
 {
-    return DestructorCallbackImpl<Callback>(callback);
+  return DestructorCallbackImpl<Callback>(callback);
 }
 
 /**
@@ -86,7 +85,7 @@ DestructorCallbackImpl<Callback> DestructorCallback(Callback&& callback)
 template <typename Callback>
 DestructorCallbackImpl<Callback> DestructorCallback(const Callback& callback)
 {
-    return DestructorCallbackImpl<Callback>(callback);
+  return DestructorCallbackImpl<Callback>(callback);
 }
 }  // namespace scalopus
 
