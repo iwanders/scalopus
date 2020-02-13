@@ -97,4 +97,17 @@ Endpoint::Ptr NativeTraceProvider::factory(const Transport::Ptr& transport)
   return endpoint;
 }
 
+void NativeTraceProvider::setLogger(LoggingFunction logger)
+{
+  logger_ = std::move(logger);
+}
+
+void NativeTraceProvider::log(const std::string& message) const
+{
+  if (logger_)
+  {
+    logger_(message);
+  }
+}
+
 }  // namespace scalopus

@@ -109,6 +109,10 @@ int main(int argc, char** argv)
   auto native_trace_provider = std::make_shared<scalopus::NativeTraceProvider>(manager);
   manager->addEndpointFactory(scalopus::EndpointNativeTraceSender::name, native_trace_provider);
 
+  // Setup logging for the native logger.
+  auto native_logging = [](const std::string& msg) { std::cout << "[nativeProvider] " << msg << std::endl; };
+  native_trace_provider->setLogger(native_logging);
+
   // Create the server and add the providers
   auto catapult_server = std::make_shared<scalopus::CatapultServer>();
   auto lttng_provider = std::make_shared<scalopus::LttngProvider>(path, manager);
