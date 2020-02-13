@@ -45,6 +45,7 @@ class NativeTraceProvider : public ScopeTracingProvider, public std::enable_shar
 public:
   using Ptr = std::shared_ptr<NativeTraceProvider>;
   using WeakPtr = std::weak_ptr<NativeTraceProvider>;
+  using LoggingFunction = std::function<void(const std::string& output)>;
 
   /**
    * @brief Create the provider.
@@ -65,6 +66,17 @@ public:
    */
   Endpoint::Ptr factory(const Transport::Ptr& transport);
 
+  /**
+   * @brief Function to set the logger to use for the backend and session output.
+   */
+  void setLogger(LoggingFunction logger);
+
+  /**
+   * @brief Log a message, to be used by the sources of this provider.
+   * @param message The message to be written to the logger.
+   */
+  void log(const std::string& message) const;
+
 private:
   /**
    * @brief The receiving endpoint calls this method whenever it received unsolicited data.
@@ -73,6 +85,8 @@ private:
 
   std::mutex source_mutex_;
   std::set<std::shared_ptr<NativeTraceSource>> sources_;
+
+  LoggingFunction logger_;    //!< Function to use for logging.
 };
 
 }  // namespace scalopus

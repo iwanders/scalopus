@@ -95,70 +95,89 @@ std::vector<json> NativeTraceSource::finishInterval()
   ProcessCounter counter_values;
 
   // Now, we start converting the chunks of data we obtain into trace events.
-  for (const auto& dptr : data)
+  try
   {
-    // First, we parse the bson we got and convert it to events.
-    std::map<std::string, cbor::cbor_object> parsed;
-    cbor::from_cbor(parsed, *dptr);
-    const int pid = static_cast<int>(parsed.at("pid").get<unsigned long>());
-    tracepoint_collector_types::ThreadedEvents events;
-    parsed.at("events").get_to(events);
-
-    for (const auto& thread_events : events)
+    for (const auto& dptr : data)
     {
-      // Events are grouped by thread id.
-      const auto& tid = thread_events.first;
-      for (const auto& event : thread_events.second)
-      {
-        const auto& timestamp_ns_since_epoch = event.time_point;
-        const auto& trace_id = event.trace_id;
-        const auto& type = event.trace_type;
+      // First, we parse the bson we got and convert it to events.
+      std::map<std::string, cbor::cbor_object> parsed;
+      cbor::from_cbor(parsed, *dptr);
+      const int pid = static_cast<int>(parsed.at("pid").get<unsigned long>());
+      tracepoint_collector_types::ThreadedEvents events;
+      parsed.at("events").get_to(events);
 
-        // Finally, we can create a trace type that can be used by devtools.
-        json entry;
-        entry["ts"] = static_cast<double>(timestamp_ns_since_epoch) / 1e3;
-        entry["tid"] = tid;
-        entry["pid"] = pid;
-        entry["cat"] = "PERF";
-        const auto trace_id_string = provider->getScopeName(mapping, pid, trace_id);
-        entry["name"] = trace_id_string;  // Overwritten for counters later on.
-        if (type == TracePointCollectorNative::SCOPE_ENTRY)
+      for (const auto& thread_events : events)
+      {
+        // Events are grouped by thread id.
+        const auto& tid = thread_events.first;
+        for (const auto& event : thread_events.second)
         {
-          entry["ph"] = "B";
+          const auto& timestamp_ns_since_epoch = event.time_point;
+          const auto& trace_id = event.trace_id;
+          const auto& type = event.trace_type;
+
+          // Finally, we can create a trace type that can be used by devtools.
+          json entry;
+          entry["ts"] = static_cast<double>(timestamp_ns_since_epoch) / 1e3;
+          entry["tid"] = tid;
+          entry["pid"] = pid;
+          entry["cat"] = "PERF";
+          const auto trace_id_string = provider->getScopeName(mapping, pid, trace_id);
+          entry["name"] = trace_id_string;  // Overwritten for counters later on.
+          if (type == TracePointCollectorNative::SCOPE_ENTRY)
+          {
+            entry["ph"] = "B";
+          }
+          else if (type == TracePointCollectorNative::SCOPE_EXIT)
+          {
+            entry["ph"] = "E";
+          }
+          else if (type == TracePointCollectorNative::MARK_GLOBAL)
+          {
+            entry["ph"] = "i";
+            entry["s"] = "g";
+          }
+          else if (type == TracePointCollectorNative::MARK_PROCESS)
+          {
+            entry["ph"] = "i";
+            entry["s"] = "p";
+          }
+          else if (type == TracePointCollectorNative::MARK_THREAD)
+          {
+            entry["ph"] = "i";
+            entry["s"] = "t";
+          }
+          else if (type == TracePointCollectorNative::COUNTER)
+          {
+            entry["ph"] = "C";
+            const auto counter_series = NativeTraceProvider::splitCounterSeriesName(trace_id_string);
+            entry["name"] = counter_series.first;
+            std::int64_t z;
+            cbor::from_cbor(z, *event.dynamic_data);
+            // Update the current counters.
+            counter_values[pid][counter_series.first][counter_series.second] = z;
+            entry["args"] = counter_values[pid][counter_series.first];
+          }
+          else
+          {
+            throw std::runtime_error(std::string("Type specification unknown, got: ") + std::to_string(type));
+          }
+          res.push_back(entry);
         }
-        else if (type == TracePointCollectorNative::SCOPE_EXIT)
-        {
-          entry["ph"] = "E";
-        }
-        else if (type == TracePointCollectorNative::MARK_GLOBAL)
-        {
-          entry["ph"] = "i";
-          entry["s"] = "g";
-        }
-        else if (type == TracePointCollectorNative::MARK_PROCESS)
-        {
-          entry["ph"] = "i";
-          entry["s"] = "p";
-        }
-        else if (type == TracePointCollectorNative::MARK_THREAD)
-        {
-          entry["ph"] = "i";
-          entry["s"] = "t";
-        }
-        else if (type == TracePointCollectorNative::COUNTER)
-        {
-          entry["ph"] = "C";
-          const auto counter_series = NativeTraceProvider::splitCounterSeriesName(trace_id_string);
-          entry["name"] = counter_series.first;
-          std::int64_t z;
-          cbor::from_cbor(z, *event.dynamic_data);
-          // Update the current counters.
-          counter_values[pid][counter_series.first][counter_series.second] = z;
-          entry["args"] = counter_values[pid][counter_series.first];
-        }
-        res.push_back(entry);
       }
     }
+  }
+  catch (const std::out_of_range& e)
+  {
+    provider->log(std::string("Encountered out of range during data processing: ") + e.what());
+  }
+  catch (const cbor::error& e)
+  {
+    provider->log(std::string("Encountered cbor error: ") + e.what());
+  }
+  catch (const std::runtime_error& e)
+  {
+    provider->log(std::string("Encountered runtime error: ") + e.what());
   }
 
   // Sort res by "ts" because sometimes the "E"nd events are out of order wrt the "B"egin, leading to unfinished scope
