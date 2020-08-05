@@ -52,6 +52,12 @@ void BabeltraceParser::setLogger(LoggingFunction logger)
 
 void BabeltraceParser::process(FILE* stdout)
 {
+  if (stdout == nullptr)
+  {
+    logger_("[BabeltraceParser] Incorrect filepointer for stdout, quitting parser.");
+    return;
+  }
+
   // start the processing.
   processing_.store(true);
   std::array<char, 1024> tmp;
