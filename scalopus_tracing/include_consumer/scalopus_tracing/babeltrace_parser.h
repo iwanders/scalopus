@@ -99,7 +99,7 @@ public:
   static CTFEvent parse(std::string line);
 
 private:
-  std::atomic_bool processing_;  //! Bool to check on each while loop in the process function.
+  std::atomic_bool processing_{ false };  //! Bool to check on each while loop in the process function.
 
   std::mutex mutex_;                                             //! Mutex for the recording sessions set.
   std::set<std::shared_ptr<EventCallback>> sessions_recording_;  //! Set of sessions that are actively recording.

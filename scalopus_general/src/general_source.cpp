@@ -42,10 +42,10 @@ std::vector<json> GeneralSource::finishInterval()
   provider_->updateMapping();
 
   std::vector<json> result;
-  auto mapping = provider_->getMapping();
+  const auto mapping = provider_->getMapping();
 
   // Iterate over all mappings by process ID.
-  for (const auto pid_process_info : mapping)
+  for (const auto& pid_process_info : mapping)
   {
     // make a metadata entry to name a process.
     json process_entry;
@@ -57,7 +57,7 @@ std::vector<json> GeneralSource::finishInterval()
     result.push_back(process_entry);
 
     // For all thread mappings, make a metadata entry to name the thread.
-    for (const auto thread_mapping : pid_process_info.second.threads)
+    for (const auto& thread_mapping : pid_process_info.second.threads)
     {
       json tid_entry;
       tid_entry["tid"] = thread_mapping.first;
