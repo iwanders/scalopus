@@ -54,7 +54,7 @@ void BabeltraceParser::process(FILE* stdout)
 {
   if (stdout == nullptr)
   {
-    logger_("[BabeltraceParser] Incorrect filepointer for stdout, quitting parser.");
+    logger_("[BabeltraceParser] Incorrect file pointer for stdout, quitting parser.");
     return;
   }
 
