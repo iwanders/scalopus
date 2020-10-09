@@ -39,7 +39,8 @@ void test(const A& a, const B& b)
     exit(1);
   }
 }
-int main(int /* argc */, char** /* argv */)
+
+void test_expected()
 {
   std::string line{ "[1544361620.739021131] eagle scalopus_scope_id:exit: { cpu_id = 2 }, { vpid = 14897, pthread_id = "
                     "139688084124608 }, { id = 4144779573 }" };
@@ -51,5 +52,17 @@ int main(int /* argc */, char** /* argv */)
   test(event.domain(), "scalopus_scope_id");
   test(event.name(), "exit");
   test(event.eventData().at("id"), 4144779573U);
+}
+
+void test_unexpected()
+{
+  std::string line{ "[scalopus] Cleaning up transport to: 404305\n" };
+  scalopus::CTFEvent event{ line };  // should not throw.
+}
+
+int main(int /* argc */, char** /* argv */)
+{
+  test_expected();
+  test_unexpected();
   return 0;
 }
