@@ -31,7 +31,9 @@
 #include <scalopus_general/general_provider.h>
 #include <scalopus_tracing/endpoint_native_trace_sender.h>
 #include <scalopus_tracing/endpoint_trace_configurator.h>
+#ifdef SCALOPUS_TRACING_HAVE_LTTNG
 #include <scalopus_tracing/lttng_provider.h>
+#endif
 #include <scalopus_tracing/native_trace_provider.h>
 #include <scalopus_transport/transport_unix.h>
 
@@ -39,6 +41,7 @@
 
 #include <chrono>
 #include <thread>
+#include <iostream>
 
 #include <signal.h>
 #include <cstdlib>
@@ -69,10 +72,16 @@ int main(int argc, char** argv)
   }
   if (port == 0)  // failed to parse the port, like --help... :)
   {
-    std::cerr << "" << argv[0] << " [port [lttng_session_or_babeltrace_path]]" << std::endl;
+    std::cerr << "" << argv[0] << " [port";
+#ifdef SCALOPUS_TRACING_HAVE_LTTNG
+    std::cerr << " [lttng_session_or_babeltrace_path]";
+#endif
+    std::cerr << "]" << std::endl;
     std::cerr << std::endl;
     std::cerr << " port:" << std::endl;
     std::cerr << "      the port on which the catapult backend will bind. Defaults to 9222." << std::endl << std::endl;
+
+#ifdef SCALOPUS_TRACING_HAVE_LTTNG
     std::cerr << " lttng_session_or_babeltrace_path:" << std::endl;
     std::cerr << "      If no \"/\" is present in the string, this is used as the lttng" << std::endl;
     std::cerr << "      session, the default is \"scalopus_target_session\". If a \"/\"" << std::endl;
@@ -81,6 +90,7 @@ int main(int argc, char** argv)
     std::cerr << "      allows connecting to sessions other than on localhost. Using" << std::endl;
     std::cerr << "      \"net://localhost/host/$HOSTNAME/scalopus_target_session\" has " << std::endl;
     std::cerr << "      the same result as setting \"scalopus_target_session\"." << std::endl;
+#endif
     exit(1);
   }
 
@@ -115,9 +125,13 @@ int main(int argc, char** argv)
 
   // Create the server and add the providers
   auto catapult_server = std::make_shared<scalopus::CatapultServer>();
+
+#ifdef SCALOPUS_TRACING_HAVE_LTTNG
   auto lttng_provider = std::make_shared<scalopus::LttngProvider>(path, manager);
   lttng_provider->setLogger(logging_function);
   catapult_server->addProvider(lttng_provider);
+#endif
+
   catapult_server->addProvider(native_trace_provider);
   catapult_server->addProvider(std::make_shared<scalopus::GeneralProvider>(manager));
   catapult_server->setLogger(logging_function);

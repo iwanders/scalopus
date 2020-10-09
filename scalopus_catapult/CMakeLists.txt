@@ -27,6 +27,13 @@ add_executable(scalopus_catapult_server src/scalopus_catapult_server.cpp)
 target_link_libraries(scalopus_catapult_server PRIVATE Scalopus::scalopus_catapult)
 target_compile_options(scalopus_catapult_server PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 
+if (SCALOPUS_TRACING_HAVE_BUILT_LTTNG)
+  target_compile_definitions(scalopus_catapult_server
+    PRIVATE
+      SCALOPUS_TRACING_HAVE_LTTNG=1
+  )
+endif()
+
 
 
 export(
