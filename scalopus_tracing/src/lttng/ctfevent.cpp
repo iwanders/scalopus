@@ -50,24 +50,47 @@ CTFEvent::CTFEvent(std::string line)
   // Extract the timestamp, its between []
   size_t start_pos = line.find("[");
   size_t end_pos = line.find("]");
+  if (start_pos == std::string::npos || end_pos == std::string::npos)
+  {
+    return;
+  }
   std::string timestamp_str = line.substr(start_pos + 1, end_pos - 1);
-  timestamp_ = std::stod(timestamp_str);
+  try
+  {
+    timestamp_ = std::stod(timestamp_str);
+  }
+  catch (const std::invalid_argument& e)
+  {
+    return;
+  }
 
   // Go for the hostname, this is the first thing between spaces.
   start_pos = end_pos;
   start_pos = line.find(" ", start_pos);
   end_pos = line.find(" ", start_pos + 1);
+  if (start_pos == std::string::npos || end_pos == std::string::npos)
+  {
+    return;
+  }
   hostname_ = line.substr(start_pos + 1, end_pos - start_pos - 1);
 
   // Extract the trace point specification, it's the third entry between spaces.
   start_pos = end_pos;
   start_pos = line.find(" ", start_pos);
   end_pos = line.find(" ", start_pos + 1);
+  if (start_pos == std::string::npos || end_pos == std::string::npos)
+  {
+    return;
+  }
   // -1 for removal of space, -1 for removal of ':'
   std::string trace_point = line.substr(start_pos + 1, end_pos - start_pos - 1 - 1);
 
   // Split the tracepoint in domain and name.
   size_t split_point = trace_point.find(":");
+  if (split_point == std::string::npos)
+  {
+    return;
+  }
   tracepoint_domain_ = trace_point.substr(0, split_point);
   tracepoint_name_ = trace_point.substr(split_point + 1, trace_point.size() - split_point);
 
@@ -75,18 +98,30 @@ CTFEvent::CTFEvent(std::string line)
   start_pos = end_pos;
   start_pos = line.find("{", start_pos);
   end_pos = line.find("}", start_pos + 1);
+  if (start_pos == std::string::npos || end_pos == std::string::npos)
+  {
+    return;
+  }
   std::string stream_context = line.substr(start_pos + 2, end_pos - start_pos - 1 - 2);
 
   // Obtain the event context between the curly braces.
   start_pos = end_pos;
   start_pos = line.find("{", start_pos);
   end_pos = line.find("}", start_pos + 1);
+  if (start_pos == std::string::npos || end_pos == std::string::npos)
+  {
+    return;
+  }
   std::string event_context = line.substr(start_pos + 2, end_pos - start_pos - 1 - 2);
 
   // Obtain the trace data between the curly braces.
   start_pos = end_pos;
   start_pos = line.find("{", start_pos);
   end_pos = line.find("}", start_pos + 1);
+  if (start_pos == std::string::npos || end_pos == std::string::npos)
+  {
+    return;
+  }
   std::string trace_data = line.substr(start_pos + 2, end_pos - start_pos - 1 - 2);
 
   // Make a lambda that can convert the syntax between the curly braces (comma separated values) into a map of integers.
