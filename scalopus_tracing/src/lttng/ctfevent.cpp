@@ -59,7 +59,7 @@ CTFEvent::CTFEvent(std::string line)
   {
     timestamp_ = std::stod(timestamp_str);
   }
-  catch (const std::invalid_argument& e)
+  catch (const std::invalid_argument&)
   {
     return;
   }
@@ -163,7 +163,7 @@ CTFEvent::CTFEvent(std::string line)
         // if value is a string, this will fail, we need to catch that.
         res[key] = std::stoull(value);
       }
-      catch (const std::invalid_argument& e)
+      catch (const std::invalid_argument&)
       {
       }
     }
