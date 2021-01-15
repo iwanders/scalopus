@@ -60,21 +60,30 @@ tracepoint_collector_types::ScopeBufferPtr TracePointCollectorNative::getBuffer(
         auto ptr = instance.lock();
         if (ptr != nullptr)
         {
-          ptr->erase(tid);
+          if (ptr->active_tid_buffers_.exists(tid))
+          {
+            // We have a buffer for this thread, we must retrieve the buffer and place it into the orphans list.
+            auto buffer = ptr->active_tid_buffers_.getValue(tid);
+            {
+              std::lock_guard<std::mutex> lock{ptr->orphaned_mutex_};
+              ptr->orphaned_tid_buffers_.emplace_back(tid, std::move(buffer));
+            }
+          }
+          ptr->active_tid_buffers_.erase(tid);
         }
       });
 
-  if (exists(tid))
+  if (active_tid_buffers_.exists(tid))
   {
     // Buffer already existed for this thread.
-    return getValue(tid);
+    return active_tid_buffers_.getValue(tid);
   }
   else
   {
     // Buffer did not exist for this thread, make a new one.
     auto buffer = std::make_shared<tracepoint_collector_types::ScopeBuffer>(
         tracepoint_collector_types::EventContainer{ ringbuffer_size_ });
-    insert(tid, buffer);
+    active_tid_buffers_.insert(tid, buffer);
     return buffer;
   }
   return nullptr;
@@ -83,6 +92,19 @@ tracepoint_collector_types::ScopeBufferPtr TracePointCollectorNative::getBuffer(
 void TracePointCollectorNative::setRingbufferSize(std::size_t size)
 {
   ringbuffer_size_ = size;
+}
+
+TracePointCollectorNative::BufferMap::MapType TracePointCollectorNative::getActiveMap() const
+{
+  return active_tid_buffers_.getMap();
+}
+
+TracePointCollectorNative::BufferVector TracePointCollectorNative::retrieveOrphanedBuffers()
+{
+  BufferVector tmp;
+  std::lock_guard<std::mutex> lock{orphaned_mutex_};
+  orphaned_tid_buffers_.swap(tmp);
+  return tmp;
 }
 
 }  // namespace scalopus

@@ -131,8 +131,6 @@ int main(int /* argc */, char** /* argv */)
     {
       TRACE_SCOPE_RAII("different_thread");
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    // prevent this thread from being cleaned up before the tracepoint goes from the server to the client.
   });
   {
     TRACE_SCOPE_RAII("enabled_again");
@@ -201,6 +199,23 @@ int main(int /* argc */, char** /* argv */)
   test(result.size(), 1u);
   test(result[0]["name"], "counter");
   test(result[0]["ph"], "C");
+
+  // Ensure we don't lose events if thread goes out of scope immediately
+  source->startInterval();
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  // From another thread emit a tracepoint.
+  std::thread immediately_closing_thread = std::thread([]() {
+    {
+      TRACE_SCOPE_RAII("immediately_closing_thread");
+    }
+  });
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  immediately_closing_thread.join();
+  result = source->finishInterval();
+  test(result.size(), 2u);
+  test(result[0]["name"], "immediately_closing_thread");
+  test(result[1]["name"], "immediately_closing_thread");
+
 
   return 0;
 }

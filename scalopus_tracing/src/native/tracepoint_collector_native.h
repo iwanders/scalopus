@@ -35,6 +35,7 @@
 #include <scalopus_interface/types.h>
 #include <chrono>
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
 #include "spsc_ringbuffer.h"
@@ -116,25 +117,17 @@ using NamedCounter = std::tuple<std::string, unsigned int>;
 
 /**
  * @brief A singleton class that keeps track of the ringbuffer allocated to each thread to insert tracepoints into.
+ *        If a thread goes out of scope the ringbuffer for that thread goes into the orphaned collection. This ensures
+ *        that no events get lost when a thread goes out of scope before its events are exfiltrated by the endpoint
+ *        native trace sender.
  */
-class TracePointCollectorNative : public MapTracker<unsigned long, tracepoint_collector_types::ScopeBufferPtr>
+class TracePointCollectorNative
 {
-private:
-  TracePointCollectorNative() = default;
-  TracePointCollectorNative(const TracePointCollectorNative&) = delete;
-  TracePointCollectorNative& operator=(const TracePointCollectorNative&) = delete;
-  TracePointCollectorNative& operator=(TracePointCollectorNative&&) = delete;
-
-  /**
-   * @brief The size of each thread's ringbuffer.
-   * If this is too small, and the thread produces events quicker than the server thread collects them this will result
-   * in lost events.
-   */
-  std::size_t ringbuffer_size_{ 10000 };
-
 public:
   using Ptr = std::shared_ptr<TracePointCollectorNative>;
   using WeakPtr = std::weak_ptr<TracePointCollectorNative>;
+  using BufferMap = MapTracker<unsigned long, tracepoint_collector_types::ScopeBufferPtr>;
+  using BufferVector = std::vector<std::pair<unsigned long, tracepoint_collector_types::ScopeBufferPtr>>;
 
   static const uint8_t SCOPE_ENTRY;  // If initialised here and made constexpr clang drops it during linking :(
   static const uint8_t SCOPE_EXIT;
@@ -158,6 +151,43 @@ public:
    * @brief Set the size of any new ringbuffers that will be created.
    */
   void setRingbufferSize(std::size_t size);
+
+  /**
+   * @brief Return the map of active threads and their ringbuffers
+   */
+  BufferMap::MapType getActiveMap() const;
+
+  /**
+   * @brief Retrieve the orphaned buffers and clear them.
+   */
+  BufferVector retrieveOrphanedBuffers();
+
+private:
+  TracePointCollectorNative() = default;
+  TracePointCollectorNative(const TracePointCollectorNative&) = delete;
+  TracePointCollectorNative& operator=(const TracePointCollectorNative&) = delete;
+  TracePointCollectorNative& operator=(TracePointCollectorNative&&) = delete;
+
+  /**
+   * @brief The size of each thread's ringbuffer.
+   * If this is too small, and the thread produces events quicker than the server thread collects them this will result
+   * in lost events.
+   */
+  std::size_t ringbuffer_size_{ 10000 };
+
+  /**
+   *  @brief Thread safe map that tracks the event buffers per thread for currently active threads.
+   */
+  BufferMap active_tid_buffers_;
+
+
+  mutable std::mutex orphaned_mutex_; //!< Mutex for the orphaned_tid_buffers_
+
+  /**
+   * @brief Vector of orphaned buffers, any thread that has a ringbuffer and goes out of scope is moved to this
+   *        container, which is cleaned up when they are retrieved by retrieveOrphanedBuffers.
+   */
+  BufferVector orphaned_tid_buffers_;
 };
 }  // namespace scalopus
 

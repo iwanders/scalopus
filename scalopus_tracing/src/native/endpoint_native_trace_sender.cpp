@@ -74,11 +74,17 @@ static Data process_events(const EventMap& tid_event_map)
 void EndpointNativeTraceSender::work()
 {
   // The collector is a singleton, just retrieve it once.
-  const auto collector_ptr = TracePointCollectorNative::getInstance();
-  const auto& collector = *collector_ptr;
+  auto collector_ptr = TracePointCollectorNative::getInstance();
+  auto& collector = *collector_ptr;
   while (running_)
   {
-    auto tid_buffers = collector.getMap();
+    // First, retrieve the orphaned buffers.
+    auto tid_buffers = collector.retrieveOrphanedBuffers();
+    // Then, append to that the active buffers.
+    for (const auto& active_tid_buffer : collector.getActiveMap())
+    {
+      tid_buffers.push_back(active_tid_buffer);
+    }
     std::size_t collected{ 0 };
     EventMap events;
     for (const auto& tid_buffer : tid_buffers)

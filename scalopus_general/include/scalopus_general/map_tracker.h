@@ -43,9 +43,7 @@ template <typename Key, typename Value>
 class MapTracker
 {
 public:
-  MapTracker(MapTracker const&) = delete;      //! Delete the copy constructor.
-  void operator=(MapTracker const&) = delete;  //! Delete the assigment operator.
-
+  using MapType = std::unordered_map<Key, Value>;
   /**
    * @brief Function to insert an key->value pair. Is thread safe.
    * @param key The key to store in the map.
@@ -107,10 +105,6 @@ public:
 private:
   std::unordered_map<Key, Value> mapping_;
   mutable std::shared_timed_mutex mutex_;  //! Mutex for the mapping container.
-
-protected:
-  //! Make constructor private such that we can ensure it is a singleton.
-  MapTracker() = default;
 };
 }  // namespace scalopus
 
