@@ -59,6 +59,5 @@ public:
    */
   void setThreadName(unsigned long thread_id, const std::string& name);
 };
-
 }  // namespace scalopus
 #endif  // SCALOPUS_SCOPE_INTERNAL_THREAD_NAME_TRACKER_H
