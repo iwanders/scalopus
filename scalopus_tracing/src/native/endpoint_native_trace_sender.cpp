@@ -79,7 +79,7 @@ void EndpointNativeTraceSender::work()
   while (running_)
   {
     // First, retrieve the orphaned buffers.
-    auto tid_buffers = collector.retrieveOrphanedBuffers();
+    auto tid_buffers = collector.retrieveAndClearOrphanedBuffers();
     // Then, append to that the active buffers.
     for (const auto& active_tid_buffer : collector.getActiveMap())
     {

@@ -160,7 +160,7 @@ public:
   /**
    * @brief Retrieve the orphaned buffers and clear them.
    */
-  BufferVector retrieveOrphanedBuffers();
+  BufferVector retrieveAndClearOrphanedBuffers();
 
 private:
   TracePointCollectorNative() = default;
@@ -179,7 +179,6 @@ private:
    *  @brief Thread safe map that tracks the event buffers per thread for currently active threads.
    */
   BufferMap active_tid_buffers_;
-
 
   mutable std::mutex orphaned_mutex_; //!< Mutex for the orphaned_tid_buffers_
 
