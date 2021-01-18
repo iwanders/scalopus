@@ -102,7 +102,7 @@ TracePointCollectorNative::BufferMap::MapType TracePointCollectorNative::getActi
   return active_tid_buffers_.getMap();
 }
 
-TracePointCollectorNative::BufferVector TracePointCollectorNative::retrieveOrphanedBuffers()
+TracePointCollectorNative::BufferVector TracePointCollectorNative::retrieveAndClearOrphanedBuffers()
 {
   BufferVector tmp;
   std::lock_guard<std::mutex> lock{orphaned_mutex_};
