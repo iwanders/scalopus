@@ -3,6 +3,7 @@ add_library(scalopus_catapult SHARED
   src/catapult_backend.cpp
   src/catapult_server.cpp
   src/trace_session.cpp
+  src/catapult_recorder.cpp
 )
 
 target_include_directories(scalopus_catapult

@@ -68,3 +68,7 @@ add_executable(showcase_counters src/showcase_count_events.cpp)
 target_compile_options(showcase_counters PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_link_libraries(showcase_counters Scalopus::scalopus_tracing_native)
 
+# Example shows how to start a catapult recorder at the process start, writes the traces on shutdown.
+add_executable(embedded_catapult_recorder src/embedded_catapult_recorder.cpp)
+target_compile_options(embedded_catapult_recorder PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
+target_link_libraries(embedded_catapult_recorder Scalopus::scalopus_catapult Scalopus::scalopus_tracing_native)
