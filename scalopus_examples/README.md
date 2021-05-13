@@ -35,6 +35,11 @@ This shows how one could embed the catapult server in the process that produces 
 built using the `native` tracing backend, because that's the only one that makes sense for such a usecase. I don't
 expect this use case to be particularly useful, but it's possible.
 
+## `embedded_catapult_recorder.cpp`
+This shows how one could embed the catapult recorder in the process that produces the tracepoints. This example is only
+built using the `native` tracing backend, because that's the only one that makes sense for such a usecase. This can be
+useful when measuring durations in short-lived programs, or when the full lifetime of the process needs to be captured.
+
 ## `query_servers.cpp`
 This results in a binary that will connect to all discovered servers and obtain the data provided through the introspect
 , process info and trace mapping endpoints. The binary outputs human readable text to `stderr` while it is working, at

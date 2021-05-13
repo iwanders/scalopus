@@ -70,47 +70,52 @@ void EndpointManagerPoll::manage()
   const auto providers = factory_->discover();
   for (const auto& destination : providers)
   {
-    if (transports_.find(destination->hash_code()) != transports_.end())
-    {
-      continue;  // already have a connection to this transport, ignore it.
-    }
-    log("[scalopus] Creating transport to: " + std::string(*destination));
-    // Attempt to make a transport to this server.
-    auto transport = factory_->connect(destination);
-    if (!transport->isConnected())
-    {
-      log("[scalopus] Client failed to connect to " + std::string(*destination));
-      continue;
-    }
-    transports_[destination->hash_code()] = transport;
-    transport_endpoints_[transport] = {};
+    connect(destination);
+  }
+}
 
-    // Investigate which endpoints are supported by this transport.
-    auto introspect_client = std::make_shared<EndpointIntrospect>();
-    introspect_client->setTransport(transport);
-    const auto supported = introspect_client->supported();
-    for (const auto& supported_endpoint : supported)
+void EndpointManagerPoll::connect(const Destination::Ptr destination)
+{
+  if (transports_.find(destination->hash_code()) != transports_.end())
+  {
+    return;  // already have a connection to this transport, ignore it.
+  }
+  log("[scalopus] Creating transport to: " + std::string(*destination));
+  // Attempt to make a transport to this server.
+  auto transport = factory_->connect(destination);
+  if (!transport->isConnected())
+  {
+    log("[scalopus] Client failed to connect to " + std::string(*destination));
+    return;
+  }
+  transports_[destination->hash_code()] = transport;
+  transport_endpoints_[transport] = {};
+
+  // Investigate which endpoints are supported by this transport.
+  auto introspect_client = std::make_shared<EndpointIntrospect>();
+  introspect_client->setTransport(transport);
+  const auto supported = introspect_client->supported();
+  for (const auto& supported_endpoint : supported)
+  {
+    const auto it = endpoint_factories_.find(supported_endpoint);
+    if (it != endpoint_factories_.end())
     {
-      const auto it = endpoint_factories_.find(supported_endpoint);
-      if (it != endpoint_factories_.end())
+      // we support this endpoint, construct it and add it to the list.
+      auto new_endpoint = endpoint_factories_[supported_endpoint](transport);
+      if (new_endpoint != nullptr)
       {
-        // we support this endpoint, construct it and add it to the list.
-        auto new_endpoint = endpoint_factories_[supported_endpoint](transport);
-        if (new_endpoint != nullptr)
-        {
-          transport_endpoints_[transport][supported_endpoint] = new_endpoint;
-          // Also register the new endpoint with the transport in case it needs to listen to broadcast messages.
-          transport->addEndpoint(new_endpoint);
-        }
-        else
-        {
-          log("[scalopus] Factory for " + std::string{ supported_endpoint } + " returned nullptr");
-        }
+        transport_endpoints_[transport][supported_endpoint] = new_endpoint;
+        // Also register the new endpoint with the transport in case it needs to listen to broadcast messages.
+        transport->addEndpoint(new_endpoint);
       }
       else
       {
-        log("[scalopus] remote supports endpoint we don't support: " + supported_endpoint);
+        log("[scalopus] Factory for " + std::string{ supported_endpoint } + " returned nullptr");
       }
+    }
+    else
+    {
+      log("[scalopus] remote supports endpoint we don't support: " + supported_endpoint);
     }
   }
 }

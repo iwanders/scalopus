@@ -17,6 +17,11 @@ calling `makeSource()` on all providers. This `TraceSession` handles the actual 
 will call `startInterval` and `finishInterval` on all the sources. Ultimately chunking the collected trace events and
 sending them to the trace viewer.
 
+The [CatapultRecorder](/scalopus_catapult/include/scalopus_catapult/catapult_recorder.h) can be used to collect the
+tracepoints from providers without running the catapult server. Combined with a transport that connects to the running
+process, this can be used to collect tracepoints during the lifetime of the process and write these to a file on process
+exit. This is shown in the `embedded_catapult_recorder` example in the example directory.
+
 ## scalopus_catapult_server
 
 Besides the `scalopus_catapult` shared object, this package builds the `scalopus_catapult_server` binary that can be

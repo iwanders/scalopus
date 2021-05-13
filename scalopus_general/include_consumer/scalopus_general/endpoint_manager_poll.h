@@ -65,6 +65,12 @@ public:
   void manage();
 
   /**
+   * @brief Connect to a specific destination, doesn't do anything if already connected to this destination. The caller
+   *        is responsible for ensuring the mutex for this objects' state is locked, or single threading is guaranteed.
+   */
+  void connect(const Destination::Ptr dest);
+
+  /**
    * @brief Return the map of the currently known endpoints.
    */
   virtual TransportEndpoints endpoints() const;
