@@ -216,6 +216,5 @@ int main(int /* argc */, char** /* argv */)
   test(result[0]["name"], "immediately_closing_thread");
   test(result[1]["name"], "immediately_closing_thread");
 
-
   return 0;
 }

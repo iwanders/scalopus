@@ -39,8 +39,8 @@
 
 // The catapult recorder side.
 #include <scalopus_catapult/catapult_recorder.h>
-#include <scalopus_general/general_provider.h>
 #include <scalopus_general/endpoint_manager_poll.h>
+#include <scalopus_general/general_provider.h>
 #include <scalopus_tracing/native_trace_provider.h>
 
 void c()
@@ -96,12 +96,12 @@ int main(int /* argc */, char** argv)
   logging_function("Logging can be enabled in the source, uncomment the lines below this one.");
 
   manager->connect(server->getAddress());  // Connect the manager to the server.
-  catapult_recorder->start();  // start the recorder thread.
-  catapult_recorder->startInterval();  // start recording.
+  catapult_recorder->start();              // start the recorder thread.
+  catapult_recorder->startInterval();      // start recording.
 
   TRACE_THREAD_NAME("main");
 
-  for (std::size_t i=0; i < 5; i++)
+  for (std::size_t i = 0; i < 5; i++)
   {
     a();
   }

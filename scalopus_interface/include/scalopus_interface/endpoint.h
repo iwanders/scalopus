@@ -88,7 +88,8 @@ public:
    */
   // static Endpoint::Ptr factory(const std::shared_ptr<Transport>& transport);
 protected:
-  Transport* transport_{ nullptr };  // Transport has a shared pointer to the endpoint, so it cannot go out of scope before this.
+  Transport* transport_{ nullptr };  // Transport has a shared pointer to the endpoint, so it cannot go out of scope
+                                     // before this.
 };
 
 }  // namespace scalopus

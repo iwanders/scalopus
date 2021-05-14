@@ -180,7 +180,7 @@ private:
    */
   BufferMap active_tid_buffers_;
 
-  mutable std::mutex orphaned_mutex_; //!< Mutex for the orphaned_tid_buffers_
+  mutable std::mutex orphaned_mutex_;  //!< Mutex for the orphaned_tid_buffers_
 
   /**
    * @brief Vector of orphaned buffers, any thread that has a ringbuffer and goes out of scope is moved to this

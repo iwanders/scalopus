@@ -68,7 +68,7 @@ tracepoint_collector_types::ScopeBufferPtr TracePointCollectorNative::getBuffer(
             // Do not check if it is empty, if for some reason tracepoints are still inserted into the buffer
             // by other thread_local's that have tracepoints, we will still be collecting them.
             {
-              std::lock_guard<std::mutex> lock{ptr->orphaned_mutex_};
+              std::lock_guard<std::mutex> lock{ ptr->orphaned_mutex_ };
               ptr->orphaned_tid_buffers_.emplace_back(tid, std::move(buffer));
             }
           }
@@ -105,7 +105,7 @@ TracePointCollectorNative::BufferMap::MapType TracePointCollectorNative::getActi
 TracePointCollectorNative::BufferVector TracePointCollectorNative::retrieveAndClearOrphanedBuffers()
 {
   BufferVector tmp;
-  std::lock_guard<std::mutex> lock{orphaned_mutex_};
+  std::lock_guard<std::mutex> lock{ orphaned_mutex_ };
   orphaned_tid_buffers_.swap(tmp);
   return tmp;
 }
