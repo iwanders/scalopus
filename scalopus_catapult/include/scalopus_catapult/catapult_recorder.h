@@ -87,23 +87,26 @@ public:
   void writeToFile(const std::string& file_path);
 
   /**
-   * @brief stop the interval, finalize it to collect the trace events and return the json serialized results.
+   * @brief Stop the interval, finalize it to collect the trace events and return the json serialized results.
    */
   std::string collectEvents();
 
-  // Destructor, used to dump the file.
+  /**
+   * @brief Destructor, used to dump the file.
+   */
   ~CatapultRecorder();
+
 private:
+  void loop();  //!< Function the thread executes.
+
   std::vector<TraceEventProvider::Ptr> providers_;
   std::vector<TraceEventSource::Ptr> sources_;
 
   std::string dump_file_path_;
 
   std::thread worker_;
-  void loop();
   std::atomic_bool running_{ false };
   std::mutex source_mutex_;
-  
 };
 
 }  // namespace scalopus

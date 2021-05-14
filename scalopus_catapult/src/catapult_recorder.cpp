@@ -88,6 +88,7 @@ void CatapultRecorder::start()
   {
     return;
   }
+
   sources_.clear();
   sources_.reserve(providers_.size());
   // Add all the sources to the session
