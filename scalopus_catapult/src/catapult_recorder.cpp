@@ -35,10 +35,10 @@ namespace scalopus
 {
 void CatapultRecorder::loop()
 {
-  while(running_)
+  while (running_)
   {
     {
-      std::lock_guard<std::mutex> lock{source_mutex_};
+      std::lock_guard<std::mutex> lock{ source_mutex_ };
       for (auto& source : sources_)
       {
         source->work();
@@ -58,10 +58,9 @@ void CatapultRecorder::stop()
   sources_.clear();
 }
 
-
 void CatapultRecorder::startInterval()
 {
-  std::lock_guard<std::mutex> lock{source_mutex_};
+  std::lock_guard<std::mutex> lock{ source_mutex_ };
   for (auto& source : sources_)
   {
     source->startInterval();
@@ -70,7 +69,7 @@ void CatapultRecorder::startInterval()
 
 void CatapultRecorder::stopInterval()
 {
-  std::lock_guard<std::mutex> lock{source_mutex_};
+  std::lock_guard<std::mutex> lock{ source_mutex_ };
   for (auto& source : sources_)
   {
     source->stopInterval();
@@ -97,15 +96,13 @@ void CatapultRecorder::start()
     sources_.push_back(provider->makeSource());
   }
   running_ = true;
-  worker_ = std::thread{[&]{loop();}};
+  worker_ = std::thread{ [&] { loop(); } };
 }
-
 
 void CatapultRecorder::setupDumpFile(const std::string& file_path)
 {
   dump_file_path_ = file_path;
 }
-
 
 std::string CatapultRecorder::collectEvents()
 {
@@ -115,7 +112,7 @@ std::string CatapultRecorder::collectEvents()
   // Then collect the events by calling finishInterval
   std::vector<json> events;
   {
-    std::lock_guard<std::mutex> lock{source_mutex_};
+    std::lock_guard<std::mutex> lock{ source_mutex_ };
     for (auto& source : sources_)
     {
       auto results = source->finishInterval();
@@ -143,7 +140,7 @@ std::string CatapultRecorder::collectEvents()
 void CatapultRecorder::writeToFile(const std::string& file_path)
 {
   const auto output = collectEvents();
-  std::ofstream out{file_path};
+  std::ofstream out{ file_path };
   out << output;
 }
 

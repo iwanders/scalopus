@@ -40,8 +40,8 @@
 #include "scalopus_catapult/catapult_server.h"
 
 #include <chrono>
-#include <thread>
 #include <iostream>
+#include <thread>
 
 #include <signal.h>
 #include <cstdlib>

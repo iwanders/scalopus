@@ -31,13 +31,12 @@
 #define SCALOPUS_CATAPULT_CATAPULT_RECORDER_H
 
 #include <scalopus_interface/trace_event_provider.h>
-#include <thread>
 #include <atomic>
 #include <mutex>
+#include <thread>
 
 namespace scalopus
 {
-
 /**
  * @brief The catapult recorder, runs a recording of tracepoints and allows writing to file on destruction.
  */

@@ -86,7 +86,7 @@ private:
   std::mutex source_mutex_;
   std::set<std::shared_ptr<NativeTraceSource>> sources_;
 
-  LoggingFunction logger_;    //!< Function to use for logging.
+  LoggingFunction logger_;  //!< Function to use for logging.
 };
 
 }  // namespace scalopus
