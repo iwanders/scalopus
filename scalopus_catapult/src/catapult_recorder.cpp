@@ -55,7 +55,6 @@ void CatapultRecorder::stop()
 {
   running_ = false;
   worker_.join();
-  sources_.clear();
 }
 
 void CatapultRecorder::startInterval()
