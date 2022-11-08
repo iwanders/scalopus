@@ -32,6 +32,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <thread>
 #include "scalopus_general/endpoint_introspect.h"
 
 namespace scalopus

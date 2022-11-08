@@ -30,6 +30,7 @@
 #include <pybind11/stl.h>
 #include <scalopus_catapult/catapult_server.h>
 #include <scalopus_tracing/tracing.h>
+#include <thread>
 #include "json_util.h"
 #include "scalopus_catapult.h"
 
