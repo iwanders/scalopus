@@ -30,6 +30,7 @@
 #include <scalopus_transport/transport_loopback.h>
 #include <iostream>
 #include <numeric>
+#include <thread>
 #include "scalopus_tracing/native_trace_provider.h"
 #include "scalopus_tracing/tracing.h"
 
