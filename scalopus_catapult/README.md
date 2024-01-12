@@ -60,3 +60,15 @@ babeltrace --clock-seconds --clock-gmt --no-delta --input-format=lttng-live lttn
 [seasocks]: https://github.com/mattgodbolt/seasocks/
 [lttng_view]: https://lttng.org/man/1/lttng-view/v2.10/
 [chrome_tracing]: chrome://inspect?tracing
+
+
+## Sniffing Google Chrome's traffic
+
+Things broke after the `120.0.6099.129` build, sniffing the communication can be done by running one browser that exposes
+the debugging port on `9222`;
+
+```
+google-chrome   --user-data-dir="$(mktemp -d)" --disable-extensions --remote-debugging-port=9222
+```
+
+Then we can connect to this from another browser, and at the same time have wireshark running on the loopback device.

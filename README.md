@@ -135,7 +135,7 @@ After building and succesfully being able to run the tests, use the following st
 [BabeltraceParser] Reached end of file, quiting parser function.
 [scalopus] Creating transport to: <unix:8343>
 ```
-3. Go go [`chrome://inspect?tracing`][chrome_tracing] (copy the link, clicking doesn't work), next to `Target (Scalopus Devtools Target)` click trace. You should now be in the tracing viewer and see `This about:tracing is connected to a remote device...` at the top. Click record, record, wait a bit and press stop.
+3. Go go [`chrome://inspect?tracing`][chrome_tracing] (copy the link, clicking doesn't work), right of `Target (120.0.6099.129)` click trace, there's a text arrow pointing at the correct `trace` button. You should now be in the tracing viewer and see `This about:tracing is connected to a remote device...` at the top. Click record, record, wait a bit and press stop.
 4. Profit.
 
 ## Legal
