@@ -56,19 +56,19 @@ std::shared_ptr<ss::Response> CatapultBackend::handle(const ss::Request& request
   {
     // This URL is retrieved on the chrome://inspect?tracing page and it is the bold text.
     json j2 = {
-      { "Browser", "Scalopus Devtools Target" },
-      { "Protocol-Version", "1.2" },
-      { "User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu "
-                      "Chromium/64.0.3282.119 Chrome/64.0.3282.119 Safari/537.36" },
-      { "V8-Version", "6.4.388.40" },
-      { "WebKit-Version", "537.36 (@2ba93af511033c75c55cac08672b808e2c3fbe71)" },
+      { "Browser", "Chrome/120.0.6099.129" },
+      { "Protocol-Version", "1.3" },
+      { "User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/120.0.0.0 Safari/537.36" },
+      { "V8-Version", "12.0.267.10" },
+      { "WebKit-Version", "537.36 (@204016af461e03117aa3858b51ba4534c7cfda81)" },
       { "webSocketDebuggerUrl", "devtools/page/bar" },
     };
 
     return ss::Response::htmlResponse(j2.dump());
   }
 
-  if (request.getRequestUri() == "/json")
+  if (request.getRequestUri().rfind("/json/list", 0) == 0)  // check if string starts with this '/json/list?for_tab'
   {
     // This fakes a page display on this target, this makes it clear the target active and available.
     json j2 = { {
@@ -76,9 +76,10 @@ std::shared_ptr<ss::Response> CatapultBackend::handle(const ss::Request& request
         { "description", "Scalopus Operational" },
         { "devtoolsFrontendUrl", "/devtools/inspector.html?ws=127.0.0.1:9222/devtools/p" },
         { "id", "fooo" },
-        { "title", "click 'trace' -----------------------------------------^" },
-        { "type", "Scalopus remote tracing target" },
-        { "url", "z" },
+        { "title", "Scalopus; click 'trace' ---------------------------------------"
+                   "-----------------------------------^" },
+        { "type", "tab" },
+        { "url", "scalopus://catapult_server" },
         { "faviconUrl", DEVTOOLS_ENDPOINT_FAVICON },
         { "webSocketDebuggerUrl", "-" },
     } };
