@@ -1,6 +1,4 @@
-
-from distutils.core import setup
-import setuptools
+from setuptools import setup
 
 import unittest
 def scalopus_python_tests():
