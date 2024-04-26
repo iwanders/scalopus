@@ -1,3 +1,4 @@
+find_package (Python COMPONENTS Interpreter Development)
 
 if(NOT TARGET pybind11::pybind11)
   message(WARNING "Did not detect pybind11, skipping building the Python bindings.")
