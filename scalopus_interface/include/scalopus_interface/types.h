@@ -30,6 +30,7 @@
 #ifndef SCALOPUS_INTERFACE_TYPES_H
 #define SCALOPUS_INTERFACE_TYPES_H
 
+#include <cstdint>
 #include <vector>
 #include "scalopus_interface/exceptions.h"
 
