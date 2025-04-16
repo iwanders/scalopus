@@ -51,7 +51,14 @@ bool pyToData(const py::object& obj, Data& outgoing)
   // also try buffer, which is bytearray and bytes.
   if (py::isinstance<py::buffer>(obj))
   {
-    outgoing = obj.cast<Data>();
+    // Buffer is no longer convertible to std::vector<uint8_t>.
+    // https://github.com/pybind/pybind11/issues/1807
+    py::buffer_info info(py::buffer(obj).request());
+    const char* data = reinterpret_cast<const char *>(info.ptr);
+    const std::size_t length = static_cast<size_t>(info.size);
+    outgoing.clear();
+    outgoing.resize(length);
+    std::memcpy(outgoing.data(), data, length);
     return true;
   }
   // If it is a list, it's probably a list of integers

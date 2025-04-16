@@ -148,7 +148,7 @@ bool EndpointTraceConfigurator::handle(Transport& /* server */, const Data& requ
 
   // Store the process state
   updated_state.process_state = process_state->load();
-  updated_state.new_thread_state =new_thread_state->load();
+  updated_state.new_thread_state = new_thread_state->load();
 
   // Store the thread state
   std::for_each(thread_map.begin(), thread_map.end(),

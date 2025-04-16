@@ -136,7 +136,7 @@ int main(int /* argc */, char** /* argv */)
   {
     TRACE_SCOPE_RAII("enabled_again");
   }
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   different_thread.join();
   result = source->finishInterval();
   test(result.size(), 2u);
@@ -169,6 +169,7 @@ int main(int /* argc */, char** /* argv */)
 
   // Finally check whether we can flip the process state back to true.
   scalopus::TraceConfigurator::getInstance()->setProcessState(true);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   source->startInterval();
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   {
