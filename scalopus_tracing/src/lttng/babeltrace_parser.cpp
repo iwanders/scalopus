@@ -28,6 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_tracing/babeltrace_parser.h"
+#include <array>
 #include <iostream>
 #include <sstream>
 
