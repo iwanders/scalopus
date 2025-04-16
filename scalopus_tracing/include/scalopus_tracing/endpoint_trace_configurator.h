@@ -49,6 +49,10 @@ public:
   {
     bool process_state{ false };                 //!< Are traces for this process enabled?
     bool set_process_state{ false };             //!< Are we setting the process state?
+
+    bool new_thread_state{ false };                 //!< Are traces for new threads enabled?
+    bool set_new_thread_state{ false };             //!< Are we setting the new thread state?
+
     std::map<unsigned long, bool> thread_state;  //!< Thread state, true = tracing enabled.
     bool cmd_success{ false };
 

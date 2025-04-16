@@ -186,13 +186,22 @@ def run_trace_configure(args):
 
         new_state = scalopus.tracing.EndpointTraceConfigurator.TraceConfiguration()
 
+
         if (pinfo.pid in relevant_ids):
-            new_state.set_process_state = True
-            new_state.process_state = new_trace_state
+            if args.new_thread:
+                new_state.set_new_thread_state = True
+                new_state.new_thread_state = new_trace_state
+            else:
+                new_state.set_process_state = True
+                new_state.process_state = new_trace_state
         else:
             if args.unmatched_pid:
-                new_state.set_process_state = True
-                new_state.process_state = new_unmatched_trace_state
+                if args.new_thread:
+                    new_state.set_new_thread_state = True
+                    new_state.new_thread_state = new_unmatched_trace_state
+                else:
+                    new_state.set_process_state = True
+                    new_state.process_state = new_unmatched_trace_state
 
         for thread_id in pinfo.threads.keys():
             if thread_id in relevant_ids:
@@ -215,7 +224,8 @@ def run_trace_configure(args):
 
     for pid, data in entries:
         pid_str = color_by_state("{: >6d}".format(pid), data["state"]["process_state"])
-        print("PID: {}  \"{}\"".format(pid_str, data["process_info"]["name"]))
+        new_threads_str = color_by_state("new_threads", data["state"]["new_thread_state"])
+        print("PID: {}  \"{}\" [{}]".format(pid_str, data["process_info"]["name"], new_threads_str))
         doffset = " " * 8
         threads = data["process_info"]["threads"]
         for thread_id, thread_name in sorted(threads.items()):
@@ -276,6 +286,10 @@ if __name__ == "__main__":
     trace_configure_parser.add_argument('-u','--unmatched-pid',default=None,
         choices=['on', 'off'], nargs="?",
         help="Set unmatched process id's state to this value.")
+    
+    trace_configure_parser.add_argument('-t','--new-thread',default=False,
+        action="store_true",help="Set the value for new threads instead of current threads/process.")
+    
     trace_configure_parser.add_argument("id", nargs="*", type=int,
         help="Process or thread ID to change.")
 

@@ -35,6 +35,7 @@ namespace scalopus
 TraceConfigurator::TraceConfigurator()
 {
   process_state_ = std::make_shared<std::atomic_bool>(true);  // default to enabled.
+  new_thread_state_ = std::make_shared<std::atomic_bool>(true);  // default to enabled.
 }
 
 TraceConfigurator::AtomicBoolPtr TraceConfigurator::getThreadStatePtr()
@@ -58,7 +59,7 @@ TraceConfigurator::AtomicBoolPtr TraceConfigurator::getThreadStatePtr()
   }
   else
   {
-    auto boolean = std::make_shared<std::atomic_bool>(true);  // default each thread to enabled.
+    auto boolean = std::make_shared<std::atomic_bool>(new_thread_state_->load());
     thread_state_[tid] = boolean;
     return boolean;
   }
@@ -93,6 +94,21 @@ bool TraceConfigurator::getProcessState() const
 bool TraceConfigurator::setProcessState(bool new_state)
 {
   return process_state_->exchange(new_state);
+}
+
+TraceConfigurator::AtomicBoolPtr TraceConfigurator::getNewThreadStatePtr() const
+{
+  return new_thread_state_;
+}
+
+bool TraceConfigurator::getNewThreadState() const
+{
+  return *new_thread_state_;
+}
+
+bool TraceConfigurator::setNewThreadState(bool new_state)
+{
+  return new_thread_state_->exchange(new_state);
 }
 
 std::map<unsigned long, TraceConfigurator::AtomicBoolPtr> TraceConfigurator::getThreadMap() const

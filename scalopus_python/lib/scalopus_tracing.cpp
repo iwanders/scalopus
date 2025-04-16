@@ -89,6 +89,10 @@ void add_scalopus_tracing(py::module& m)
   endpoint_tc_trace_conf.def_readwrite("cmd_success", &EndpointTraceConfigurator::TraceConfiguration::cmd_success);
   endpoint_tc_trace_conf.def_readwrite("set_process_state",
                                        &EndpointTraceConfigurator::TraceConfiguration::set_process_state);
+  endpoint_tc_trace_conf.def_readwrite("new_thread_state",
+                                       &EndpointTraceConfigurator::TraceConfiguration::new_thread_state);
+  endpoint_tc_trace_conf.def_readwrite("set_new_thread_state",
+                                       &EndpointTraceConfigurator::TraceConfiguration::set_new_thread_state);
   endpoint_tc_trace_conf.def_readwrite("thread_state", &EndpointTraceConfigurator::TraceConfiguration::thread_state);
   // For some reason, assigning into tread_state directly didn't work, make a simple assign function.
   endpoint_tc_trace_conf.def("add_thread_entry", [](EndpointTraceConfigurator::TraceConfiguration& v, unsigned long id,
@@ -98,6 +102,8 @@ void add_scalopus_tracing(py::module& m)
     auto dict = py::dict();
     dict["set_process_state"] = p.set_process_state;
     dict["process_state"] = p.process_state;
+    dict["set_new_thread_state"] = p.set_new_thread_state;
+    dict["new_thread_state"] = p.new_thread_state;
     dict["cmd_success"] = p.cmd_success;
     dict["thread_state"] = p.thread_state;
     return dict;

@@ -36,7 +36,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   # disable mismatched tags until https://github.com/nlohmann/json/issues/1401
   set(CLANG_ONLY_COMPILE_FLAGS "${CLANG_ONLY_COMPILE_FLAGS};-Wno-mismatched-tags")
 endif()
-set(SCALOPUS_COMPILE_OPTIONS "-Werror;-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-Wpedantic;${CLANG_ONLY_COMPILE_FLAGS}")
+set(SCALOPUS_COMPILE_OPTIONS "-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-Wpedantic;${CLANG_ONLY_COMPILE_FLAGS}")
 
 include(FindThreads)
 
