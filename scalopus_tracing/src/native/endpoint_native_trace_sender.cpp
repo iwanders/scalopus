@@ -109,7 +109,7 @@ void EndpointNativeTraceSender::work()
       }
     }
     // @TODO; do some real rate limiting here.
-    if (TraceConfigurator::getInstance()->getProcessState()) {
+    if (!TraceConfigurator::getInstance()->getProcessState()) {
       // Sleep for a longer duration if the process is completely disabled.
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
     } else {
