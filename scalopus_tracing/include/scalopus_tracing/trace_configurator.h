@@ -82,6 +82,11 @@ public:
   AtomicBoolPtr getProcessStatePtr() const;
 
   /**
+   * @brief Retrieve the new thread boolean pointer.
+   */
+  AtomicBoolPtr getNewThreadStatePtr() const;
+
+  /**
    * @brief Retrieve the process wide boolean.
    */
   bool getProcessState() const;
@@ -92,12 +97,23 @@ public:
   bool setProcessState(bool new_state);
 
   /**
+   * @brief Retrieve the boolean state for new threads.
+   */
+  bool getNewThreadState() const;
+
+  /**
+   * @brief Set the new thread state and return the old state.
+   */
+  bool setNewThreadState(bool new_state);
+
+  /**
    * @brief Retrieve the map of thread booleans.
    */
   std::map<unsigned long, AtomicBoolPtr> getThreadMap() const;
 
 private:
   AtomicBoolPtr process_state_;  //!< Process wide enable / disable flag.
+  AtomicBoolPtr new_thread_state_; //!< State of newly created threads.
 
   mutable std::mutex threads_map_mutex_;                 //!< Mutex for the threads_enabled_ map.
   std::map<unsigned long, AtomicBoolPtr> thread_state_;  //!< Enable / disable per thread.

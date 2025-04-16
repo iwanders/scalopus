@@ -28,6 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_tracing/endpoint_native_trace_sender.h"
+#include "scalopus_tracing/trace_configurator.h"
 #include <cbor/stl.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -108,7 +109,13 @@ void EndpointNativeTraceSender::work()
       }
     }
     // @TODO; do some real rate limiting here.
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    if (TraceConfigurator::getInstance()->getProcessState()) {
+      // Sleep for a longer duration if the process is completely disabled.
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    } else {
+      // Else sleep briefly to avoid spinning at a full core.
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
   }
 }
 

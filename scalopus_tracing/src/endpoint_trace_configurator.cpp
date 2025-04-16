@@ -47,6 +47,8 @@ void to_json(json& j, const EndpointTraceConfigurator::TraceConfiguration& state
 {
   j["p"] = state.process_state;
   j["sp"] = state.set_process_state;
+  j["nt"] = state.new_thread_state;
+  j["snt"] = state.set_new_thread_state;
   j["t"] = state.thread_state;
 }
 
@@ -54,6 +56,8 @@ void from_json(const json& j, EndpointTraceConfigurator::TraceConfiguration& sta
 {
   j.at("p").get_to(state.process_state);
   j.at("sp").get_to(state.set_process_state);
+  j.at("nt").get_to(state.new_thread_state);
+  j.at("snt").get_to(state.set_new_thread_state);
   j.at("t").get_to(state.thread_state);
 }
 
@@ -110,6 +114,7 @@ bool EndpointTraceConfigurator::handle(Transport& /* server */, const Data& requ
 
   auto thread_map = configurator_instance->getThreadMap();
   auto process_state = configurator_instance->getProcessStatePtr();
+  auto new_thread_state = configurator_instance->getNewThreadStatePtr();
 
   if (req.at("cmd").get<std::string>() == "set")
   {
@@ -118,6 +123,12 @@ bool EndpointTraceConfigurator::handle(Transport& /* server */, const Data& requ
     if (new_state.set_process_state)
     {
       process_state->store(new_state.process_state);
+    }
+
+    // Store the new thread state
+    if (new_state.set_new_thread_state)
+    {
+      new_thread_state->store(new_state.new_thread_state);
     }
 
     // Iterate over the provided thread id's and try to set their state.
@@ -137,6 +148,7 @@ bool EndpointTraceConfigurator::handle(Transport& /* server */, const Data& requ
 
   // Store the process state
   updated_state.process_state = process_state->load();
+  updated_state.new_thread_state =new_thread_state->load();
 
   // Store the thread state
   std::for_each(thread_map.begin(), thread_map.end(),
