@@ -136,6 +136,7 @@ py::object PendingResponse::wait_for(double seconds)
   py::gil_scoped_release release;
   if (resp_->wait_for(std::chrono::duration<double>(seconds)) == std::future_status::ready)
   {
+    pybind11::gil_scoped_acquire gil;
     return dataToPy(resp_->get());
   }
   return py::cast<py::none>(Py_None);
