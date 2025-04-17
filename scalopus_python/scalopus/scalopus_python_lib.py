@@ -12,7 +12,7 @@ def __bootstrap__():
         if len(so_abi_suffix):
             so_suffix = so_abi_suffix[0] + "." if so_abi_suffix[0] is not None else ""
     name = __name__
-    filename = './scalopus_python_lib.{}so'.format(so_suffix)
+    filename = f'./scalopus_python_lib.{so_suffix}so'
     __file__ = pkg_resources.resource_filename(name, filename)
     __loader__ = None; del __bootstrap__, __loader__
     
