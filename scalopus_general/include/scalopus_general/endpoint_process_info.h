@@ -50,7 +50,7 @@ public:
   {
     std::string name;                              //!< Name of this process.
     std::map<unsigned long, std::string> threads;  //!< Names of the threads in this process.
-    int pid;                                       //!< Process id.
+    int pid{ 0 };                                  //!< Process id.
   };
 
   /**
