@@ -9,8 +9,7 @@ option(SCALOPUS_USE_EXTERNAL_PYBIND "Try to obtain pybind11 through find_package
 option(SCALOPUS_BUILD_TRACING_LTTNG "Try to build the LTTNG tracing target." ON)
 
 # Allow quick configuration of the Python version. For manually specfiying the version use PYBIND11_PYTHON_VERSION.
-option(SCALOPUS_USE_PYTHON2 "Set PYBIND11_PYTHON_VERSION to 2." OFF)
-option(SCALOPUS_USE_PYTHON3 "Set PYBIND11_PYTHON_VERSION to 3." OFF)
+option(SCALOPUS_USE_PYTHON3 "Set PYBIND11_PYTHON_VERSION to 3." ON)
 
 
 set(SCALOPUS_TRACING_HAVE_BUILT_LTTNG OFF)

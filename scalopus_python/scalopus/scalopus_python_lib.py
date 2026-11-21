@@ -18,7 +18,8 @@ def __bootstrap__():
     
     import importlib.machinery
     loader = importlib.machinery.ExtensionFileLoader(name, filename)
-    spec = importlib.machinery.ModuleSpec(name=name, loader=loader, origin=filename)
+    spec = importlib.util.spec_from_loader(name, loader)
     module = importlib.util.module_from_spec(spec)
+    sys.modules[__name__] = module
     spec.loader.exec_module(module) 
 __bootstrap__()

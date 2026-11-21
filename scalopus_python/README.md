@@ -16,9 +16,7 @@ will be installed in `/usr/local/lib`, which should be searched automatically. I
 
 The actual Python bindings are created with the files in the [`lib`](/scalopus_python/lib/) folder. These files are
 compiled into a shared object that implements a Python module in C. This module `scalopus_python_lib`, contains the real
- bindings. This library is be different between Python 2 and Python 3 and the compilation of Scalopus will produce only
-one of them. The version can be selected by setting the `SCALOPUS_USE_PYTHON2=on` or setting `SCALOPUS_USE_PYTHON3=on`
-as a build option to cmake.
+ bindings. 
 
 A convenience module is provided called [`scalopus`](/scalopus_python/scalopus/). In general the Python functions take
 the same arguments as their C++ counterparts. For documentation as to how to use classes or functions from Python

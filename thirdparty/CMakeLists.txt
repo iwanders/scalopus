@@ -24,12 +24,6 @@ else()
 endif()
 
 
-# Ideally we'd just build both, depending on availability, but that's hard at the moment:
-# https://github.com/pybind/pybind11/issues/748
-if(SCALOPUS_USE_PYTHON2)
-  set(PYBIND11_PYTHON_VERSION 2)
-endif()
-
 if(SCALOPUS_USE_PYTHON3)
   set(PYBIND11_PYTHON_VERSION 3)
 endif()
@@ -42,4 +36,3 @@ endif()
 
 set(CBOR_BUILD_TESTS OFF CACHE INTERNAL "")
 add_subdirectory(thirdparty/cbor)
-
