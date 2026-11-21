@@ -28,13 +28,15 @@ target_include_directories(scalopus_consumer
 target_link_libraries(scalopus_consumer
   PUBLIC
     Scalopus::scalopus_interface
+  PUBLIC
+    nlohmann_json::nlohmann_json
 )
 add_library(Scalopus::scalopus_consumer ALIAS scalopus_consumer)
 
 # For the vendored version, we actually need to install it with this newer version of cmake.
 set(SCALOPUS_INTERFACE_INSTALL_TARGETS scalopus_interface scalopus_consumer)
 if(NOT SCALOPUS_USE_EXTERNAL_JSON)
-    list(APPEND INSTALL_TARGETS nlohmann_json)
+    list(APPEND SCALOPUS_INTERFACE_INSTALL_TARGETS nlohmann_json)
 endif()
 
 export(
