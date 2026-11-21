@@ -38,15 +38,14 @@
  * a vast amount of artificial tracepoints.
  */
 
+#include <scalopus_tracing/tracing.h>
+#include <scalopus_transport/transport_unix.h>
+#include <signal.h>
+
 #include <iostream>
 #include <random>
 #include <sstream>
 #include <thread>
-
-#include <signal.h>
-
-#include <scalopus_tracing/tracing.h>
-#include <scalopus_transport/transport_unix.h>
 
 // Helper function to create random integer between two values.
 int randint(int min, int max)
@@ -143,15 +142,17 @@ int main(int argc, char** argv)
   std::atomic_bool threads_running{ true };
   for (size_t i = 0; i < thread_count; i++)
   {
-    active_threads.emplace_back([i, &threads_running, time_base]() {
-      std::stringstream thread_name;
-      thread_name << "Thread 0x" << std::hex << i;
-      TRACE_THREAD_NAME(thread_name.str());
-      while (threads_running.load())
-      {
-        random_callstack(0, time_base);
-      }
-    });
+    active_threads.emplace_back(
+        [i, &threads_running, time_base]()
+        {
+          std::stringstream thread_name;
+          thread_name << "Thread 0x" << std::hex << i;
+          TRACE_THREAD_NAME(thread_name.str());
+          while (threads_running.load())
+          {
+            random_callstack(0, time_base);
+          }
+        });
   }
 
   // Block until interrupt is received.

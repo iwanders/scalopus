@@ -125,7 +125,8 @@ CTFEvent::CTFEvent(std::string line)
   std::string trace_data = line.substr(start_pos + 2, end_pos - start_pos - 1 - 2);
 
   // Make a lambda that can convert the syntax between the curly braces (comma separated values) into a map of integers.
-  auto processContext = [](std::string csv) -> std::map<std::string, unsigned long long int> {
+  auto processContext = [](std::string csv) -> std::map<std::string, unsigned long long int>
+  {
     std::map<std::string, unsigned long long int> res;
 
     size_t start = 0;

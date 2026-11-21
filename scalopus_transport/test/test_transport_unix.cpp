@@ -24,8 +24,10 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <unistd.h>
+
 #include <chrono>
 #include <iostream>
+
 #include "test_transport_util.h"
 #include "transport_unix.h"
 
@@ -37,8 +39,8 @@ int main(int /* argc */, char** /* argv */)
 
   // Put an echo endpoint in the server.
   auto endpoint0_at_server = std::make_shared<scalopus::EndpointTest>();
-  endpoint0_at_server->handle_ = [](scalopus::Transport& /* transport */, const auto& incoming,
-                                    auto& outgoing) -> bool {
+  endpoint0_at_server->handle_ = [](scalopus::Transport& /* transport */, const auto& incoming, auto& outgoing) -> bool
+  {
     outgoing = incoming;
     return true;
   };
@@ -64,8 +66,9 @@ int main(int /* argc */, char** /* argv */)
   const auto test_endpoint = std::make_shared<scalopus::EndpointTest>();
   char received_unsolicited = 0;
   test_endpoint->unsolicited_ = [&](scalopus::Transport& /* transport */, const scalopus::Data& incoming,
-                                    scalopus::Data &
-                                    /* outgoing */) -> bool {
+                                    scalopus::Data&
+                                    /* outgoing */) -> bool
+  {
     received_unsolicited = incoming.front();
     return false;
   };

@@ -28,6 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "json_util.h"
+
 #include <iostream>
 
 namespace pybind11_nlohmann_conversion
@@ -210,14 +211,18 @@ json pyToJson(const py::object& data)
 void add_pybind11_nlohmann_tests(py::module& m)
 {
   py::module test_module = m.def_submodule("pybind11_nlohmann_test", "The tests for pybind11 nlohmann conversion.");
-  test_module.def("echo", [](const py::object& object) {
-    json json_object = object;
-    return json_object.get<py::object>();
-  });
-  test_module.def("json_str", [](const py::object& object) {
-    json json_object = object;
-    return json_object.dump();
-  });
+  test_module.def("echo",
+                  [](const py::object& object)
+                  {
+                    json json_object = object;
+                    return json_object.get<py::object>();
+                  });
+  test_module.def("json_str",
+                  [](const py::object& object)
+                  {
+                    json json_object = object;
+                    return json_object.dump();
+                  });
 }
 
 }  // namespace pybind11_nlohmann_conversion

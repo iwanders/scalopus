@@ -28,6 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <iostream>
+
 #include "scalopus_tracing/ctfevent.h"
 
 template <typename A, typename B>

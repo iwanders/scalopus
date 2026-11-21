@@ -28,11 +28,12 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_tracing/native_trace_provider.h"
-#include "endpoint_native_trace_receiver.h"
-#include "scalopus_tracing/native_trace_source.h"
 
 #include <nlohmann/json.hpp>
 #include <sstream>
+
+#include "endpoint_native_trace_receiver.h"
+#include "scalopus_tracing/native_trace_source.h"
 
 namespace scalopus
 {
@@ -51,14 +52,16 @@ TraceEventSource::Ptr NativeTraceProvider::makeSource()
 
 Endpoint::Ptr NativeTraceProvider::receiveEndpoint()
 {
-  return std::make_shared<EndpointNativeTraceReceiver>([provider = WeakPtr{ shared_from_this() }](const Data& data) {
-    // This function is called from the server thread
-    auto ptr = provider.lock();
-    if (ptr)
-    {
-      ptr->incoming(data);
-    }
-  });
+  return std::make_shared<EndpointNativeTraceReceiver>(
+      [provider = WeakPtr{ shared_from_this() }](const Data& data)
+      {
+        // This function is called from the server thread
+        auto ptr = provider.lock();
+        if (ptr)
+        {
+          ptr->incoming(data);
+        }
+      });
 }
 
 void NativeTraceProvider::incoming(const Data& incoming)

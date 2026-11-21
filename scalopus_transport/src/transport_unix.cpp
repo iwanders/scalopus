@@ -28,16 +28,19 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "transport_unix.h"
+
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
+
 #include <algorithm>
 #include <cstring>
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
 #include "protocol.h"
 
 namespace scalopus

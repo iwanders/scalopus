@@ -38,9 +38,8 @@
 #include <scalopus_tracing/lttng_tracepoint.h>
 #endif
 
-#include <scalopus_tracing/nop_tracepoint.h>
-
 #include <scalopus_tracing/native_trace_provider.h>
+#include <scalopus_tracing/nop_tracepoint.h>
 #include <scalopus_tracing/trace_configurator.h>
 
 static std::size_t uniqueTraceId()
@@ -98,45 +97,54 @@ void add_scalopus_tracing(py::module& m)
   endpoint_tc_trace_conf.def("add_thread_entry", [](EndpointTraceConfigurator::TraceConfiguration& v, unsigned long id,
                                                     bool state) { v.thread_state[id] = state; });
 
-  endpoint_tc_trace_conf.def("to_dict", [](const EndpointTraceConfigurator::TraceConfiguration& p) {
-    auto dict = py::dict();
-    dict["set_process_state"] = p.set_process_state;
-    dict["process_state"] = p.process_state;
-    dict["set_new_thread_state"] = p.set_new_thread_state;
-    dict["new_thread_state"] = p.new_thread_state;
-    dict["cmd_success"] = p.cmd_success;
-    dict["thread_state"] = p.thread_state;
-    return dict;
-  });
+  endpoint_tc_trace_conf.def("to_dict",
+                             [](const EndpointTraceConfigurator::TraceConfiguration& p)
+                             {
+                               auto dict = py::dict();
+                               dict["set_process_state"] = p.set_process_state;
+                               dict["process_state"] = p.process_state;
+                               dict["set_new_thread_state"] = p.set_new_thread_state;
+                               dict["new_thread_state"] = p.new_thread_state;
+                               dict["cmd_success"] = p.cmd_success;
+                               dict["thread_state"] = p.thread_state;
+                               return dict;
+                             });
   // End EndpointTraceConfigurator
 
   py::module native = tracing.def_submodule("native", "The native specific components.");
   py::class_<EndpointNativeTraceSender, EndpointNativeTraceSender::Ptr, Endpoint> endpoint_native_trace_sender(
       native, "EndpointNativeTraceSender");
-  endpoint_native_trace_sender.def_property_readonly_static(
-      "name", [](py::object /* self */) { return EndpointNativeTraceSender::name; });
+  endpoint_native_trace_sender.def_property_readonly_static("name", [](py::object /* self */)
+                                                            { return EndpointNativeTraceSender::name; });
   endpoint_native_trace_sender.def(py::init<>());
 
-  tracing.def("setTraceName", [](const unsigned int id, const std::string& name) {
-    StaticStringTracker::getInstance().insert(id, name);
-  });
+  tracing.def("setTraceName", [](const unsigned int id, const std::string& name)
+              { StaticStringTracker::getInstance().insert(id, name); });
 
-  tracing.def("getThreadState", []() {
-    auto configurator = TraceConfigurator::getInstance();
-    return configurator->getThreadState();
-  });
-  tracing.def("setThreadState", [](bool new_state) {
-    auto configurator = TraceConfigurator::getInstance();
-    return configurator->setThreadState(new_state);
-  });
-  tracing.def("getProcessState", []() {
-    auto configurator = TraceConfigurator::getInstance();
-    return configurator->getProcessState();
-  });
-  tracing.def("setProcessState", [](bool new_state) {
-    auto configurator = TraceConfigurator::getInstance();
-    return configurator->setProcessState(new_state);
-  });
+  tracing.def("getThreadState",
+              []()
+              {
+                auto configurator = TraceConfigurator::getInstance();
+                return configurator->getThreadState();
+              });
+  tracing.def("setThreadState",
+              [](bool new_state)
+              {
+                auto configurator = TraceConfigurator::getInstance();
+                return configurator->setThreadState(new_state);
+              });
+  tracing.def("getProcessState",
+              []()
+              {
+                auto configurator = TraceConfigurator::getInstance();
+                return configurator->getProcessState();
+              });
+  tracing.def("setProcessState",
+              [](bool new_state)
+              {
+                auto configurator = TraceConfigurator::getInstance();
+                return configurator->setProcessState(new_state);
+              });
 
 #ifdef SCALOPUS_TRACING_HAVE_LTTNG
   py::module lttng = tracing.def_submodule("lttng", "The lttng specific components.");

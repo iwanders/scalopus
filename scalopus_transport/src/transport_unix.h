@@ -31,12 +31,14 @@
 #define SCALOPUS_TRANSPORT_TRANSPORT_UNIX_INTERNAL_H
 
 #include <scalopus_interface/transport_factory.h>
+
 #include <future>
 #include <map>
 #include <set>
 #include <thread>
 #include <utility>
 #include <vector>
+
 #include "protocol.h"
 #include "scalopus_transport/transport_unix.h"
 

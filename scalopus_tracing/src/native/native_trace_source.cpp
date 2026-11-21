@@ -28,8 +28,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_tracing/native_trace_source.h"
+
 #include <cbor/stl.h>
+
 #include <sstream>
+
 #include "tracepoint_collector_native.h"
 
 namespace scalopus
@@ -182,9 +185,8 @@ std::vector<json> NativeTraceSource::finishInterval()
 
   // Sort res by "ts" because sometimes the "E"nd events are out of order wrt the "B"egin, leading to unfinished scope
   // events.
-  std::stable_sort(res.begin(), res.end(), [](const json& lhs, const json& rhs) {
-    return lhs.at("ts").get<double>() < rhs.at("ts").get<double>();
-  });
+  std::stable_sort(res.begin(), res.end(), [](const json& lhs, const json& rhs)
+                   { return lhs.at("ts").get<double>() < rhs.at("ts").get<double>(); });
 
   // Need a reverse iteration here, to populate all counters with all series seen in the entire interval.
   ProcessCounter counter_all_series;

@@ -30,6 +30,7 @@
 #include <array>
 #include <iostream>
 #include <vector>
+
 #include "spsc_ringbuffer.h"
 
 template <typename A, typename B>

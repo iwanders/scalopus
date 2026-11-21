@@ -32,6 +32,7 @@
 
 #include <cstdint>
 #include <vector>
+
 #include "scalopus_interface/exceptions.h"
 
 namespace scalopus

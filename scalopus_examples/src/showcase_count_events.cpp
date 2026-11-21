@@ -27,13 +27,13 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include <scalopus_tracing/tracing.h>
+#include <scalopus_transport/transport_unix.h>
+
 #include <chrono>
 #include <cmath>
 #include <iostream>
 #include <thread>
-
-#include <scalopus_tracing/tracing.h>
-#include <scalopus_transport/transport_unix.h>
 
 // This example shows how counters can be used.
 

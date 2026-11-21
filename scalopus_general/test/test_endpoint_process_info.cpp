@@ -28,12 +28,13 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <scalopus_transport/transport_loopback.h>
-#include <iostream>
-#include "scalopus_general/endpoint_process_info.h"
-#include "scalopus_general/thread_naming.h"
-
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <iostream>
+
+#include "scalopus_general/endpoint_process_info.h"
+#include "scalopus_general/thread_naming.h"
 
 template <typename A, typename B>
 void test(const A& a, const B& b)

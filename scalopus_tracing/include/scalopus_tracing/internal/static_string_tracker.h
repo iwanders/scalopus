@@ -31,6 +31,7 @@
 #define SCALOPUS_TRACING_STATIC_STRING_TRACKER_H
 
 #include <scalopus_general/map_tracker.h>
+
 #include <map>
 #include <mutex>
 #include <shared_mutex>

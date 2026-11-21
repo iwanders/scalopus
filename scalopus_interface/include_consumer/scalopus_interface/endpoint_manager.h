@@ -31,6 +31,7 @@
 #define SCALOPUS_INTERFACE_ENDPOINT_MANAGER_H
 
 #include <scalopus_interface/transport_factory.h>
+
 #include <functional>
 #include <map>
 #include <memory>
@@ -81,14 +82,16 @@ public:
   template <typename T>
   void addEndpointFactory(const std::string& name, const std::shared_ptr<T>& endpoint_provider)
   {
-    addEndpointFactory(name, [weak_provider = std::weak_ptr<T>(endpoint_provider)](const auto& transport) {
-      auto provider = weak_provider.lock();
-      if (provider != nullptr)
-      {
-        return provider->factory(transport);
-      }
-      return scalopus::Endpoint::Ptr{ nullptr };
-    });
+    addEndpointFactory(name,
+                       [weak_provider = std::weak_ptr<T>(endpoint_provider)](const auto& transport)
+                       {
+                         auto provider = weak_provider.lock();
+                         if (provider != nullptr)
+                         {
+                           return provider->factory(transport);
+                         }
+                         return scalopus::Endpoint::Ptr{ nullptr };
+                       });
   }
 
   /**

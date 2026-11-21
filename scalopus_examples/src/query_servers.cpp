@@ -30,6 +30,7 @@
 #include <scalopus_general/general.h>
 #include <scalopus_tracing/tracing.h>
 #include <scalopus_transport/transport_unix.h>
+
 #include <cstring>
 #include <iostream>
 #include <nlohmann/json.hpp>

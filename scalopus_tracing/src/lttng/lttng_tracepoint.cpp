@@ -32,6 +32,7 @@
 #include <scalopus_tracing/internal/marker_tracepoint.h>
 #include <scalopus_tracing/internal/scope_tracepoint.h>
 #include <scalopus_tracing/trace_configurator.h>
+
 #include "lttng/scope_tracepoint_lttng_definition.h"
 
 namespace scalopus

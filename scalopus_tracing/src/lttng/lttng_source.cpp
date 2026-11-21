@@ -153,9 +153,8 @@ std::vector<json> LttngSource::convertEvents()
 
   // Sort res by "ts" because sometimes the "E"nd events are out of order wrt the "B"egin, leading to unfinished scope
   // events.
-  std::stable_sort(result.begin(), result.end(), [](const json& lhs, const json& rhs) {
-    return lhs.at("ts").get<double>() < rhs.at("ts").get<double>();
-  });
+  std::stable_sort(result.begin(), result.end(), [](const json& lhs, const json& rhs)
+                   { return lhs.at("ts").get<double>() < rhs.at("ts").get<double>(); });
 
   // Need a reverse iteration here, to populate all counters with all series seen in the entire interval.
   CounterMap count_all_series;

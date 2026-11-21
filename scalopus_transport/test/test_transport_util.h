@@ -29,6 +29,7 @@
 */
 
 #include <scalopus_interface/endpoint.h>
+
 #include <functional>
 
 template <typename A, typename B>

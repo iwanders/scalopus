@@ -28,6 +28,7 @@
 #define SCALOPUS_TRANSPORT_UNIX_H
 
 #include <scalopus_interface/transport_factory.h>
+
 #include <memory>
 
 namespace scalopus

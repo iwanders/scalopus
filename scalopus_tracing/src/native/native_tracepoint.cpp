@@ -27,15 +27,16 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <time.h>
-#include <iostream>
+#include "scalopus_tracing/native_tracepoint.h"
 
 #include <cbor/stl.h>
-
 #include <scalopus_tracing/internal/marker_tracepoint.h>
 #include <scalopus_tracing/internal/scope_tracepoint.h>
 #include <scalopus_tracing/trace_configurator.h>
-#include "scalopus_tracing/native_tracepoint.h"
+#include <time.h>
+
+#include <iostream>
+
 #include "tracepoint_collector_native.h"
 
 namespace scalopus

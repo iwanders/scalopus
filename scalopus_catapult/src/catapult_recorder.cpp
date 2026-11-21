@@ -28,6 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_catapult/catapult_recorder.h"
+
 #include <fstream>
 #include <sstream>
 

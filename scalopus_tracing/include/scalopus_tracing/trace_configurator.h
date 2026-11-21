@@ -112,8 +112,8 @@ public:
   std::map<unsigned long, AtomicBoolPtr> getThreadMap() const;
 
 private:
-  AtomicBoolPtr process_state_;  //!< Process wide enable / disable flag.
-  AtomicBoolPtr new_thread_state_; //!< State of newly created threads.
+  AtomicBoolPtr process_state_;     //!< Process wide enable / disable flag.
+  AtomicBoolPtr new_thread_state_;  //!< State of newly created threads.
 
   mutable std::mutex threads_map_mutex_;                 //!< Mutex for the threads_enabled_ map.
   std::map<unsigned long, AtomicBoolPtr> thread_state_;  //!< Enable / disable per thread.

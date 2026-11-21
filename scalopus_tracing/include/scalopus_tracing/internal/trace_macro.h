@@ -34,6 +34,7 @@
 #include <scalopus_tracing/internal/count_tracepoint.h>
 #include <scalopus_tracing/internal/marker_tracepoint.h>
 #include <scalopus_tracing/internal/scope_tracepoint.h>
+
 #include <scalopus_tracing/internal/compile_time_crc.hpp>
 
 // Create a unique ID based on the crc32 of the filename and the line number.

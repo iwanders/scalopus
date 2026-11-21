@@ -28,9 +28,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <scalopus_transport/transport_loopback.h>
+
 #include <iostream>
 #include <numeric>
 #include <thread>
+
 #include "scalopus_tracing/native_trace_provider.h"
 #include "scalopus_tracing/tracing.h"
 
@@ -64,7 +66,7 @@ public:
   {
     return endpoints_;
   }
-  void addEndpointFactory(const std::string& name, EndpointFactory&& factory_function){};
+  void addEndpointFactory(const std::string& name, EndpointFactory&& factory_function) {};
 };
 }  // namespace scalopus
 
@@ -128,11 +130,13 @@ int main(int /* argc */, char** /* argv */)
   source->startInterval();
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   // From another thread emit a tracepoint.
-  std::thread different_thread = std::thread([]() {
-    {
-      TRACE_SCOPE_RAII("different_thread");
-    }
-  });
+  std::thread different_thread = std::thread(
+      []()
+      {
+        {
+          TRACE_SCOPE_RAII("different_thread");
+        }
+      });
   {
     TRACE_SCOPE_RAII("enabled_again");
   }
@@ -206,11 +210,13 @@ int main(int /* argc */, char** /* argv */)
   source->startInterval();
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   // From another thread emit a tracepoint.
-  std::thread immediately_closing_thread = std::thread([]() {
-    {
-      TRACE_SCOPE_RAII("immediately_closing_thread");
-    }
-  });
+  std::thread immediately_closing_thread = std::thread(
+      []()
+      {
+        {
+          TRACE_SCOPE_RAII("immediately_closing_thread");
+        }
+      });
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   immediately_closing_thread.join();
   result = source->finishInterval();

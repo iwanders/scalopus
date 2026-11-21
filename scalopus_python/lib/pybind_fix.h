@@ -65,10 +65,12 @@ struct type_caster<std::shared_ptr<scalopus::Endpoint>>
 
     auto py_obj = py::reinterpret_borrow<py::object>(src);
     auto base_ptr = static_cast<std::shared_ptr<scalopus::Endpoint>>(bc);
-    auto py_obj_ptr = std::shared_ptr<py::object>(new py::object{ py_obj }, [](auto py_object_ptr) {
-      pybind11::gil_scoped_acquire gil;
-      delete py_object_ptr;
-    });
+    auto py_obj_ptr = std::shared_ptr<py::object>(new py::object{ py_obj },
+                                                  [](auto py_object_ptr)
+                                                  {
+                                                    pybind11::gil_scoped_acquire gil;
+                                                    delete py_object_ptr;
+                                                  });
 
     value = std::shared_ptr<scalopus::Endpoint>(py_obj_ptr, base_ptr.get());
     return true;
@@ -105,10 +107,12 @@ struct type_caster<std::shared_ptr<scalopus::TraceEventProvider>>
 
     auto py_obj = py::reinterpret_borrow<py::object>(src);
     auto base_ptr = static_cast<std::shared_ptr<scalopus::TraceEventProvider>>(bc);
-    auto py_obj_ptr = std::shared_ptr<py::object>(new py::object{ py_obj }, [](auto py_object_ptr) {
-      pybind11::gil_scoped_acquire gil;
-      delete py_object_ptr;
-    });
+    auto py_obj_ptr = std::shared_ptr<py::object>(new py::object{ py_obj },
+                                                  [](auto py_object_ptr)
+                                                  {
+                                                    pybind11::gil_scoped_acquire gil;
+                                                    delete py_object_ptr;
+                                                  });
 
     value = std::shared_ptr<scalopus::TraceEventProvider>(py_obj_ptr, base_ptr.get());
     return true;
@@ -146,10 +150,12 @@ struct type_caster<std::shared_ptr<scalopus::TraceEventSource>>
 
     auto py_obj = py::reinterpret_borrow<py::object>(src);
     auto base_ptr = static_cast<std::shared_ptr<scalopus::TraceEventSource>>(bc);
-    auto py_obj_ptr = std::shared_ptr<py::object>(new py::object{ py_obj }, [](auto py_object_ptr) {
-      pybind11::gil_scoped_acquire gil;
-      delete py_object_ptr;
-    });
+    auto py_obj_ptr = std::shared_ptr<py::object>(new py::object{ py_obj },
+                                                  [](auto py_object_ptr)
+                                                  {
+                                                    pybind11::gil_scoped_acquire gil;
+                                                    delete py_object_ptr;
+                                                  });
 
     value = std::shared_ptr<scalopus::TraceEventSource>(py_obj_ptr, base_ptr.get());
     return true;

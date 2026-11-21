@@ -35,6 +35,7 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+
 #include "scalopus_interface/destination.h"
 #include "scalopus_interface/endpoint.h"
 

@@ -28,9 +28,10 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_tracing/lttng_provider.h"
-#include "scalopus_tracing/lttng_source.h"
 
 #include <sstream>
+
+#include "scalopus_tracing/lttng_source.h"
 
 namespace scalopus
 {

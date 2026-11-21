@@ -28,11 +28,13 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_interface.h"
+
 #include <pybind11/chrono.h>
 #include <pybind11/functional.h>
 #include <scalopus_interface/endpoint_manager.h>
 #include <scalopus_interface/trace_event_provider.h>
 #include <scalopus_interface/trace_event_source.h>
+
 #include "json_util.h"
 
 namespace scalopus
@@ -54,7 +56,7 @@ bool pyToData(const py::object& obj, Data& outgoing)
     // Buffer is no longer convertible to std::vector<uint8_t>.
     // https://github.com/pybind/pybind11/issues/1807
     py::buffer_info info(py::buffer(obj).request());
-    const char* data = reinterpret_cast<const char *>(info.ptr);
+    const char* data = reinterpret_cast<const char*>(info.ptr);
     const std::size_t length = static_cast<size_t>(info.size);
     outgoing.clear();
     outgoing.resize(length);
@@ -191,9 +193,8 @@ void add_scalopus_interface(py::module& m)
   transport_interface.def("isConnected", &Transport::isConnected);
   transport_interface.def("getAddress", &Transport::getAddress);
   transport_interface.def("broadcast", &Transport::broadcast);
-  transport_interface.def("request", [](Transport& transport, const std::string& name, const py::object& outgoing) {
-    return std::make_shared<PendingResponse>(transport.request(name, pyToData(outgoing)));
-  });
+  transport_interface.def("request", [](Transport& transport, const std::string& name, const py::object& outgoing)
+                          { return std::make_shared<PendingResponse>(transport.request(name, pyToData(outgoing))); });
   //  transport_interface.def("setLogger", &Transport::setLogger);  // causes deadlocks when python shuts down.
 
   py::class_<Endpoint, PyEndpoint, Endpoint::Ptr> py_endpoint(interface, "Endpoint");
@@ -218,23 +219,28 @@ void add_scalopus_interface(py::module& m)
 
   py::class_<EndpointManager, EndpointManager::Ptr> endpoint_manager(interface, "EndpointManager");
   endpoint_manager.def("endpoints", &EndpointManager::endpoints, py::return_value_policy::copy);
-  endpoint_manager.def("addEndpointFactory", [](EndpointManager& manager, std::string name, py::object fun) {
-    manager.addEndpointFactory(name, [fun](const Transport::Ptr& transport) {
-      pybind11::gil_scoped_acquire gil;
-      py::object result_py = fun(transport);
-      if (py::isinstance<py::none>(result_py))
-      {
-        // python side returned none... provider went weak.
-        return Endpoint::Ptr{};
-      }
-      Endpoint::Ptr endpoint = result_py.cast<Endpoint::Ptr>();
-      if (endpoint == nullptr)
-      {
-        throw py::value_error("Could not cast returned object to Endpoint.");
-      }
-      return endpoint;
-    });
-  });
+  endpoint_manager.def("addEndpointFactory",
+                       [](EndpointManager& manager, std::string name, py::object fun)
+                       {
+                         manager.addEndpointFactory(name,
+                                                    [fun](const Transport::Ptr& transport)
+                                                    {
+                                                      pybind11::gil_scoped_acquire gil;
+                                                      py::object result_py = fun(transport);
+                                                      if (py::isinstance<py::none>(result_py))
+                                                      {
+                                                        // python side returned none... provider went weak.
+                                                        return Endpoint::Ptr{};
+                                                      }
+                                                      Endpoint::Ptr endpoint = result_py.cast<Endpoint::Ptr>();
+                                                      if (endpoint == nullptr)
+                                                      {
+                                                        throw py::value_error(
+                                                            "Could not cast returned object to Endpoint.");
+                                                      }
+                                                      return endpoint;
+                                                    });
+                       });
 
   py::class_<TransportFactory, TransportFactory::Ptr> transport_factory(interface, "TransportFactory");
   transport_factory.def("discover", &TransportFactory::discover);

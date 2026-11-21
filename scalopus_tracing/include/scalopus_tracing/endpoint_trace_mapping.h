@@ -31,6 +31,7 @@
 #define SCALOPUS_TRACING_ENDPOINT_TRACE_MAPPING_H
 
 #include <scalopus_interface/transport.h>
+
 #include <map>
 #include <string>
 #include <unordered_map>

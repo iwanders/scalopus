@@ -28,6 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_catapult.h"
+
 #include <pybind11/stl.h>
 #include <scalopus_catapult/catapult_server.h>
 
@@ -42,12 +43,16 @@ void add_scalopus_catapult(py::module& m)
   catapult_server.def(py::init<>());
   catapult_server.def("addProvider", &CatapultServer::addProvider, py::keep_alive<1, 2>());
   catapult_server.def("setSeasocksWarningLogger", &CatapultServer::setSeasocksWarningLogger);
-  catapult_server.def("setLogger", [](CatapultServer& server, py::object fun) {
-    server.setLogger([fun](const std::string& str) {
-      pybind11::gil_scoped_acquire gil;
-      fun(str);
-    });
-  });
+  catapult_server.def("setLogger",
+                      [](CatapultServer& server, py::object fun)
+                      {
+                        server.setLogger(
+                            [fun](const std::string& str)
+                            {
+                              pybind11::gil_scoped_acquire gil;
+                              fun(str);
+                            });
+                      });
 
   catapult_server.def("setMaxBuffersize", &CatapultServer::setMaxBuffersize);
   catapult_server.def("start", [](CatapultServer& server, int port) { server.start(port); }, py::arg("port") = 9222);

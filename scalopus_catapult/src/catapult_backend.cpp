@@ -150,8 +150,10 @@ void CatapultBackend::makeSession(ss::WebSocket* ws)
     // New sessions, create the tracing session to use.
     // This function must only sent if the websocket is actually still availble to send to...
     // To guarantee this we create a weak pointer to the trace session, which we capture in the lambda.
-    auto response_function = [ws, this](const std::string& data) {
-      auto runnable = [ws, data, this]() {
+    auto response_function = [ws, this](const std::string& data)
+    {
+      auto runnable = [ws, data, this]()
+      {
         // lock the session mutex, technically this is not necessary as this function is executed from the server thread
         // and connections will not be closed or opened while this function is executing.
         std::lock_guard<std::mutex> session_lock(session_mutex_);

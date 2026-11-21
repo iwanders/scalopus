@@ -28,6 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "endpoint_native_trace_receiver.h"
+
 #include <iostream>
 namespace scalopus
 {

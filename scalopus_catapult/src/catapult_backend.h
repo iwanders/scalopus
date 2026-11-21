@@ -30,6 +30,7 @@
 #ifndef SCALOPUS_CATAPULT_CATAPULT_BACKEND_H
 #define SCALOPUS_CATAPULT_CATAPULT_BACKEND_H
 
+#include <scalopus_interface/trace_event_provider.h>
 #include <seasocks/PageHandler.h>
 #include <seasocks/WebSocket.h>
 #include <seasocks/util/PathHandler.h>
@@ -43,7 +44,6 @@
 #include <string>
 #include <thread>
 
-#include <scalopus_interface/trace_event_provider.h>
 #include "trace_session.h"
 
 namespace scalopus

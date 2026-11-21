@@ -28,9 +28,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_catapult/catapult_server.h"
+
 #include <seasocks/IgnoringLogger.h>
 #include <seasocks/PrintfLogger.h>
 #include <seasocks/Server.h>
+
 #include "catapult_backend.h"
 
 namespace scalopus
@@ -71,7 +73,8 @@ void CatapultServer::start(const int port)
 
   // Set the function that's to be used to execute functions on the seasocks thread.
   backend_->setExecutor(
-      [weak_server = std::weak_ptr<ss::Server>(server_)](scalopus::CatapultBackend::Runnable&& runnable) {
+      [weak_server = std::weak_ptr<ss::Server>(server_)](scalopus::CatapultBackend::Runnable&& runnable)
+      {
         auto server = weak_server.lock();
         if (server != nullptr)
         {

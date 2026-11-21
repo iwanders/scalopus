@@ -32,6 +32,7 @@
 #define SCALOPUS_CATAPULT_TRACE_SESSION_H
 
 #include <scalopus_interface/trace_event_source.h>
+
 #include <functional>
 #include <list>
 #include <mutex>

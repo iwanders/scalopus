@@ -33,11 +33,13 @@
 #include <cbor/stl.h>
 #include <scalopus_general/map_tracker.h>
 #include <scalopus_interface/types.h>
+
 #include <chrono>
 #include <map>
 #include <mutex>
 #include <string>
 #include <vector>
+
 #include "spsc_ringbuffer.h"
 namespace scalopus
 {

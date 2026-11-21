@@ -28,6 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_general.h"
+
 #include <pybind11/functional.h>
 #include <pybind11/stl.h>
 #include <scalopus_general/endpoint_manager_poll.h>
@@ -52,13 +53,15 @@ void add_scalopus_general(py::module& m)
   endpoint_process_info_info.def_readwrite("name", &EndpointProcessInfo::ProcessInfo::name);
   endpoint_process_info_info.def_readwrite("pid", &EndpointProcessInfo::ProcessInfo::pid);
   endpoint_process_info_info.def_readwrite("threads", &EndpointProcessInfo::ProcessInfo::threads);
-  endpoint_process_info_info.def("to_dict", [](const EndpointProcessInfo::ProcessInfo& p) {
-    auto dict = py::dict();
-    dict["name"] = p.name;
-    dict["threads"] = p.threads;
-    dict["pid"] = p.pid;
-    return dict;
-  });
+  endpoint_process_info_info.def("to_dict",
+                                 [](const EndpointProcessInfo::ProcessInfo& p)
+                                 {
+                                   auto dict = py::dict();
+                                   dict["name"] = p.name;
+                                   dict["threads"] = p.threads;
+                                   dict["pid"] = p.pid;
+                                   return dict;
+                                 });
 
   py::class_<EndpointProcessInfo, EndpointProcessInfo::Ptr, Endpoint> endpoint_process_info(general,
                                                                                             "EndpointProcessInfo");

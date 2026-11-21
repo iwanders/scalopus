@@ -28,6 +28,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_general/internal/thread_name_tracker.h"
+
 #include <scalopus_general/destructor_callback.h>
 
 namespace scalopus

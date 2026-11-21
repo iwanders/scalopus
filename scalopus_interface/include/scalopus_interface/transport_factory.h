@@ -32,6 +32,7 @@
 
 #include <memory>
 #include <vector>
+
 #include "scalopus_interface/destination.h"
 #include "scalopus_interface/transport.h"
 

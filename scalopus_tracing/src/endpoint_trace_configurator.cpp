@@ -29,6 +29,7 @@
 */
 #include <scalopus_tracing/endpoint_trace_configurator.h>
 #include <scalopus_tracing/trace_configurator.h>
+
 #include <iostream>
 #include <nlohmann/json.hpp>
 

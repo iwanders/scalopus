@@ -55,7 +55,7 @@ add_subdirectory(scalopus_catapult)
 add_subdirectory(scalopus_python)
 
 file(GLOB_RECURSE FORMAT_SRC_FILES  "${PROJECT_SOURCE_DIR}/scalopus*/**.h"  "${PROJECT_SOURCE_DIR}/scalopus*/**.cpp")
-add_custom_target(clang_format_scalopus COMMAND clang-format-7 -i ${FORMAT_SRC_FILES})
+add_custom_target(clang_format_scalopus COMMAND clang-format-19 -i ${FORMAT_SRC_FILES})
 
 # Write version file
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake

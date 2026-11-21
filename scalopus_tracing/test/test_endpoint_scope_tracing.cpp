@@ -28,7 +28,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <scalopus_transport/transport_loopback.h>
+
 #include <iostream>
+
 #include "scalopus_tracing/tracing.h"
 
 template <typename A, typename B>

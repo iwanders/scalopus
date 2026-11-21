@@ -31,6 +31,7 @@
 #define SCALOPUS_GENERAL_ENDPOINT_PROCESS_INFO_H
 
 #include <scalopus_interface/transport.h>
+
 #include <map>
 #include <string>
 

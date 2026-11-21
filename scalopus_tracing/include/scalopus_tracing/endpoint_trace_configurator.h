@@ -31,6 +31,7 @@
 #define SCALOPUS_TRACING_ENDPOINT_TRACE_CONFIGURATOR_H
 
 #include <scalopus_interface/transport.h>
+
 #include <map>
 #include <string>
 
@@ -47,11 +48,11 @@ public:
 
   struct TraceConfiguration
   {
-    bool process_state{ false };                 //!< Are traces for this process enabled?
-    bool set_process_state{ false };             //!< Are we setting the process state?
+    bool process_state{ false };      //!< Are traces for this process enabled?
+    bool set_process_state{ false };  //!< Are we setting the process state?
 
-    bool new_thread_state{ false };                 //!< Are traces for new threads enabled?
-    bool set_new_thread_state{ false };             //!< Are we setting the new thread state?
+    bool new_thread_state{ false };      //!< Are traces for new threads enabled?
+    bool set_new_thread_state{ false };  //!< Are we setting the new thread state?
 
     std::map<unsigned long, bool> thread_state;  //!< Thread state, true = tracing enabled.
     bool cmd_success{ false };

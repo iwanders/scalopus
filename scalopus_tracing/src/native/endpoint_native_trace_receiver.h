@@ -31,8 +31,10 @@
 #define SCALOPUS_TRACING_ENDPOINT_NATIVE_TRACE_RECEIVER_H
 
 #include <scalopus_interface/transport.h>
+
 #include <map>
 #include <string>
+
 #include "scalopus_tracing/native_trace_provider.h"
 
 namespace scalopus

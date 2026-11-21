@@ -32,6 +32,7 @@
 
 #include <scalopus_interface/trace_event_source.h>
 #include <scalopus_tracing/babeltrace_tool.h>
+
 #include "scalopus_tracing/lttng_provider.h"
 
 namespace scalopus

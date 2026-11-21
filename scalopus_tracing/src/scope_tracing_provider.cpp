@@ -28,7 +28,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_tracing/scope_tracing_provider.h"
+
 #include <scalopus_general/endpoint_process_info.h>
+
 #include <sstream>
 
 namespace scalopus

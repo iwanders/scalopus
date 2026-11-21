@@ -36,15 +36,14 @@
 #endif
 #include <scalopus_tracing/native_trace_provider.h>
 #include <scalopus_transport/transport_unix.h>
-
-#include "scalopus_catapult/catapult_server.h"
+#include <signal.h>
 
 #include <chrono>
+#include <cstdlib>
 #include <iostream>
 #include <thread>
 
-#include <signal.h>
-#include <cstdlib>
+#include "scalopus_catapult/catapult_server.h"
 
 // Signal handling.
 bool running{ true };

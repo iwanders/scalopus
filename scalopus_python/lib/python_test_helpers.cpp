@@ -30,7 +30,9 @@
 #include <pybind11/stl.h>
 #include <scalopus_catapult/catapult_server.h>
 #include <scalopus_tracing/tracing.h>
+
 #include <thread>
+
 #include "json_util.h"
 #include "scalopus_catapult.h"
 
@@ -67,10 +69,12 @@ public:
   }
   void stage_destroy(int ms)
   {
-    thread_ = std::thread([&]() {
-      std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-      source.reset();
-    });
+    thread_ = std::thread(
+        [&]()
+        {
+          std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+          source.reset();
+        });
     thread_running_ = true;
   }
   void join()

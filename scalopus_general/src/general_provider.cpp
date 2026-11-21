@@ -28,9 +28,10 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_general/general_provider.h"
-#include "scalopus_general/general_source.h"
 
 #include <sstream>
+
+#include "scalopus_general/general_source.h"
 
 namespace scalopus
 {

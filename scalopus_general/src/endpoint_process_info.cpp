@@ -29,12 +29,12 @@
 */
 #include <scalopus_general/endpoint_process_info.h>
 #include <scalopus_general/internal/thread_name_tracker.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #include <cstring>
 #include <iostream>
 #include <nlohmann/json.hpp>
-
-#include <sys/types.h>
-#include <unistd.h>
 
 namespace scalopus
 {

@@ -32,6 +32,7 @@
 
 #include <scalopus_interface/transport_factory.h>
 #include <scalopus_transport/transport_loopback.h>
+
 #include <future>
 #include <map>
 #include <memory>

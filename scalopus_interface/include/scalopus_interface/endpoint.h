@@ -31,6 +31,7 @@
 #define SCALOPUS_INTERFACE_ENDPOINT_H
 
 #include <scalopus_interface/types.h>
+
 #include <memory>
 #include <string>
 #include <vector>

@@ -27,12 +27,12 @@
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include <scalopus_tracing/tracing.h>
+#include <scalopus_transport/transport_unix.h>
+
 #include <chrono>
 #include <iostream>
 #include <thread>
-
-#include <scalopus_tracing/tracing.h>
-#include <scalopus_transport/transport_unix.h>
 
 // This example, adapted from the readme_example.cpp file shows how the
 // TRACING_CONFIG_THREAD_STATE_RAII macro can be used to disable and enable tracepoints for any lower scopes.

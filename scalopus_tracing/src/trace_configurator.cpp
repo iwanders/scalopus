@@ -34,7 +34,7 @@ namespace scalopus
 {
 TraceConfigurator::TraceConfigurator()
 {
-  process_state_ = std::make_shared<std::atomic_bool>(true);  // default to enabled.
+  process_state_ = std::make_shared<std::atomic_bool>(true);     // default to enabled.
   new_thread_state_ = std::make_shared<std::atomic_bool>(true);  // default to enabled.
 }
 
@@ -44,13 +44,15 @@ TraceConfigurator::AtomicBoolPtr TraceConfigurator::getThreadStatePtr()
 
   //  Register a destructor callback such that the thread gets removed from the map when the thread exits.
   auto instance_pointer = getInstance();
-  thread_local auto cleanup = DestructorCallback([instance = TraceConfigurator::WeakPtr(instance_pointer), tid]() {
-    auto ptr = instance.lock();
-    if (ptr != nullptr)
-    {
-      ptr->removeThread(tid);
-    }
-  });
+  thread_local auto cleanup = DestructorCallback(
+      [instance = TraceConfigurator::WeakPtr(instance_pointer), tid]()
+      {
+        auto ptr = instance.lock();
+        if (ptr != nullptr)
+        {
+          ptr->removeThread(tid);
+        }
+      });
   std::lock_guard<decltype(threads_map_mutex_)> lock(threads_map_mutex_);
   auto it = thread_state_.find(tid);
   if (it != thread_state_.end())

@@ -28,11 +28,13 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "scalopus_general/endpoint_manager_poll.h"
+
 #include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <thread>
+
 #include "scalopus_general/endpoint_introspect.h"
 
 namespace scalopus
@@ -40,9 +42,8 @@ namespace scalopus
 EndpointManagerPoll::EndpointManagerPoll(const TransportFactory::Ptr factory) : factory_(factory)
 {
   std::lock_guard<std::mutex> lock(mutex_);
-  endpoint_factories_[EndpointIntrospect::name] = [](const auto& transport) {
-    return EndpointIntrospect::factory(transport);
-  };
+  endpoint_factories_[EndpointIntrospect::name] = [](const auto& transport)
+  { return EndpointIntrospect::factory(transport); };
 }
 
 EndpointManagerPoll::~EndpointManagerPoll()
