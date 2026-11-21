@@ -71,7 +71,7 @@ configure_file(
 # The following does look a bit fragile... but it works for now.
 # It can find the scalopus_python_lib library because that's present in the working directory.
 add_custom_target(test_python_module_run
-  COMMAND python3 -m unittest discover
+  COMMAND python3 -u -m unittest discover
   DEPENDS scalopus_python_lib
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 add_test(NAME python_test COMMAND make test_python_module_run

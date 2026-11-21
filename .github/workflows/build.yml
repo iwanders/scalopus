@@ -19,10 +19,10 @@ jobs:
         run: |
           cd build
           cmake  -D SCALOPUS_USE_PYTHON2=off -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-      - name: make
+      - name: make -jN
         run: |
           cd build
-          make
+          make -j$(nproc)
       - name: ctest .
         run: |
           cd build
