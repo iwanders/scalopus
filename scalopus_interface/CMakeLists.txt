@@ -15,7 +15,6 @@ target_include_directories(scalopus_interface
 )
 add_library(Scalopus::scalopus_interface ALIAS scalopus_interface)
 
-
 # Interface for providers, requires exposing nlohmann_json.
 add_library(scalopus_consumer SHARED
   src/trace_event_source.cpp
@@ -28,18 +27,23 @@ target_include_directories(scalopus_consumer
 )
 target_link_libraries(scalopus_consumer
   PUBLIC
-    nlohmann_json::nlohmann_json
     Scalopus::scalopus_interface
 )
 add_library(Scalopus::scalopus_consumer ALIAS scalopus_consumer)
 
+# For the vendored version, we actually need to install it with this newer version of cmake.
+set(SCALOPUS_INTERFACE_INSTALL_TARGETS scalopus_interface scalopus_consumer)
+if(NOT SCALOPUS_USE_EXTERNAL_JSON)
+    list(APPEND INSTALL_TARGETS nlohmann_json)
+endif()
 
 export(
-  TARGETS scalopus_interface scalopus_consumer
+  TARGETS ${SCALOPUS_INTERFACE_INSTALL_TARGETS}
   NAMESPACE Scalopus::
   FILE ${SCALOPUS_EXPORT_CMAKE_DIR}/ScalopusInterfaceConfig.cmake
 )
-install(TARGETS scalopus_interface scalopus_consumer EXPORT ScalopusInterfaceConfig
+
+install(TARGETS ${SCALOPUS_INTERFACE_INSTALL_TARGETS} EXPORT ScalopusInterfaceConfig
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scalopus_interface/)

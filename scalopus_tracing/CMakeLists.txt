@@ -13,7 +13,7 @@ add_library(scalopus_scope_tracing SHARED
 )
 set_property(TARGET scalopus_scope_tracing PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_include_directories(scalopus_scope_tracing
-  PUBLIC 
+  PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_tracing/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE
@@ -41,14 +41,14 @@ if (SCALOPUS_BUILD_TRACING_LTTNG)
   endif()
 
   if (LTTngUST_FOUND)
-    # Create the library that provides the scope tracepoints 
+    # Create the library that provides the scope tracepoints
     add_library(scalopus_tracepoint_lttng SHARED
       src/lttng/lttng_tracepoint.cpp
     )
     target_compile_features(scalopus_tracepoint_lttng PRIVATE cxx_relaxed_constexpr)
     target_compile_options(scalopus_tracepoint_lttng PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
     target_include_directories(scalopus_tracepoint_lttng
-      PUBLIC 
+      PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_tracing/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lttng/include>
@@ -68,7 +68,7 @@ if (SCALOPUS_BUILD_TRACING_LTTNG)
       src/scope_trace_raii.cpp)
     add_library(Scalopus::scalopus_tracing_lttng ALIAS scalopus_tracing_lttng)
     target_include_directories(scalopus_tracing_lttng
-      PUBLIC 
+      PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_tracing/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
       PRIVATE
@@ -89,13 +89,13 @@ else()
     message(WARNING "Building scalopus_tracing_lttng is disabled via SCALOPUS_BUILD_TRACING_LTTNG")
 endif()
 
-# Create the library that provides the scope tracepoints 
+# Create the library that provides the scope tracepoints
 add_library(scalopus_tracepoint_native SHARED
   src/native/native_tracepoint.cpp
 )
 target_compile_options(scalopus_tracepoint_native PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_include_directories(scalopus_tracepoint_native
-  PUBLIC 
+  PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_tracing/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/native/include>
@@ -122,7 +122,7 @@ target_link_libraries(scalopus_tracing_native
     Scalopus::scalopus_scope_tracing
 )
 target_include_directories(scalopus_tracing_native
-  PUBLIC 
+  PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_tracing/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE
@@ -136,7 +136,7 @@ add_library(scalopus_tracepoint_nop SHARED
 target_compile_features(scalopus_tracepoint_nop PRIVATE cxx_relaxed_constexpr)
 target_compile_options(scalopus_tracepoint_nop PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_include_directories(scalopus_tracepoint_nop
-  PUBLIC 
+  PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_tracing/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/nop/include>
@@ -158,7 +158,7 @@ target_link_libraries(scalopus_tracing_nop
     Scalopus::scalopus_scope_tracing
 )
 target_include_directories(scalopus_tracing_nop
-  PUBLIC 
+  PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_tracing/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE
@@ -178,7 +178,7 @@ target_link_libraries(scalopus_lttng_babeltrace
     Threads::Threads
 )
 target_include_directories(scalopus_lttng_babeltrace
-  PUBLIC 
+  PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_tracing/include_consumer>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include_consumer>
   PRIVATE
@@ -198,7 +198,7 @@ add_library(scalopus_tracing_consumer
 )
 target_compile_options(scalopus_tracing_consumer PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_include_directories(scalopus_tracing_consumer
-  PUBLIC 
+  PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_tracing/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include_consumer>
@@ -241,4 +241,3 @@ install(
   DESTINATION ${SCALOPUS_INSTALL_EXPORT_CMAKE_DIR}
 )
 add_subdirectory(test)
-

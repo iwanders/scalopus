@@ -9,7 +9,7 @@ target_compile_options(scalopus_general PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_compile_features(scalopus_general PUBLIC cxx_relaxed_constexpr)
 
 target_include_directories(scalopus_general
-  PUBLIC 
+  PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_general/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE
@@ -32,7 +32,7 @@ add_library(scalopus_general_consumer SHARED
 )
 target_compile_options(scalopus_general_consumer PRIVATE ${SCALOPUS_COMPILE_OPTIONS})
 target_include_directories(scalopus_general_consumer
-  PUBLIC 
+  PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_general/include_consumer>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include_consumer>
   PRIVATE
