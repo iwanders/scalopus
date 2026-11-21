@@ -7,7 +7,7 @@ add_library(scalopus_catapult SHARED
 )
 
 target_include_directories(scalopus_catapult
-  PUBLIC 
+  PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/scalopus_catapult/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE
@@ -38,7 +38,7 @@ endif()
 
 
 export(
-  TARGETS scalopus_catapult
+  TARGETS scalopus_catapult seasocks # IW; not sure why this is necessary... perhaps because we link against a shared object?
   NAMESPACE Scalopus::
   FILE ${SCALOPUS_EXPORT_CMAKE_DIR}/ScalopusCatapultConfig.cmake
 )

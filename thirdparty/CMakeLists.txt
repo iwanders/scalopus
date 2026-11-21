@@ -20,6 +20,7 @@ if(SCALOPUS_USE_EXTERNAL_SEASOCKS)
 else()
   set(UNITTESTS OFF CACHE INTERNAL "")
   set(SEASOCKS_EXAMPLE_APP OFF CACHE INTERNAL "")
+  set(BUILD_SHARED_LIBS ON)
   add_subdirectory(thirdparty/seasocks)
 endif()
 
